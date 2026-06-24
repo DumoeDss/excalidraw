@@ -1,0 +1,22 @@
+{
+  "pipeline": "small-feature",
+  "classification": "small-feature",
+  "tier": "B",
+  "notes": "LEAD authors propose+apply (holds full design + media-node context). Author!=verifier enforced via an independent reviewer subagent for verify/review-loop. Gates auto-continued per explicit user pre-authorization ('不要停下').",
+  "decisions": {
+    "generation": "async job + poll",
+    "models": "dynamic fetch (onListGeneratorModels)",
+    "panel": "render hook (host-rendered, renderGeneratorPanel)",
+    "refs": "uploaded files + canvas element selection"
+  },
+  "stages": {
+    "propose": { "status": "done", "worker": { "role": "lead", "agentId": "lead" } },
+    "apply": { "status": "pending" },
+    "verify": { "status": "pending" },
+    "review-loop": { "status": "pending" },
+    "ship": { "status": "pending" },
+    "archive": { "status": "pending" }
+  },
+  "rounds": 0,
+  "openFindings": []
+}
