@@ -187,6 +187,35 @@ export type ExcalidrawMediaElement =
   | ExcalidrawAudioElement
   | ExcalidrawVideoElement;
 
+/**
+ * Generator nodes — an image/video/audio element that also remembers how it
+ * was generated (prompt/model/params/refs) and its async job state. Stored
+ * under `element.customData.generator`. See `isGeneratorElement` and the
+ * generator helpers.
+ */
+export type GeneratorKind = "image" | "audio" | "video";
+
+export type GeneratorRef =
+  | { type: "url"; url: string }
+  | { type: "file"; url: string }
+  | { type: "element"; elementId: string };
+
+export type GeneratorState =
+  | { status: "idle" }
+  // live progress is kept transiently in the editor, not persisted on the element
+  | { status: "pending"; jobId: string }
+  | { status: "done" }
+  | { status: "error"; message?: string };
+
+export type GeneratorConfig = {
+  kind: GeneratorKind;
+  prompt: string;
+  model: string | null;
+  params: Record<string, string | number | boolean>;
+  refs: GeneratorRef[];
+  state: GeneratorState;
+};
+
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;

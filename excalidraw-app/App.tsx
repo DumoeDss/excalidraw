@@ -116,6 +116,12 @@ import {
 
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { uploadMediaFile } from "./data/media";
+import {
+  listGeneratorModels,
+  submitGenerator,
+  pollGenerator,
+} from "./data/generators";
+import { GeneratorPanel } from "./components/GeneratorPanel";
 import { FileStatusStore } from "./data/fileStatusStore";
 import {
   importFromLocalStorage,
@@ -915,6 +921,10 @@ const ExcalidrawWrapper = () => {
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         onMediaUpload={(file) => uploadMediaFile(file)}
+        onListGeneratorModels={(kind) => listGeneratorModels(kind)}
+        onGeneratorSubmit={(req) => submitGenerator(req)}
+        onGeneratorPoll={(jobId) => pollGenerator(jobId)}
+        renderGeneratorPanel={(ctx) => <GeneratorPanel {...ctx} />}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,

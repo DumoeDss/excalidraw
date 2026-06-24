@@ -54,6 +54,8 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import { newGeneratorConfig } from "@excalidraw/element";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -71,6 +73,7 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   StrokeRoundness,
+  GeneratorConfig,
 } from "@excalidraw/element/types";
 
 import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
@@ -412,6 +415,33 @@ const restoreElementWithProperties = <
   return ret;
 };
 
+/**
+ * Normalizes a restored generator config: defaults any missing fields and
+ * coerces a stale "pending" job back to "idle" (no client can poll a job it
+ * didn't submit, so an in-flight job does not survive a reload).
+ */
+const normalizeGeneratorCustomData = (
+  element: ExcalidrawElement,
+): ExcalidrawElement["customData"] => {
+  const customData = element.customData;
+  const generator = (
+    customData as { generator?: Partial<GeneratorConfig> } | undefined
+  )?.generator;
+  if (!generator) {
+    return customData;
+  }
+  const kind = generator.kind ?? "image";
+  const normalized: GeneratorConfig = {
+    ...newGeneratorConfig(kind),
+    ...generator,
+    state:
+      !generator.state || generator.state.status === "pending"
+        ? { status: "idle" }
+        : generator.state,
+  };
+  return { ...customData, generator: normalized };
+};
+
 export const restoreElement = (
   /** element to be restored */
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
@@ -494,17 +524,20 @@ export const restoreElement = (
         fileId: element.fileId,
         scale: element.scale || [1, 1],
         crop: element.crop ?? null,
+        customData: normalizeGeneratorCustomData(element),
       });
     case "video":
       return restoreElementWithProperties(element, {
         src: element.src ?? null,
         status: element.status || "saved",
         poster: element.poster ?? null,
+        customData: normalizeGeneratorCustomData(element),
       });
     case "audio":
       return restoreElementWithProperties(element, {
         src: element.src ?? null,
         status: element.status || "saved",
+        customData: normalizeGeneratorCustomData(element),
       });
     case "line":
     // @ts-ignore LEGACY type

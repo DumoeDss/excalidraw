@@ -147,6 +147,10 @@ import {
   isEmbeddableElement,
   isMediaElement,
   isVideoElement,
+  isGeneratorElement,
+  getGeneratorConfig,
+  newGeneratorConfig,
+  withGeneratorConfig,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -239,6 +243,7 @@ import {
   Scene,
   Store,
   CaptureUpdateAction,
+  type CaptureUpdateActionType,
   type ElementUpdate,
   hitElementBoundingBox,
   isLineElement,
@@ -288,6 +293,10 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawMediaElement,
+  GeneratorKind,
+  GeneratorConfig,
+  GeneratorState,
+  GeneratorRef,
   Ordered,
   MagicGenerationData,
   ExcalidrawArrowElement,
@@ -501,6 +510,8 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  GeneratorModel,
+  GeneratorPanelContext,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -665,6 +676,16 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+
+  // generator nodes: in-flight jobs (abortable) + per-kind model cache
+  private generatorJobs = new Map<string, AbortController>();
+  private generatorModelControllers = new Set<AbortController>();
+  private generatorModels = new Map<
+    GeneratorKind,
+    GeneratorModel[] | "loading" | "error"
+  >();
+  // state to restore if a generation is cancelled (e.g. a prior "done")
+  private generatorPriorState = new Map<string, GeneratorState>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
@@ -1976,6 +1997,142 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  /**
+   * Renders the generator DOM layer above the canvas: a status badge for any
+   * generator node mid-generation / errored, and the host-provided panel for
+   * the single selected generator node. Both anchor to the node and track
+   * zoom/pan.
+   */
+  private renderGeneratorLayer() {
+    const generatorElements = this.scene
+      .getNonDeletedElements()
+      .filter(isGeneratorElement);
+
+    if (!generatorElements.length) {
+      return null;
+    }
+
+    const selectedElementIds = this.state.selectedElementIds;
+    const selectedCount = Object.keys(selectedElementIds).length;
+    const scale = this.state.zoom.value;
+
+    return (
+      <>
+        {generatorElements.map((el) => {
+          const config = getGeneratorConfig(el);
+          if (!config) {
+            return null;
+          }
+
+          const isVisible = isElementInViewport(
+            el,
+            this.state.width,
+            this.state.height,
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          if (!isVisible) {
+            return null;
+          }
+
+          const status = config.state.status;
+          const isSelected = selectedCount === 1 && !!selectedElementIds[el.id];
+          const showBadge = status === "pending" || status === "error";
+          const showPanel = isSelected && !!this.props.renderGeneratorPanel;
+
+          if (!showBadge && !showPanel) {
+            return null;
+          }
+
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: el.x, sceneY: el.y },
+            this.state,
+          );
+          const left = x - this.state.offsetLeft;
+          const top = y - this.state.offsetTop;
+
+          let panel: React.ReactNode = null;
+          if (showPanel) {
+            // models are loaded in componentDidUpdate on selection
+            const ctx: GeneratorPanelContext = {
+              element: el,
+              config,
+              models: this.generatorModels.get(config.kind) ?? "loading",
+              setConfig: (patch) => this.updateGeneratorConfig(el, patch),
+              addFileRefs: () => this.addGeneratorFileRefs(el),
+              addSelectionRefs: () => this.addGeneratorSelectionRefs(el),
+              removeRef: (index) => this.removeGeneratorRef(el, index),
+              generate: () => this.startGeneration(el),
+              cancel: () => this.cancelGeneration(el),
+            };
+            panel = this.props.renderGeneratorPanel!(ctx);
+          }
+
+          const progress = this.generatorProgress.get(el.id) ?? null;
+
+          return (
+            <div
+              key={el.id}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                transform: `translate(${left}px, ${top}px)`,
+                pointerEvents: "none",
+                zIndex: 4,
+              }}
+            >
+              {showBadge && (
+                <div
+                  style={{
+                    position: "absolute",
+                    transform: `scale(${scale})`,
+                    transformOrigin: "top left",
+                    padding: "4px 8px",
+                    borderRadius: 6,
+                    fontSize: 12,
+                    whiteSpace: "nowrap",
+                    color: "#fff",
+                    background:
+                      status === "error"
+                        ? "rgba(180,30,30,0.85)"
+                        : "rgba(0,0,0,0.7)",
+                  }}
+                >
+                  {status === "pending"
+                    ? progress != null
+                      ? `Generating… ${Math.round(progress * 100)}%`
+                      : "Generating…"
+                    : `Error: ${
+                        config.state.status === "error"
+                          ? config.state.message ?? "generation failed"
+                          : ""
+                      }`}
+                </div>
+              )}
+              {panel && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: `${el.height * scale + 8}px`,
+                    pointerEvents: "all",
+                    background: "var(--island-bg-color, #fff)",
+                    border: "1px solid var(--default-border-color, #e9ecef)",
+                    borderRadius: 8,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
+                    padding: 12,
+                  }}
+                >
+                  {panel}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </>
+    );
+  }
+
   private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
     return `${this.id}-frame-name-${frameElement.id}`;
   };
@@ -2547,6 +2704,7 @@ class App extends React.Component<AppProps, AppState> {
                         </ExcalidrawActionManagerContext.Provider>
                         {this.renderEmbeddables()}
                         {this.renderMediaPlayers()}
+                        {this.renderGeneratorLayer()}
                       </ExcalidrawElementsContext.Provider>
                     </ExcalidrawAppStateContext.Provider>
                   </ExcalidrawSetAppStateContext.Provider>
@@ -3304,6 +3462,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    // abort any in-flight generator jobs / model fetches so their callbacks
+    // don't write to the destroyed component
+    this.generatorJobs.forEach((controller) => controller.abort());
+    this.generatorJobs.clear();
+    this.generatorModelControllers.forEach((controller) => controller.abort());
+    this.generatorModelControllers.clear();
+    this.generatorProgress.clear();
+    this.generatorPriorState.clear();
+
     // we're recreating the api object reference so that the
     // <ExcalidrawAPIContext.Provider/> picks up on it
     this.api = { ...this.api, isDestroyed: true };
@@ -3517,6 +3684,19 @@ class App extends React.Component<AppProps, AppState> {
       this._initialized = true;
       this.editorLifecycleEvents.emit("editor:initialize", this.api);
       this.props.onInitialize?.(this.api);
+    }
+
+    // lazily load generator models when a generator node becomes selected
+    // (guarded internally so it fetches at most once per kind)
+    if (this.state.selectedElementIds !== prevState.selectedElementIds) {
+      const selectedIds = Object.keys(this.state.selectedElementIds);
+      if (selectedIds.length === 1) {
+        const selected = this.scene.getNonDeletedElement(selectedIds[0]);
+        const generatorConfig = getGeneratorConfig(selected);
+        if (generatorConfig && this.props.renderGeneratorPanel) {
+          this.loadGeneratorModels(generatorConfig.kind);
+        }
+      }
     }
 
     this.appStateObserver.flush(prevState);
@@ -12323,6 +12503,463 @@ class App extends React.Component<AppProps, AppState> {
       // resets the (transient) media tool back to selection
       this.actionManager.executeAction(actionFinalize);
     });
+  };
+
+  // ---------------------------------------------------------------------------
+  // Generator nodes
+  // ---------------------------------------------------------------------------
+
+  /** transient (non-persisted) per-element generation progress 0..1 */
+  private generatorProgress = new Map<string, number>();
+
+  /** Lazily fetch + cache the model list for a kind (safe to call from render). */
+  private loadGeneratorModels = (kind: GeneratorKind): void => {
+    if (this.generatorModels.has(kind)) {
+      return;
+    }
+    if (!this.props.onListGeneratorModels) {
+      this.generatorModels.set(kind, "error");
+      return;
+    }
+    this.generatorModels.set(kind, "loading");
+    const controller = new AbortController();
+    this.generatorModelControllers.add(controller);
+    this.props
+      .onListGeneratorModels(kind, { signal: controller.signal })
+      .then((models) => {
+        this.generatorModelControllers.delete(controller);
+        if (this.unmounted) {
+          return;
+        }
+        this.generatorModels.set(kind, models);
+        this.setState({});
+      })
+      .catch(() => {
+        this.generatorModelControllers.delete(controller);
+        if (this.unmounted) {
+          return;
+        }
+        this.generatorModels.set(kind, "error");
+        this.setState({});
+      });
+  };
+
+  private updateGeneratorConfig = (
+    element: ExcalidrawElement,
+    patch: Partial<GeneratorConfig>,
+    captureUpdate: CaptureUpdateActionType = CaptureUpdateAction.EVENTUALLY,
+  ) => {
+    const current = getGeneratorConfig(element);
+    if (!current) {
+      return;
+    }
+    this.scene.mutateElement(element, {
+      customData: withGeneratorConfig(element, { ...current, ...patch }),
+    });
+    // config edits + transient state changes coalesce (EVENTUALLY); a committed
+    // result is captured discretely (IMMEDIATELY) by applyGeneratorResult
+    this.store.scheduleAction(captureUpdate);
+    this.setState({});
+  };
+
+  /** Resolve refs to data the backend can consume (element refs → media URLs). */
+  private resolveGeneratorRefs = (
+    refs: readonly GeneratorRef[],
+  ): GeneratorRef[] => {
+    const resolved: GeneratorRef[] = [];
+    for (const ref of refs) {
+      if (ref.type === "url" || ref.type === "file") {
+        resolved.push(ref);
+        continue;
+      }
+      const el = this.scene.getElement(ref.elementId);
+      if (!el) {
+        continue;
+      }
+      if (isMediaElement(el) && el.src) {
+        resolved.push({ type: "url", url: el.src });
+      } else if (isInitializedImageElement(el) && this.files[el.fileId]) {
+        resolved.push({ type: "url", url: this.files[el.fileId].dataURL });
+      } else {
+        console.warn(
+          `Generator reference ${ref.elementId} (type "${el.type}") is not directly usable and was skipped.`,
+        );
+      }
+    }
+    return resolved;
+  };
+
+  private startGeneration = async (element: ExcalidrawElement) => {
+    const config = getGeneratorConfig(element);
+    if (!config) {
+      return;
+    }
+    if (!this.props.onGeneratorSubmit || !this.props.onGeneratorPoll) {
+      this.updateGeneratorConfig(element, {
+        state: { status: "error", message: "Generation is not configured" },
+      });
+      return;
+    }
+    if (!config.model) {
+      this.updateGeneratorConfig(element, {
+        state: { status: "error", message: "No model selected" },
+      });
+      return;
+    }
+
+    this.cancelGeneration(element);
+
+    // remember the committed state so a later cancel can restore it
+    this.generatorPriorState.set(
+      element.id,
+      config.state.status === "done" ? { status: "done" } : { status: "idle" },
+    );
+
+    const controller = new AbortController();
+    this.generatorJobs.set(element.id, controller);
+    this.generatorProgress.delete(element.id);
+
+    const refs = this.resolveGeneratorRefs(config.refs);
+    this.updateGeneratorConfig(element, {
+      state: { status: "pending", jobId: "" },
+    });
+
+    try {
+      const { jobId } = await this.props.onGeneratorSubmit(
+        {
+          kind: config.kind,
+          prompt: config.prompt,
+          model: config.model,
+          params: config.params,
+          refs,
+        },
+        { signal: controller.signal },
+      );
+      const live = this.scene.getNonDeletedElement(element.id);
+      if (controller.signal.aborted || !live) {
+        this.generatorJobs.delete(element.id);
+        controller.abort();
+        return;
+      }
+      this.updateGeneratorConfig(live, {
+        state: { status: "pending", jobId },
+      });
+      this.pollGeneration(element.id, jobId, controller);
+    } catch (error: any) {
+      if (controller.signal.aborted) {
+        return;
+      }
+      this.generatorJobs.delete(element.id);
+      const el = this.scene.getElement(element.id);
+      if (el) {
+        this.updateGeneratorConfig(el, {
+          state: {
+            status: "error",
+            message: error?.message || "Submit failed",
+          },
+        });
+      }
+    }
+  };
+
+  private pollGeneration = (
+    elementId: string,
+    jobId: string,
+    controller: AbortController,
+  ) => {
+    const POLL_INTERVAL = 1500;
+    const MAX_POLLS = 400; // ~10 min ceiling
+    let polls = 0;
+
+    const tick = async () => {
+      if (controller.signal.aborted || !this.props.onGeneratorPoll) {
+        return;
+      }
+      // NOTE: deletion is a soft-delete (element stays in elementsMap), so we
+      // must use getNonDeletedElement to detect a deleted node and stop.
+      const element = this.scene.getNonDeletedElement(elementId);
+      if (!element) {
+        // node deleted mid-job → abort and ignore
+        this.generatorJobs.delete(elementId);
+        controller.abort();
+        return;
+      }
+      if (polls++ >= MAX_POLLS) {
+        this.generatorJobs.delete(elementId);
+        this.updateGeneratorConfig(element, {
+          state: { status: "error", message: "Generation timed out" },
+        });
+        return;
+      }
+      try {
+        const result = await this.props.onGeneratorPoll(jobId, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) {
+          return;
+        }
+        const el = this.scene.getNonDeletedElement(elementId);
+        if (!el) {
+          this.generatorJobs.delete(elementId);
+          controller.abort();
+          return;
+        }
+        if (result.status === "pending") {
+          if (result.progress != null) {
+            this.generatorProgress.set(elementId, result.progress);
+            this.setState({});
+          }
+          window.setTimeout(tick, POLL_INTERVAL);
+        } else if (result.status === "done") {
+          this.generatorJobs.delete(elementId);
+          this.generatorProgress.delete(elementId);
+          await this.applyGeneratorResult(el, result.url);
+        } else {
+          this.generatorJobs.delete(elementId);
+          this.generatorProgress.delete(elementId);
+          this.updateGeneratorConfig(el, {
+            state: { status: "error", message: result.message },
+          });
+        }
+      } catch (error: any) {
+        if (controller.signal.aborted) {
+          return;
+        }
+        this.generatorJobs.delete(elementId);
+        const el = this.scene.getNonDeletedElement(elementId);
+        if (el) {
+          this.updateGeneratorConfig(el, {
+            state: {
+              status: "error",
+              message: error?.message || "Poll failed",
+            },
+          });
+        }
+      }
+    };
+
+    window.setTimeout(tick, POLL_INTERVAL);
+  };
+
+  private cancelGeneration = (element: ExcalidrawElement) => {
+    const controller = this.generatorJobs.get(element.id);
+    if (controller) {
+      controller.abort();
+      this.generatorJobs.delete(element.id);
+    }
+    this.generatorProgress.delete(element.id);
+    const config = getGeneratorConfig(element);
+    if (config && config.state.status === "pending") {
+      // restore the prior committed state (e.g. a previous "done") if any
+      const prior = this.generatorPriorState.get(element.id) ?? {
+        status: "idle",
+      };
+      this.updateGeneratorConfig(element, { state: prior });
+    }
+    this.generatorPriorState.delete(element.id);
+  };
+
+  private applyGeneratorResult = async (
+    element: ExcalidrawElement,
+    url: string,
+  ) => {
+    const config = getGeneratorConfig(element);
+    if (!config) {
+      return;
+    }
+    this.generatorPriorState.delete(element.id);
+
+    if (element.type === "video" || element.type === "audio") {
+      const live = this.scene.getNonDeletedElement(element.id);
+      if (!live || (live.type !== "video" && live.type !== "audio")) {
+        return;
+      }
+      this.scene.mutateElement(live, {
+        src: url,
+        status: "saved",
+        customData: withGeneratorConfig(live, {
+          ...config,
+          state: { status: "done" },
+        }),
+      });
+      // a committed result is a discrete, undoable step
+      this.store.scheduleAction(CaptureUpdateAction.IMMEDIATELY);
+      this.setState({});
+      return;
+    }
+
+    if (element.type === "image") {
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const mimeType = (blob.type ||
+          MIME_TYPES.png) as BinaryFileData["mimeType"];
+        const file = new File([blob], "generated", { type: mimeType });
+        const fileId = (await (this.props.generateIdForFile?.(file) ||
+          generateIdFromFile(file))) as FileId;
+        const dataURL = await getDataURL(file);
+        this.addFiles([
+          {
+            mimeType,
+            id: fileId,
+            dataURL,
+            created: Date.now(),
+            lastRetrieved: Date.now(),
+          },
+        ]);
+
+        const el = this.scene.getNonDeletedElement(element.id);
+        if (!el || el.type !== "image") {
+          return;
+        }
+
+        // load the generated image into the cache so we can read its natural
+        // size — addFiles/addNewImagesToImageCache only loads files referenced
+        // by an *initialized* (fileId-bearing) image, which `el` is not yet.
+        const initialized = newElementWith(el, {
+          fileId,
+        }) as InitializedExcalidrawImageElement;
+        await this.updateImageCache([initialized]);
+        const imageHTML = await this.imageCache.get(fileId)?.image;
+
+        // resize the node to the generated image's natural aspect ratio
+        // (the idle placeholder is square)
+        let dimensions: {
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+          crop: ExcalidrawImageElement["crop"];
+        } | null = null;
+        if (imageHTML) {
+          dimensions = this.getImageNaturalDimensions(el, imageHTML);
+        }
+
+        // re-check liveness after the awaits
+        const liveEl = this.scene.getNonDeletedElement(element.id);
+        if (!liveEl || liveEl.type !== "image") {
+          return;
+        }
+        this.scene.mutateElement(liveEl, {
+          fileId,
+          status: "saved",
+          ...(dimensions ?? {}),
+          customData: withGeneratorConfig(liveEl, {
+            ...config,
+            state: { status: "done" },
+          }),
+        });
+        this.store.scheduleAction(CaptureUpdateAction.IMMEDIATELY);
+        this.setState({});
+      } catch (error: any) {
+        const el = this.scene.getNonDeletedElement(element.id);
+        if (el) {
+          this.updateGeneratorConfig(el, {
+            state: {
+              status: "error",
+              message: error?.message || "Failed to load result",
+            },
+          });
+        }
+      }
+    }
+  };
+
+  private addGeneratorFileRefs = async (element: ExcalidrawElement) => {
+    const config = getGeneratorConfig(element);
+    if (!config) {
+      return;
+    }
+    try {
+      const files = await fileOpen({
+        description: "Reference",
+        mimeTypes: ["image/*", "audio/*", "video/*"],
+        multiple: true,
+      });
+      const newRefs: GeneratorRef[] = [];
+      for (const file of files) {
+        const { url } = this.props.onMediaUpload
+          ? await this.props.onMediaUpload(file)
+          : { url: URL.createObjectURL(file) };
+        newRefs.push({ type: "file", url });
+      }
+      const el = this.scene.getElement(element.id) ?? element;
+      const latest = getGeneratorConfig(el) ?? config;
+      this.updateGeneratorConfig(el, { refs: [...latest.refs, ...newRefs] });
+    } catch (error: any) {
+      if (error?.name !== "AbortError") {
+        console.error(error);
+      }
+    }
+  };
+
+  private addGeneratorSelectionRefs = (element: ExcalidrawElement) => {
+    const config = getGeneratorConfig(element);
+    if (!config) {
+      return;
+    }
+    const selectedIds = Object.keys(this.state.selectedElementIds).filter(
+      (id) => id !== element.id && this.state.selectedElementIds[id],
+    );
+    if (!selectedIds.length) {
+      return;
+    }
+    // dedupe against element refs already present
+    const existing = new Set(
+      config.refs.flatMap((ref) =>
+        ref.type === "element" ? [ref.elementId] : [],
+      ),
+    );
+    const newRefs: GeneratorRef[] = selectedIds
+      .filter((elementId) => !existing.has(elementId))
+      .map((elementId) => ({ type: "element", elementId }));
+    if (!newRefs.length) {
+      return;
+    }
+    this.updateGeneratorConfig(element, { refs: [...config.refs, ...newRefs] });
+  };
+
+  private removeGeneratorRef = (element: ExcalidrawElement, index: number) => {
+    const config = getGeneratorConfig(element);
+    if (!config) {
+      return;
+    }
+    this.updateGeneratorConfig(element, {
+      refs: config.refs.filter((_, i) => i !== index),
+    });
+  };
+
+  public createGeneratorNode = (kind: GeneratorKind) => {
+    const clientX = this.state.width / 2 + this.state.offsetLeft;
+    const clientY = this.state.height / 2 + this.state.offsetTop;
+    const { x, y } = viewportCoordsToSceneCoords(
+      { clientX, clientY },
+      this.state,
+    );
+
+    const base =
+      kind === "image"
+        ? this.newImagePlaceholder({ sceneX: x, sceneY: y })
+        : this.newMediaPlaceholder({ sceneX: x, sceneY: y, kind });
+    const node = newElementWith(base, {
+      customData: { generator: newGeneratorConfig(kind) },
+    });
+
+    this.insertNewElements([node]);
+    this.setState(
+      {
+        selectedElementIds: makeNextSelectedElementIds(
+          { [node.id]: true },
+          this.state,
+        ),
+        activeTool: updateActiveTool(this.state, {
+          type: this.state.preferredSelectionTool.type,
+        }),
+      },
+      () => {
+        this.actionManager.executeAction(actionFinalize);
+      },
+    );
   };
 
   /** Reads a video file's natural pixel dimensions via a temporary element. */

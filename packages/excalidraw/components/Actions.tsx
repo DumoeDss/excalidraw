@@ -70,6 +70,7 @@ import {
   EmbedIcon,
   VideoIcon,
   AudioIcon,
+  ImageIcon,
   extraToolsIcon,
   frameToolIcon,
   mermaidLogoIcon,
@@ -1289,6 +1290,31 @@ export const ShapesSwitcher = ({
             >
               {t("toolBar.magicframe")}
             </DropdownMenu.Item>
+          )}
+          {!!app.props.renderGeneratorPanel && (
+            <>
+              <DropdownMenu.Item
+                onSelect={() => app.createGeneratorNode("image")}
+                icon={ImageIcon}
+                data-testid="toolbar-image-generator"
+              >
+                {t("toolBar.imageGenerator")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => app.createGeneratorNode("audio")}
+                icon={AudioIcon}
+                data-testid="toolbar-audio-generator"
+              >
+                {t("toolBar.audioGenerator")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => app.createGeneratorNode("video")}
+                icon={VideoIcon}
+                data-testid="toolbar-video-generator"
+              >
+                {t("toolBar.videoGenerator")}
+              </DropdownMenu.Item>
+            </>
           )}
         </DropdownMenu.Content>
       </DropdownMenu>

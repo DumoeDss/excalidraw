@@ -105,6 +105,11 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     showDeprecatedFonts,
     renderScrollbars,
     imageOptions,
+    onMediaUpload,
+    onListGeneratorModels,
+    onGeneratorSubmit,
+    onGeneratorPoll,
+    renderGeneratorPanel,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -224,6 +229,11 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
           imageOptions={normalizedImageOptions}
+          onMediaUpload={onMediaUpload}
+          onListGeneratorModels={onListGeneratorModels}
+          onGeneratorSubmit={onGeneratorSubmit}
+          onGeneratorPoll={onGeneratorPoll}
+          renderGeneratorPanel={renderGeneratorPanel}
         >
           {children}
         </App>
@@ -392,6 +402,14 @@ export type {
   SavedChat,
   SavedChats,
 } from "./components/TTDDialog/types";
+
+export type {
+  GeneratorParam,
+  GeneratorModel,
+  GeneratorRequest,
+  GeneratorPoll,
+  GeneratorPanelContext,
+} from "./types";
 
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export {

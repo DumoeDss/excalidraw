@@ -33,6 +33,9 @@ import type {
   ExcalidrawNonSelectionElement,
   BindMode,
   ExcalidrawTextElement,
+  GeneratorKind,
+  GeneratorRef,
+  GeneratorConfig,
 } from "@excalidraw/element/types";
 
 import type {
@@ -569,6 +572,70 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+// -----------------------------------------------------------------------------
+// Generator nodes — backend-agnostic AI generation contract (host-implemented)
+// -----------------------------------------------------------------------------
+
+/** A single host-configurable parameter, used to (optionally) render typed
+ *  controls in a host generator panel. */
+export type GeneratorParam =
+  | {
+      type: "select";
+      key: string;
+      label: string;
+      options: { value: string; label: string }[];
+      default?: string;
+    }
+  | {
+      type: "number";
+      key: string;
+      label: string;
+      min?: number;
+      max?: number;
+      step?: number;
+      default?: number;
+    }
+  | { type: "boolean"; key: string; label: string; default?: boolean }
+  | { type: "string"; key: string; label: string; default?: string };
+
+export type GeneratorModel = {
+  id: string;
+  label: string;
+  kind: GeneratorKind;
+  params?: GeneratorParam[];
+};
+
+export type GeneratorRequest = {
+  kind: GeneratorKind;
+  prompt: string;
+  model: string;
+  params: Record<string, string | number | boolean>;
+  refs: GeneratorRef[];
+};
+
+export type GeneratorPoll =
+  | { status: "pending"; progress?: number }
+  | { status: "done"; url: string }
+  | { status: "error"; message?: string };
+
+/** Passed to `renderGeneratorPanel`; the host renders the form, the library
+ *  owns anchoring, the job lifecycle, and result wiring. */
+export type GeneratorPanelContext = {
+  element: NonDeletedExcalidrawElement;
+  config: GeneratorConfig;
+  models: GeneratorModel[] | "loading" | "error";
+  setConfig: (
+    patch: Partial<
+      Pick<GeneratorConfig, "prompt" | "model" | "params" | "refs">
+    >,
+  ) => void;
+  addFileRefs: () => Promise<void>;
+  addSelectionRefs: () => void;
+  removeRef: (index: number) => void;
+  generate: () => void;
+  cancel: () => void;
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -664,6 +731,29 @@ export interface ExcalidrawProps {
    * object URL (does not survive reload / won't work for collaborators).
    */
   onMediaUpload?: (file: File) => MaybePromise<{ url: string }>;
+  /**
+   * Generator nodes — all optional and backend-agnostic. When omitted,
+   * generator nodes still render as normal media/image nodes.
+   */
+  /** Dynamically list the models (and their param schema) for a kind. */
+  onListGeneratorModels?: (
+    kind: GeneratorKind,
+    opts: { signal: AbortSignal },
+  ) => Promise<GeneratorModel[]>;
+  /** Create an async generation job; returns a job id to poll. */
+  onGeneratorSubmit?: (
+    req: GeneratorRequest,
+    opts: { signal: AbortSignal },
+  ) => Promise<{ jobId: string }>;
+  /** Poll a generation job for status / result. */
+  onGeneratorPoll?: (
+    jobId: string,
+    opts: { signal: AbortSignal },
+  ) => Promise<GeneratorPoll>;
+  /** Render the generation panel for a selected generator node. The library
+   *  anchors it to the node and owns the job lifecycle; the host renders the
+   *  form. */
+  renderGeneratorPanel?: (ctx: GeneratorPanelContext) => JSX.Element | null;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
@@ -842,6 +932,7 @@ export type AppClassProperties = {
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
+  createGeneratorNode: App["createGeneratorNode"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];

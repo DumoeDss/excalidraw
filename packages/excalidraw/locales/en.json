@@ -333,6 +333,9 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "imageGenerator": "Image generator",
+    "audioGenerator": "Audio generator",
+    "videoGenerator": "Video generator",
     "convertElementType": "Toggle shape type"
   },
   "element": {

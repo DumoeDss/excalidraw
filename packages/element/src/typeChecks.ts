@@ -84,6 +84,18 @@ export const isMediaElement = (
   return !!element && (element.type === "video" || element.type === "audio");
 };
 
+export const isGeneratorElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawImageElement | ExcalidrawMediaElement => {
+  return (
+    !!element &&
+    (element.type === "image" ||
+      element.type === "video" ||
+      element.type === "audio") &&
+    !!(element.customData as { generator?: unknown } | undefined)?.generator
+  );
+};
+
 export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
