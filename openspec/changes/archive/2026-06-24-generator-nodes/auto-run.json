@@ -14,8 +14,8 @@
     "apply": { "status": "done", "worker": { "role": "lead", "agentId": "lead" }, "selfCheck": "typecheck+eslint+prettier+fullsuite green (106 files/1420 tests)" },
     "verify": { "status": "done", "worker": { "role": "reviewer", "agentId": "a30beec021b9119e7" }, "result": "1 Blocker, 3 Major, 6 Minor, 3 Trivial" },
     "review-loop": { "status": "done", "worker": { "role": "reviewer", "agentId": "a30beec021b9119e7" }, "note": "round 1: LEAD fixed all 1 Blocker + 3 Major + 6 Minor + 3 Trivial; non-author re-review (twice) confirmed every Blocker/Major resolved — clean." },
-    "ship": { "status": "in_progress" },
-    "archive": { "status": "pending" }
+    "ship": { "status": "done", "worker": { "role": "lead", "agentId": "lead" }, "commits": ["dce7de6f", "02606725"] },
+    "archive": { "status": "done" }
   },
   "rounds": 1,
   "openFindings": [],
