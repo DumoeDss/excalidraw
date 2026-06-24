@@ -35,3 +35,50 @@
   background-color: #121212;
   color: #ced4da;
 }
+
+// AI generator nodes — DOM overlay chrome (status badge + host panel anchor).
+// The host-provided panel owns its own card styling; the library only
+// positions it and renders the in-progress / error badge.
+@keyframes excalidraw-generator-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.excalidraw {
+  .excalidraw-generator-panel-anchor {
+    position: absolute;
+    pointer-events: all;
+  }
+
+  .excalidraw-generator-badge {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--color-surface-lowest);
+    background: var(--color-primary);
+    box-shadow: var(--shadow-island);
+  }
+
+  .excalidraw-generator-badge--error {
+    color: #fff;
+    background: var(--color-danger-darker);
+  }
+
+  .excalidraw-generator-badge__spinner {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    animation: excalidraw-generator-spin 0.7s linear infinite;
+  }
+}

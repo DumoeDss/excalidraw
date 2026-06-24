@@ -2084,44 +2084,36 @@ class App extends React.Component<AppProps, AppState> {
             >
               {showBadge && (
                 <div
+                  className={clsx("excalidraw-generator-badge", {
+                    "excalidraw-generator-badge--error": status === "error",
+                  })}
                   style={{
-                    position: "absolute",
                     transform: `scale(${scale})`,
                     transformOrigin: "top left",
-                    padding: "4px 8px",
-                    borderRadius: 6,
-                    fontSize: 12,
-                    whiteSpace: "nowrap",
-                    color: "#fff",
-                    background:
-                      status === "error"
-                        ? "rgba(180,30,30,0.85)"
-                        : "rgba(0,0,0,0.7)",
                   }}
                 >
-                  {status === "pending"
-                    ? progress != null
-                      ? `Generating… ${Math.round(progress * 100)}%`
-                      : "Generating…"
-                    : `Error: ${
-                        config.state.status === "error"
-                          ? config.state.message ?? "generation failed"
-                          : ""
-                      }`}
+                  {status === "pending" ? (
+                    <>
+                      <span className="excalidraw-generator-badge__spinner" />
+                      <span>
+                        {progress != null
+                          ? `Generating… ${Math.round(progress * 100)}%`
+                          : "Generating…"}
+                      </span>
+                    </>
+                  ) : (
+                    <span>
+                      {config.state.status === "error"
+                        ? config.state.message ?? "Generation failed"
+                        : "Generation failed"}
+                    </span>
+                  )}
                 </div>
               )}
               {panel && (
                 <div
-                  style={{
-                    position: "absolute",
-                    top: `${el.height * scale + 8}px`,
-                    pointerEvents: "all",
-                    background: "var(--island-bg-color, #fff)",
-                    border: "1px solid var(--default-border-color, #e9ecef)",
-                    borderRadius: 8,
-                    boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
-                    padding: 12,
-                  }}
+                  className="excalidraw-generator-panel-anchor"
+                  style={{ top: `${el.height * scale + 12}px` }}
                 >
                   {panel}
                 </div>
