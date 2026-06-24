@@ -15,6 +15,10 @@ interface ImportMetaEnv {
   VITE_APP_PORTAL_URL: string;
   VITE_APP_AI_BACKEND: string;
 
+  // backend that accepts a media file upload and returns a persistent URL.
+  // when unset, uploads fall back to a local object-URL (dev mock only).
+  VITE_APP_UPLOAD_BACKEND: string;
+
   VITE_APP_FIREBASE_CONFIG: string;
 
   // whether to disable live reload / HMR. Usuaully what you want to do when

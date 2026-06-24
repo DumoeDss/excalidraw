@@ -443,6 +443,40 @@ const renderElementToSvg = (
       addToRoot(g || wrapper, element);
       break;
     }
+    case "video":
+    case "audio": {
+      // media is played via a DOM overlay in the editor; for static SVG export
+      // we emit a neutral rounded-rect placeholder.
+      const node = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      const opacity = element.opacity / 100;
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      rect.setAttribute("x", "0");
+      rect.setAttribute("y", "0");
+      rect.setAttribute("width", `${element.width}`);
+      rect.setAttribute("height", `${element.height}`);
+      rect.setAttribute("rx", `${radius}`);
+      rect.setAttribute("ry", `${radius}`);
+      rect.setAttribute(
+        "fill",
+        renderConfig.theme === THEME.DARK ? "#2E2E2E" : "#E7E7E7",
+      );
+      node.appendChild(rect);
+      if (opacity !== 1) {
+        node.setAttribute("opacity", `${opacity}`);
+      }
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      addToRoot(node, element);
+      break;
+    }
     case "image": {
       const width = Math.round(element.width);
       const height = Math.round(element.height);

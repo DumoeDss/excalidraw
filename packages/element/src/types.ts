@@ -160,6 +160,33 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   "fileId"
 >;
 
+/** Status of the underlying media file w.r.t. the upload backend. */
+export type MediaStatus = "uploading" | "saved" | "error";
+
+export type ExcalidrawVideoElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "video";
+    /** persistent, publicly-accessible URL returned by the upload backend.
+        `null` while uploading or on error. */
+    src: string | null;
+    status: MediaStatus;
+    /** optional poster/preview image URL shown before playback / on export */
+    poster: string | null;
+  }>;
+
+export type ExcalidrawAudioElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "audio";
+    /** persistent, publicly-accessible URL returned by the upload backend.
+        `null` while uploading or on error. */
+    src: string | null;
+    status: MediaStatus;
+  }>;
+
+export type ExcalidrawMediaElement =
+  | ExcalidrawAudioElement
+  | ExcalidrawVideoElement;
+
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
@@ -196,6 +223,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
+  | ExcalidrawMediaElement
   | ExcalidrawSelectionElement;
 
 /**
@@ -213,7 +241,9 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawVideoElement
+  | ExcalidrawAudioElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -264,6 +294,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawImageElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
+  | ExcalidrawVideoElement
+  | ExcalidrawAudioElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement;
 

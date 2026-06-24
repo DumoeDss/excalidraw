@@ -151,6 +151,8 @@ export type ToolType =
   | "freedraw"
   | "text"
   | "image"
+  | "video"
+  | "audio"
   | "eraser"
   | "hand"
   | "frame"
@@ -655,6 +657,13 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  /**
+   * Uploads an audio/video file and resolves to its persistent, publicly
+   * accessible URL. The host app decides how/where to store it (local disk,
+   * object storage, etc.). When not provided, the editor falls back to a local
+   * object URL (does not survive reload / won't work for collaborators).
+   */
+  onMediaUpload?: (file: File) => MaybePromise<{ url: string }>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,

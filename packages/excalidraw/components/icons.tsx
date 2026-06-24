@@ -481,6 +481,32 @@ export const EmbedIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+// tabler-icons: movie
+export const VideoIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+    <path d="M8 4l0 16" />
+    <path d="M16 4l0 16" />
+    <path d="M4 8l4 0" />
+    <path d="M4 16l4 0" />
+    <path d="M4 12l16 0" />
+    <path d="M16 8l4 0" />
+    <path d="M16 16l4 0" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
+// tabler-icons: music
+export const AudioIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+    <path d="M13 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+    <path d="M9 17v-13h10v9" />
+    <path d="M9 8h10" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 export const DuplicateIcon = createIcon(
   <g strokeWidth="1.25">
     <path d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z" />

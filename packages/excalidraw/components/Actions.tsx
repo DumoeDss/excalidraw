@@ -68,6 +68,8 @@ import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
   EmbedIcon,
+  VideoIcon,
+  AudioIcon,
   extraToolsIcon,
   frameToolIcon,
   mermaidLogoIcon,
@@ -1231,6 +1233,22 @@ export const ShapesSwitcher = ({
             selected={embeddableToolSelected}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "video" })}
+            icon={VideoIcon}
+            data-testid="toolbar-video"
+            selected={activeTool.type === "video"}
+          >
+            {t("toolBar.video")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "audio" })}
+            icon={AudioIcon}
+            data-testid="toolbar-audio"
+            selected={activeTool.type === "audio"}
+          >
+            {t("toolBar.audio")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}

@@ -115,6 +115,7 @@ import {
 } from "./data";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
+import { uploadMediaFile } from "./data/media";
 import { FileStatusStore } from "./data/fileStatusStore";
 import {
   importFromLocalStorage,
@@ -913,6 +914,7 @@ const ExcalidrawWrapper = () => {
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
+        onMediaUpload={(file) => uploadMediaFile(file)}
         UIOptions={{
           canvasActions: {
             toggleTheme: true,

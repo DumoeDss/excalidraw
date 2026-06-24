@@ -44,6 +44,8 @@ import type {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
+  ExcalidrawVideoElement,
+  ExcalidrawAudioElement,
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -542,5 +544,36 @@ export const newImageElement = (
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
     crop: opts.crop ?? null,
+  };
+};
+
+export const newVideoElement = (
+  opts: {
+    status?: ExcalidrawVideoElement["status"];
+    src?: ExcalidrawVideoElement["src"];
+    poster?: ExcalidrawVideoElement["poster"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawVideoElement> => {
+  return {
+    ..._newElementBase<ExcalidrawVideoElement>("video", opts),
+    // media has no hand-drawn stroke/fill; render a neutral placeholder
+    strokeColor: "transparent",
+    src: opts.src ?? null,
+    status: opts.status ?? "uploading",
+    poster: opts.poster ?? null,
+  };
+};
+
+export const newAudioElement = (
+  opts: {
+    status?: ExcalidrawAudioElement["status"];
+    src?: ExcalidrawAudioElement["src"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawAudioElement> => {
+  return {
+    ..._newElementBase<ExcalidrawAudioElement>("audio", opts),
+    strokeColor: "transparent",
+    src: opts.src ?? null,
+    status: opts.status ?? "uploading",
   };
 };

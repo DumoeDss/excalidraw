@@ -12,17 +12,19 @@ type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
+  /** raw mime types (e.g. "video/mp4"), merged with those derived from
+      `extensions`. Useful for types not present in MIME_TYPES (audio/video). */
+  mimeTypes?: string[];
   description: string;
   multiple?: M;
 }): Promise<M extends false | undefined ? File : File[]> => {
   // an unsafe TS hack, alas not much we can do AFAIK
   type RetType = M extends false | undefined ? File : File[];
 
-  const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
-    mimeTypes.push(MIME_TYPES[type]);
-
-    return mimeTypes;
-  }, [] as string[]);
+  const mimeTypes = [
+    ...(opts.mimeTypes ?? []),
+    ...(opts.extensions?.map((type) => MIME_TYPES[type]) ?? []),
+  ];
 
   const extensions = opts.extensions?.reduce((acc, ext) => {
     if (ext === "jpg") {

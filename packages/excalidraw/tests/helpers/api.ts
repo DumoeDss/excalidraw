@@ -17,6 +17,8 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
+  newVideoElement,
+  newAudioElement,
 } from "@excalidraw/element";
 
 import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element";
@@ -38,6 +40,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
+  MediaStatus,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -203,7 +206,13 @@ export class API {
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
-    status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
+    status?: T extends "image"
+      ? ExcalidrawImageElement["status"]
+      : T extends "video" | "audio"
+      ? MediaStatus
+      : never;
+    src?: T extends "video" | "audio" ? string : never;
+    poster?: T extends "video" ? string : never;
     startBinding?: T extends "arrow"
       ? ExcalidrawArrowElement["startBinding"] | ExcalidrawElbowArrowElement["startBinding"]
       : never;
@@ -352,8 +361,28 @@ export class API {
           height,
           type,
           fileId: (rest.fileId as string as FileId) ?? null,
-          status: rest.status || "saved",
+          status:
+            (rest.status as ExcalidrawImageElement["status"]) || "saved",
           scale: rest.scale || [1, 1],
+        });
+        break;
+      case "video":
+        element = newVideoElement({
+          ...base,
+          width,
+          height,
+          src: ((rest as any).src as string) ?? null,
+          status: ((rest as any).status as MediaStatus) || "saved",
+          poster: ((rest as any).poster as string) ?? null,
+        });
+        break;
+      case "audio":
+        element = newAudioElement({
+          ...base,
+          width,
+          height,
+          src: ((rest as any).src as string) ?? null,
+          status: ((rest as any).status as MediaStatus) || "saved",
         });
         break;
       case "frame":

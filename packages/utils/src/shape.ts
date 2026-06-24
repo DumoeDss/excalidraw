@@ -48,6 +48,7 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawMediaElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -108,6 +109,7 @@ type RectangularElement =
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawImageElement
+  | ExcalidrawMediaElement
   | ExcalidrawIframeElement
   | ExcalidrawTextElement
   | ExcalidrawSelectionElement;

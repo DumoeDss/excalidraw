@@ -29,6 +29,9 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawVideoElement,
+  ExcalidrawAudioElement,
+  ExcalidrawMediaElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -61,6 +64,24 @@ export const isIframeLikeElement = (
   return (
     !!element && (element.type === "iframe" || element.type === "embeddable")
   );
+};
+
+export const isVideoElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawVideoElement => {
+  return !!element && element.type === "video";
+};
+
+export const isAudioElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawAudioElement => {
+  return !!element && element.type === "audio";
+};
+
+export const isMediaElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawMediaElement => {
+  return !!element && (element.type === "video" || element.type === "audio");
 };
 
 export const isTextElement = (
@@ -218,6 +239,8 @@ export const isRectangularElement = (
     element != null &&
     (element.type === "rectangle" ||
       element.type === "image" ||
+      element.type === "video" ||
+      element.type === "audio" ||
       element.type === "text" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
@@ -261,6 +284,8 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
+    case "video":
+    case "audio":
     case "selection": {
       return true;
     }

@@ -130,6 +130,8 @@ import {
   newArrowElement,
   newElement,
   newImageElement,
+  newVideoElement,
+  newAudioElement,
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
@@ -143,6 +145,8 @@ import {
   isFrameLikeElement,
   isImageElement,
   isEmbeddableElement,
+  isMediaElement,
+  isVideoElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
@@ -283,6 +287,7 @@ import type {
   IframeData,
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawMediaElement,
   Ordered,
   MagicGenerationData,
   ExcalidrawArrowElement,
@@ -1859,6 +1864,118 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  /**
+   * Renders interactive HTML5 <video>/<audio> players as a DOM overlay above
+   * the canvas, positioned to track zoom/pan/rotation (mirrors how embeddables
+   * are rendered). The static-canvas placeholder shows through until a media
+   * element has a persisted `src`.
+   *
+   * Per the chosen interaction model, the player's controls only become
+   * interactive (pointer-events) when the media element is the sole selection;
+   * otherwise pointer events fall through to the canvas so the node can be
+   * selected/moved/resized like any other element.
+   */
+  private renderMediaPlayers() {
+    const scale = this.state.zoom.value;
+    const normalizedWidth = this.state.width;
+    const normalizedHeight = this.state.height;
+
+    const mediaElements = this.scene
+      .getNonDeletedElements()
+      .filter((el): el is Ordered<NonDeleted<ExcalidrawMediaElement>> =>
+        isMediaElement(el),
+      );
+
+    const selectedElementIds = this.state.selectedElementIds;
+    const selectedCount = Object.keys(selectedElementIds).length;
+
+    return (
+      <>
+        {mediaElements.map((el) => {
+          // nothing to play yet → let the canvas placeholder show through
+          if (!el.src || el.status !== "saved") {
+            return null;
+          }
+
+          const isVisible = isElementInViewport(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+
+          if (!isVisible) {
+            return null;
+          }
+
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: el.x, sceneY: el.y },
+            this.state,
+          );
+
+          // controls interactive only when this is the sole selected element
+          const isInteractive =
+            selectedCount === 1 && !!selectedElementIds[el.id];
+
+          return (
+            <div
+              key={el.id}
+              className="excalidraw__embeddable-container"
+              style={{
+                transform: `translate(${x - this.state.offsetLeft}px, ${
+                  y - this.state.offsetTop
+                }px) scale(${scale})`,
+                display: "block",
+                opacity: getRenderOpacity(
+                  el,
+                  getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
+                  this.elementsPendingErasure,
+                  null,
+                  1,
+                ),
+                ["--embeddable-radius" as string]: `${getCornerRadius(
+                  Math.min(el.width, el.height),
+                  el,
+                )}px`,
+              }}
+            >
+              <div
+                className="excalidraw__embeddable-container__inner"
+                style={{
+                  width: `${el.width}px`,
+                  height: `${el.height}px`,
+                  transform: `rotate(${el.angle}rad)`,
+                  pointerEvents: isInteractive
+                    ? POINTER_EVENTS.enabled
+                    : POINTER_EVENTS.disabled,
+                }}
+              >
+                {isVideoElement(el) ? (
+                  <video
+                    className="excalidraw__embeddable"
+                    src={el.src}
+                    poster={el.poster ?? undefined}
+                    controls
+                    playsInline
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      background: "#000",
+                    }}
+                  />
+                ) : (
+                  <audio src={el.src} controls style={{ width: "100%" }} />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </>
+    );
+  }
+
   private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
     return `${this.id}-frame-name-${frameElement.id}`;
   };
@@ -2429,6 +2546,7 @@ class App extends React.Component<AppProps, AppState> {
                           )}
                         </ExcalidrawActionManagerContext.Provider>
                         {this.renderEmbeddables()}
+                        {this.renderMediaPlayers()}
                       </ExcalidrawElementsContext.Provider>
                     </ExcalidrawAppStateContext.Provider>
                   </ExcalidrawSetAppStateContext.Provider>
@@ -3737,6 +3855,19 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
+    }
+
+    // ------------------- Audio / Video -------------------
+    const mediaFiles = dataTransferFiles
+      .map((data) => data.file)
+      .filter(
+        (file): file is File =>
+          !!file &&
+          (file.type.startsWith("audio/") || file.type.startsWith("video/")),
+      );
+    if (mediaFiles.length > 0) {
+      await this.insertMediaFiles(mediaFiles, sceneX, sceneY);
+      return;
     }
 
     // ------------------- Images or SVG code -------------------
@@ -5558,6 +5689,10 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (nextActiveTool.type === "image") {
       this.onImageToolbarButtonClick();
+    }
+
+    if (nextActiveTool.type === "video" || nextActiveTool.type === "audio") {
+      this.onMediaToolbarButtonClick(nextActiveTool.type);
     }
 
     this.setState((prevState) => {
@@ -8063,7 +8198,11 @@ class App extends React.Component<AppProps, AppState> {
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
-      this.state.activeTool.type !== "image"
+      this.state.activeTool.type !== "image" &&
+      // media tools open a file picker on activation and never create an
+      // element via pointer-down
+      this.state.activeTool.type !== "video" &&
+      this.state.activeTool.type !== "audio"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -12047,6 +12186,224 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private newMediaPlaceholder = ({
+    sceneX,
+    sceneY,
+    kind,
+    addToFrameUnderCursor = true,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    kind: "audio" | "video";
+    addToFrameUnderCursor?: boolean;
+  }) => {
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
+    );
+
+    const topLayerFrame = addToFrameUnderCursor
+      ? this.getTopLayerFrameAtSceneCoords({ x: gridX, y: gridY })
+      : null;
+
+    const zoom = this.state.zoom.value;
+    // sensible defaults: 16:9 for video, a slim control bar for audio
+    const width = 320 / zoom;
+    const height = (kind === "video" ? 180 : 54) / zoom;
+
+    const base = {
+      backgroundColor: "transparent",
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: null,
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+      x: gridX - width / 2,
+      y: gridY - height / 2,
+      width,
+      height,
+    };
+
+    return kind === "video" ? newVideoElement(base) : newAudioElement(base);
+  };
+
+  private insertMediaFiles = async (
+    mediaFiles: File[],
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    const gridPadding = 50 / this.state.zoom.value;
+
+    // Insert "uploading" placeholders immediately for instant feedback
+    const placeholders = positionElementsOnGrid(
+      mediaFiles.map((file) =>
+        this.newMediaPlaceholder({
+          sceneX,
+          sceneY,
+          kind: file.type.startsWith("video/") ? "video" : "audio",
+        }),
+      ),
+      sceneX,
+      sceneY,
+      gridPadding,
+    );
+    this.insertNewElements(placeholders);
+    this.setState({
+      selectedElementIds: makeNextSelectedElementIds(
+        Object.fromEntries(placeholders.map((el) => [el.id, true])),
+        this.state,
+      ),
+    });
+
+    // Upload each file and swap in the persistent URL when it resolves.
+    // For videos, also resize the node to the media's natural aspect ratio.
+    const updated = await Promise.all(
+      placeholders.map(async (placeholder, i) => {
+        const file = mediaFiles[i];
+        try {
+          const [uploaded, naturalSize] = await Promise.all([
+            this.props.onMediaUpload
+              ? this.props.onMediaUpload(file)
+              : Promise.resolve({ url: URL.createObjectURL(file) }),
+            isVideoElement(placeholder)
+              ? this.getVideoNaturalSize(file)
+              : Promise.resolve(null),
+          ]);
+
+          let dimensions: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+          } | null = null;
+          if (naturalSize && naturalSize.width > 0 && naturalSize.height > 0) {
+            const maxWidth = 480 / this.state.zoom.value;
+            const width = Math.min(naturalSize.width, maxWidth);
+            const height = width * (naturalSize.height / naturalSize.width);
+            // keep the placeholder's center fixed
+            dimensions = {
+              x: placeholder.x + placeholder.width / 2 - width / 2,
+              y: placeholder.y + placeholder.height / 2 - height / 2,
+              width,
+              height,
+            };
+          }
+
+          return newElementWith(placeholder, {
+            src: uploaded.url,
+            status: "saved" as const,
+            ...(dimensions ?? {}),
+          });
+        } catch (error: any) {
+          this.setState({
+            errorMessage: error?.message || t("errors.imageInsertError"),
+          });
+          return newElementWith(placeholder, { status: "error" as const });
+        }
+      }),
+    );
+
+    const updatedMap = arrayToMap(updated);
+    const nextElements = this.scene
+      .getElementsIncludingDeleted()
+      .map((el) => updatedMap.get(el.id) ?? el);
+
+    this.updateScene({
+      elements: nextElements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    this.setState({}, () => {
+      // resets the (transient) media tool back to selection
+      this.actionManager.executeAction(actionFinalize);
+    });
+  };
+
+  /** Reads a video file's natural pixel dimensions via a temporary element. */
+  private getVideoNaturalSize = (
+    file: File,
+  ): Promise<{ width: number; height: number } | null> => {
+    return new Promise((resolve) => {
+      try {
+        const url = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+          const size = {
+            width: video.videoWidth,
+            height: video.videoHeight,
+          };
+          URL.revokeObjectURL(url);
+          resolve(size.width && size.height ? size : null);
+        };
+        video.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
+        video.src = url;
+      } catch {
+        resolve(null);
+      }
+    });
+  };
+
+  private onMediaToolbarButtonClick = async (kind: "video" | "audio") => {
+    try {
+      const clientX = this.state.width / 2 + this.state.offsetLeft;
+      const clientY = this.state.height / 2 + this.state.offsetTop;
+
+      const { x, y } = viewportCoordsToSceneCoords(
+        { clientX, clientY },
+        this.state,
+      );
+
+      const mimeTypes =
+        kind === "video"
+          ? ["video/mp4", "video/webm", "video/ogg", "video/quicktime"]
+          : [
+              "audio/mpeg",
+              "audio/mp3",
+              "audio/wav",
+              "audio/ogg",
+              "audio/webm",
+              "audio/aac",
+              "audio/x-m4a",
+              "audio/mp4",
+            ];
+
+      const mediaFiles = await fileOpen({
+        description: kind === "video" ? "Video" : "Audio",
+        mimeTypes,
+        multiple: true,
+      });
+
+      await this.insertMediaFiles(mediaFiles, x, y);
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      } else {
+        console.warn(error);
+      }
+      this.setState(
+        {
+          newElement: null,
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
+    }
+  };
+
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
@@ -12097,6 +12454,19 @@ class App extends React.Component<AppProps, AppState> {
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
       return this.insertImages(imageFiles, sceneX, sceneY);
     }
+
+    const mediaFiles = fileItems
+      .map((data) => data.file)
+      .filter(
+        (file): file is File =>
+          !!file &&
+          (file.type.startsWith("audio/") || file.type.startsWith("video/")),
+      );
+
+    if (mediaFiles.length > 0) {
+      return this.insertMediaFiles(mediaFiles, sceneX, sceneY);
+    }
+
     const excalidrawLibrary_ids = dataTransferList.getData(
       MIME_TYPES.excalidrawlibIds,
     );

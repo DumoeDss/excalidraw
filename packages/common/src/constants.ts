@@ -456,6 +456,8 @@ export const TOOL_TYPE = {
   freedraw: "freedraw",
   text: "text",
   image: "image",
+  video: "video",
+  audio: "audio",
   eraser: "eraser",
   hand: "hand",
   frame: "frame",

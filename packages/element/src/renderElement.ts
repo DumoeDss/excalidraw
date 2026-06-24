@@ -74,6 +74,7 @@ import type {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawMediaElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
@@ -384,6 +385,49 @@ const drawImagePlaceholder = (
   );
 };
 
+/**
+ * Draws the static-canvas placeholder for a media (audio/video) element.
+ * The real interactive player is an HTML overlay rendered above the canvas;
+ * this placeholder is what shows when the overlay isn't mounted and what gets
+ * baked into PNG/SVG exports.
+ */
+const drawMediaPlaceholder = (
+  element: ExcalidrawMediaElement,
+  context: CanvasRenderingContext2D,
+  theme: StaticCanvasRenderConfig["theme"],
+) => {
+  const isDark = theme === THEME.DARK;
+  context.fillStyle = isDark ? "#2E2E2E" : "#E7E7E7";
+  context.fillRect(0, 0, element.width, element.height);
+
+  const cx = element.width / 2;
+  const cy = element.height / 2;
+  const size = Math.min(Math.min(element.width, element.height) * 0.3, 64);
+
+  context.fillStyle = isDark ? "#888" : "#aaa";
+
+  if (element.type === "video") {
+    // play triangle
+    const r = size / 2;
+    context.beginPath();
+    context.moveTo(cx - r * 0.5, cy - r);
+    context.lineTo(cx - r * 0.5, cy + r);
+    context.lineTo(cx + r, cy);
+    context.closePath();
+    context.fill();
+  } else {
+    // audio: equalizer bars
+    const barW = Math.max(size / 6, 2);
+    const gap = barW;
+    const heights = [0.5, 1, 0.7, 0.9];
+    const totalW = heights.length * barW + (heights.length - 1) * gap;
+    for (let i = 0; i < heights.length; i++) {
+      const h = size * heights[i];
+      context.fillRect(cx - totalW / 2 + i * (barW + gap), cy - h / 2, barW, h);
+    }
+  }
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -540,6 +584,13 @@ const drawElementOnCanvas = (
       } else {
         drawImagePlaceholder(element, context, renderConfig.theme);
       }
+      context.restore();
+      break;
+    }
+    case "video":
+    case "audio": {
+      context.save();
+      drawMediaPlaceholder(element, context, renderConfig.theme);
       context.restore();
       break;
     }
@@ -884,6 +935,8 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
+    case "video":
+    case "audio":
     case "text":
     case "iframe":
     case "embeddable": {
