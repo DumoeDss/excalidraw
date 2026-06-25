@@ -290,6 +290,16 @@ export interface AppState {
     state: "hover" | "active";
   } | null;
   /**
+   * id of the media (audio/video) element currently hovered on canvas, used to
+   * drive hover-to-preview playback. Transient (not persisted).
+   */
+  hoveredMediaElementId: string | null;
+  /**
+   * the media (audio/video) element opened in the enlarged modal player.
+   * Transient (not persisted).
+   */
+  activeMediaViewer: { elementId: string } | null;
+  /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
    */

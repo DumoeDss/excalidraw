@@ -466,7 +466,8 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { MagicIcon, copyIcon, fullscreenIcon, playerPlayIcon } from "./icons";
+import { MediaViewer } from "./MediaViewer";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
 import { findShapeByKey } from "./shapes";
@@ -676,6 +677,13 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+
+  /** live <video>/<audio> nodes for media elements, used to imperatively
+   * drive hover-to-preview playback without re-rendering on every hover */
+  private mediaPlayerRefs = new Map<
+    ExcalidrawElement["id"],
+    HTMLVideoElement | HTMLAudioElement
+  >();
 
   // generator nodes: in-flight jobs (abortable) + per-kind model cache
   private generatorJobs = new Map<string, AbortController>();
@@ -1886,15 +1894,18 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   /**
-   * Renders interactive HTML5 <video>/<audio> players as a DOM overlay above
-   * the canvas, positioned to track zoom/pan/rotation (mirrors how embeddables
-   * are rendered). The static-canvas placeholder shows through until a media
-   * element has a persisted `src`.
+   * Renders HTML5 <video>/<audio> players as a DOM overlay above the canvas,
+   * tracking zoom/pan/rotation (mirrors how embeddables are rendered). The
+   * static-canvas placeholder shows through until a media element has a
+   * persisted `src`.
    *
-   * Per the chosen interaction model, the player's controls only become
-   * interactive (pointer-events) when the media element is the sole selection;
-   * otherwise pointer events fall through to the canvas so the node can be
-   * selected/moved/resized like any other element.
+   * Interaction model (see handleMediaElementHover / syncMediaPlayback):
+   * the overlay is ALWAYS pointer-events:none, so selecting / dragging /
+   * resizing a media node behaves exactly like an image. Hovering a video node
+   * previews it muted; audio never plays on hover. The only interactive
+   * affordance is a bottom-right "expand" button that opens a modal player
+   * with full controls (renderMediaViewer). Video covers the node; audio lets
+   * the canvas placeholder show through.
    */
   private renderMediaPlayers() {
     const scale = this.state.zoom.value;
@@ -1908,7 +1919,6 @@ class App extends React.Component<AppProps, AppState> {
       );
 
     const selectedElementIds = this.state.selectedElementIds;
-    const selectedCount = Object.keys(selectedElementIds).length;
 
     return (
       <>
@@ -1935,19 +1945,23 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
-          // controls interactive only when this is the sole selected element
-          const isInteractive =
-            selectedCount === 1 && !!selectedElementIds[el.id];
+          const isVideo = isVideoElement(el);
+          const isHovered = this.state.hoveredMediaElementId === el.id;
+          const isSelected = !!selectedElementIds[el.id];
+          const showChrome = isHovered || isSelected;
 
           return (
             <div
               key={el.id}
-              className="excalidraw__embeddable-container"
+              className="excalidraw__embeddable-container excalidraw__media-container"
               style={{
                 transform: `translate(${x - this.state.offsetLeft}px, ${
                   y - this.state.offsetTop
                 }px) scale(${scale})`,
                 display: "block",
+                // the overlay never steals canvas interactions; only the
+                // expand button (below) re-enables pointer events for itself
+                pointerEvents: POINTER_EVENTS.disabled,
                 opacity: getRenderOpacity(
                   el,
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
@@ -1962,32 +1976,54 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
-                className="excalidraw__embeddable-container__inner"
+                className={clsx(
+                  "excalidraw__embeddable-container__inner excalidraw__media-inner",
+                  {
+                    "excalidraw__media-inner--chrome": showChrome,
+                    "excalidraw__media-inner--audio": !isVideo,
+                  },
+                )}
                 style={{
                   width: `${el.width}px`,
                   height: `${el.height}px`,
                   transform: `rotate(${el.angle}rad)`,
-                  pointerEvents: isInteractive
-                    ? POINTER_EVENTS.enabled
-                    : POINTER_EVENTS.disabled,
+                  pointerEvents: POINTER_EVENTS.disabled,
                 }}
               >
-                {isVideoElement(el) ? (
+                {isVideo && (
                   <video
-                    className="excalidraw__embeddable"
+                    ref={(node) => this.cacheMediaPlayerRef(el.id, node)}
+                    className="excalidraw__media-video"
                     src={el.src}
                     poster={el.poster ?? undefined}
-                    controls
+                    muted
+                    loop
                     playsInline
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                      background: "#000",
-                    }}
+                    preload="metadata"
                   />
-                ) : (
-                  <audio src={el.src} controls style={{ width: "100%" }} />
+                )}
+
+                {isVideo && !isHovered && (
+                  <div className="excalidraw__media-play-badge">
+                    {playerPlayIcon}
+                  </div>
+                )}
+
+                {showChrome && (
+                  <button
+                    type="button"
+                    className="excalidraw__media-expand"
+                    aria-label="Open media in viewer"
+                    title="Open media in viewer"
+                    style={{ pointerEvents: POINTER_EVENTS.enabled }}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      this.openMediaViewer(el.id);
+                    }}
+                  >
+                    {fullscreenIcon}
+                  </button>
                 )}
               </div>
             </div>
@@ -1996,6 +2032,121 @@ class App extends React.Component<AppProps, AppState> {
       </>
     );
   }
+
+  /**
+   * Modal lightbox player for the media node opened via its expand button.
+   * Renders the full-controls <video>/<audio> over a dark backdrop.
+   */
+  private renderMediaViewer() {
+    const viewer = this.state.activeMediaViewer;
+    if (!viewer) {
+      return null;
+    }
+    const el = this.scene.getNonDeletedElement(viewer.elementId);
+    if (!el || !isMediaElement(el) || !el.src || el.status !== "saved") {
+      return null;
+    }
+    return <MediaViewer element={el} onClose={this.closeMediaViewer} />;
+  }
+
+  private cacheMediaPlayerRef = (
+    id: ExcalidrawElement["id"],
+    node: HTMLVideoElement | HTMLAudioElement | null,
+  ) => {
+    if (node) {
+      this.mediaPlayerRefs.set(id, node);
+    } else {
+      // node unmounted (scrolled off-screen / deleted): stop & forget it
+      const existing = this.mediaPlayerRefs.get(id);
+      if (existing) {
+        try {
+          existing.pause();
+        } catch {
+          // ignore: media element may not support pause in this state
+        }
+        this.mediaPlayerRefs.delete(id);
+      }
+    }
+  };
+
+  /**
+   * Imperatively reconciles hover-to-preview playback: the hovered media node
+   * plays (muted), all others pause & rewind. Skipped while the modal viewer
+   * is open (it owns playback then). Called from componentDidUpdate.
+   */
+  private syncMediaPlayback = () => {
+    const hoveredId = this.state.hoveredMediaElementId;
+    const viewerOpen = !!this.state.activeMediaViewer;
+    this.mediaPlayerRefs.forEach((node, id) => {
+      if (!viewerOpen && id === hoveredId) {
+        const result = node.play();
+        // play() may reject (autoplay policy); ignore — preview is best-effort
+        if (result && typeof result.catch === "function") {
+          result.catch(() => {});
+        }
+      } else {
+        try {
+          node.pause();
+          if (node.currentTime !== 0) {
+            node.currentTime = 0;
+          }
+        } catch {
+          // ignore: media element not ready / not seekable
+        }
+      }
+    });
+  };
+
+  /**
+   * Tracks which media node is hovered (drives hover-to-preview playback).
+   * Only fires for a pure hover (no buttons held) in a pointer tool while not
+   * mid-interaction, so dragging/resizing/selecting stay unaffected.
+   */
+  private handleMediaElementHover = ({
+    hitElement,
+    event,
+  }: {
+    hitElement: ExcalidrawElement | null;
+    event: React.PointerEvent<HTMLCanvasElement>;
+  }) => {
+    const isPureHover = event.buttons === 0;
+    const toolOk = oneOf(this.state.activeTool.type, [
+      "selection",
+      "lasso",
+      "hand",
+    ]);
+    const notInteracting =
+      !this.state.newElement &&
+      !this.state.resizingElement &&
+      !this.state.selectionElement &&
+      !this.state.editingTextElement;
+
+    const candidate =
+      isPureHover &&
+      toolOk &&
+      notInteracting &&
+      hitElement &&
+      isMediaElement(hitElement) &&
+      hitElement.status === "saved" &&
+      !!hitElement.src
+        ? hitElement.id
+        : null;
+
+    if (this.state.hoveredMediaElementId !== candidate) {
+      this.setState({ hoveredMediaElementId: candidate });
+    }
+  };
+
+  private openMediaViewer = (elementId: ExcalidrawElement["id"]) => {
+    this.setState({
+      activeMediaViewer: { elementId },
+      hoveredMediaElementId: null,
+    });
+  };
+
+  private closeMediaViewer = () => {
+    this.setState({ activeMediaViewer: null });
+  };
 
   /**
    * Renders the generator DOM layer above the canvas: a status badge for any
@@ -2697,6 +2848,7 @@ class App extends React.Component<AppProps, AppState> {
                         {this.renderEmbeddables()}
                         {this.renderMediaPlayers()}
                         {this.renderGeneratorLayer()}
+                        {this.renderMediaViewer()}
                       </ExcalidrawElementsContext.Provider>
                     </ExcalidrawAppStateContext.Provider>
                   </ExcalidrawSetAppStateContext.Provider>
@@ -3463,6 +3615,16 @@ class App extends React.Component<AppProps, AppState> {
     this.generatorProgress.clear();
     this.generatorPriorState.clear();
 
+    // stop any media hover-preview players
+    this.mediaPlayerRefs.forEach((node) => {
+      try {
+        node.pause();
+      } catch {
+        // ignore: media element may not support pause in this state
+      }
+    });
+    this.mediaPlayerRefs.clear();
+
     // we're recreating the api object reference so that the
     // <ExcalidrawAPIContext.Provider/> picks up on it
     this.api = { ...this.api, isDestroyed: true };
@@ -3689,6 +3851,14 @@ class App extends React.Component<AppProps, AppState> {
           this.loadGeneratorModels(generatorConfig.kind);
         }
       }
+    }
+
+    // reconcile hover-to-preview playback for media nodes
+    if (
+      prevState.hoveredMediaElementId !== this.state.hoveredMediaElementId ||
+      prevState.activeMediaViewer !== this.state.activeMediaViewer
+    ) {
+      this.syncMediaPlayback();
     }
 
     this.appStateObserver.flush(prevState);
@@ -7692,6 +7862,9 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    // hover-to-preview playback for audio/video nodes
+    this.handleMediaElementHover({ hitElement, event });
+
     if (
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
@@ -7986,6 +8159,11 @@ class App extends React.Component<AppProps, AppState> {
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
+
+    // starting an interaction (select/drag) pauses any hover-preview playback
+    if (this.state.hoveredMediaElementId) {
+      this.setState({ hoveredMediaElementId: null });
+    }
 
     if (this.state.searchMatches) {
       this.setState((state) => {
