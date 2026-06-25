@@ -214,6 +214,14 @@ export type GeneratorConfig = {
   params: Record<string, string | number | boolean>;
   refs: GeneratorRef[];
   state: GeneratorState;
+  /**
+   * For image results: the backend URL the result renders from (ref-only;
+   * the image bytes are NOT embedded in the scene/files store). The image
+   * element keeps `fileId: null` and is drawn from this URL via the
+   * content-addressed `generatedImageCacheKey(result)` cache entry.
+   * video/audio results use the element's own `src` field instead.
+   */
+  result?: string | null;
 };
 
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {

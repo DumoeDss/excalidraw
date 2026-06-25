@@ -20,6 +20,9 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 import {
   getInitializedImageElements,
   updateImageCache,
+  getGeneratorConfig,
+  generatedImageCacheKey,
+  isImageElement,
 } from "@excalidraw/element";
 
 import { newElementWith } from "@excalidraw/element";
@@ -241,6 +244,42 @@ export const exportToCanvas = async (
     ),
     files,
   });
+
+  // prime the export cache for generator image nodes that render from a URL
+  // reference (customData.generator.result, fileId === null) — these carry no
+  // bytes in the `files` store. crossOrigin="anonymous" keeps the export canvas
+  // untainted when the backend sends permissive CORS headers (best-effort; a
+  // dead/cross-origin URL just renders the placeholder).
+  await Promise.all(
+    elementsForRender
+      .filter(
+        (element) =>
+          isImageElement(element) &&
+          element.fileId == null &&
+          !!getGeneratorConfig(element)?.result,
+      )
+      .map(async (element) => {
+        const url = getGeneratorConfig(element)!.result!;
+        const key = generatedImageCacheKey(url);
+        if (imageCache.has(key)) {
+          return;
+        }
+        try {
+          const image = await new Promise<HTMLImageElement>(
+            (resolve, reject) => {
+              const img = new Image();
+              img.crossOrigin = "anonymous";
+              img.onload = () => resolve(img);
+              img.onerror = (error) => reject(error);
+              img.src = url;
+            },
+          );
+          imageCache.set(key, { image, mimeType: MIME_TYPES.png });
+        } catch {
+          // leave uncached → renderStaticScene draws the placeholder
+        }
+      }),
+  );
 
   renderStaticScene({
     canvas,

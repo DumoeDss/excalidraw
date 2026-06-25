@@ -25,6 +25,8 @@ export const newGeneratorConfig = (kind: GeneratorKind): GeneratorConfig => ({
   params: {},
   refs: [],
   state: { status: "idle" },
+  // explicit idle result so new nodes carry no image-result URL ref yet
+  result: null,
 });
 
 /**
