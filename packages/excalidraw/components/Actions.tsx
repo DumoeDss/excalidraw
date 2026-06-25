@@ -1289,15 +1289,10 @@ export const ShapesSwitcher = ({
             data-testid="toolbar-image-generator"
             onClick={() => app.createGeneratorNode("image")}
           />
-          <ToolButton
-            className="Shape"
-            type="button"
-            icon={<GeneratorToolIcon base={AudioIcon} />}
-            title={t("toolBar.audioGenerator")}
-            aria-label={t("toolBar.audioGenerator")}
-            data-testid="toolbar-audio-generator"
-            onClick={() => app.createGeneratorNode("audio")}
-          />
+          {/* audio generation is disabled (no audio-generation backend); the
+              audio player node, audio upload tool, and audio-as-reference are
+              unaffected. `app.createGeneratorNode("audio")` stays available
+              programmatically. */}
           <ToolButton
             className="Shape"
             type="button"

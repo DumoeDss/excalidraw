@@ -434,6 +434,9 @@ const normalizeGeneratorCustomData = (
   const normalized: GeneratorConfig = {
     ...newGeneratorConfig(kind),
     ...generator,
+    // explicitly preserve the image-result URL ref across save/load (the spread
+    // above already carries it, but pin it so it can't silently drop)
+    result: generator.result ?? null,
     state:
       !generator.state || generator.state.status === "pending"
         ? { status: "idle" }

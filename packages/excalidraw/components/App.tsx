@@ -175,6 +175,8 @@ import {
   getEmbedLink,
   getInitializedImageElements,
   normalizeSVG,
+  loadHTMLImageElement,
+  generatedImageCacheKey,
   updateImageCache as _updateImageCache,
   getBoundTextElement,
   getContainerCenter,
@@ -513,6 +515,7 @@ import type {
   Offsets,
   GeneratorModel,
   GeneratorPanelContext,
+  DataURL,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -3201,6 +3204,9 @@ class App extends React.Component<AppProps, AppState> {
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
+      // generator images render from a URL ref (no files-store bytes); prime
+      // the cache so a freshly-loaded/updated scene shows them
+      this.primeGeneratedImageCache(actionResult.elements);
     }
 
     if (actionResult.files) {
@@ -3424,6 +3430,14 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
+
+    // re-prime the cache for generator image nodes that render from a URL ref
+    // (no bytes in the files store) so a restored scene shows them.
+    // NOTE: `syncActionResult` above already primed `actionResult.elements`;
+    // this second prime is a deliberate belt-and-suspenders against the two
+    // element lists ever diverging, and is a cheap no-op via the
+    // `!imageCache.has(...)` guard — do not "dedupe" it away.
+    this.primeGeneratedImageCache(restoredElements);
 
     // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
     this.fonts.loadSceneFonts().then((fontFaces) => {
@@ -5082,6 +5096,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (elements) {
         this.scene.replaceAllElements(elements);
+        // generator URL-ref images carry no `files`, so the addFiles/
+        // syncActionResult priming never fires for them on this public path;
+        // prime here so a host loading a saved canvas via updateScene (the
+        // ace-playground integration's exact path) renders done image-generator
+        // nodes. Idempotent: the `!imageCache.has(...)` guard no-ops repeats.
+        this.primeGeneratedImageCache(elements);
       }
 
       if (collaborators) {
@@ -12416,6 +12436,59 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /**
+   * Primes the in-memory image cache for generator image nodes that render
+   * from a backend URL reference (`customData.generator.result`, `fileId: null`)
+   * rather than the binary `files` store. Called on scene load/mount so a
+   * restored scene renders the generated image without re-fetching bytes. The
+   * URL is loaded under the synthetic `generatedImageCacheKey(result)`; on
+   * success the scene is re-rendered. Bytes are never written to `files`.
+   */
+  private primeGeneratedImageCache = async (
+    elements: readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
+  ) => {
+    const pending: { element: ExcalidrawImageElement; url: string }[] = [];
+    for (const element of elements) {
+      if (
+        !isImageElement(element) ||
+        element.fileId != null ||
+        element.isDeleted
+      ) {
+        continue;
+      }
+      const result = getGeneratorConfig(element)?.result;
+      if (result && !this.imageCache.has(generatedImageCacheKey(result))) {
+        pending.push({ element, url: result });
+      }
+    }
+
+    if (!pending.length) {
+      return;
+    }
+
+    let didLoad = false;
+    await Promise.all(
+      pending.map(async ({ element, url }) => {
+        try {
+          const image = await loadHTMLImageElement(url as DataURL);
+          this.imageCache.set(generatedImageCacheKey(url), {
+            image,
+            mimeType: MIME_TYPES.png,
+          });
+          ShapeCache.delete(element);
+          didLoad = true;
+        } catch {
+          // a dead/expired result URL renders the placeholder, same failure
+          // mode as a dead media `src` — do not write bytes or error the node
+        }
+      }),
+    );
+
+    if (didLoad) {
+      this.scene.triggerUpdate();
+    }
+  };
+
   /** generally you should use `addNewImagesToImageCache()` directly if you need
    *  to render new images. This is just a failsafe  */
   private scheduleImageRefresh = throttle(() => {
@@ -12958,62 +13031,38 @@ class App extends React.Component<AppProps, AppState> {
 
     if (element.type === "image") {
       try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const mimeType = (blob.type ||
-          MIME_TYPES.png) as BinaryFileData["mimeType"];
-        const file = new File([blob], "generated", { type: mimeType });
-        const fileId = (await (this.props.generateIdForFile?.(file) ||
-          generateIdFromFile(file))) as FileId;
-        const dataURL = await getDataURL(file);
-        this.addFiles([
-          {
-            mimeType,
-            id: fileId,
-            dataURL,
-            created: Date.now(),
-            lastRetrieved: Date.now(),
-          },
-        ]);
+        // byte-free: render the result straight from its backend URL. No
+        // fetch/blob/base64/addFiles/fileId — the scene persists ONLY the URL
+        // (on customData.generator.result). The image is loaded into the
+        // in-memory imageCache under a synthetic content-addressed key so the
+        // render gate can draw it; the element keeps fileId === null.
+        const imageHTML = await loadHTMLImageElement(url as DataURL);
+        this.imageCache.set(generatedImageCacheKey(url), {
+          image: imageHTML,
+          mimeType: MIME_TYPES.png,
+        });
 
         const el = this.scene.getNonDeletedElement(element.id);
         if (!el || el.type !== "image") {
           return;
         }
 
-        // load the generated image into the cache so we can read its natural
-        // size — addFiles/addNewImagesToImageCache only loads files referenced
-        // by an *initialized* (fileId-bearing) image, which `el` is not yet.
-        const initialized = newElementWith(el, {
-          fileId,
-        }) as InitializedExcalidrawImageElement;
-        await this.updateImageCache([initialized]);
-        const imageHTML = await this.imageCache.get(fileId)?.image;
-
         // resize the node to the generated image's natural aspect ratio
         // (the idle placeholder is square)
-        let dimensions: {
-          x: number;
-          y: number;
-          width: number;
-          height: number;
-          crop: ExcalidrawImageElement["crop"];
-        } | null = null;
-        if (imageHTML) {
-          dimensions = this.getImageNaturalDimensions(el, imageHTML);
-        }
+        const dimensions = this.getImageNaturalDimensions(el, imageHTML);
 
-        // re-check liveness after the awaits
+        // re-check liveness after the await
         const liveEl = this.scene.getNonDeletedElement(element.id);
         if (!liveEl || liveEl.type !== "image") {
           return;
         }
         this.scene.mutateElement(liveEl, {
-          fileId,
+          // fileId stays null — no entry is written to the binary files store
           status: "saved",
-          ...(dimensions ?? {}),
+          ...dimensions,
           customData: withGeneratorConfig(liveEl, {
             ...config,
+            result: url,
             state: { status: "done" },
           }),
         });

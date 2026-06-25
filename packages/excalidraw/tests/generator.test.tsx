@@ -4,13 +4,15 @@ import {
   isGeneratorElement,
   getGeneratorConfig,
   newGeneratorConfig,
+  generatedImageCacheKey,
 } from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
 import * as restore from "../data/restore";
 
 import { API } from "./helpers/api";
-import { render, act } from "./test-utils";
+import { mockHTMLImageElement } from "./helpers/mocks";
+import { render, act, queryByTestId } from "./test-utils";
 
 const h = window.h;
 
@@ -25,6 +27,7 @@ describe("generator nodes", () => {
         params: {},
         refs: [],
         state: { status: "idle" },
+        result: null,
       });
     });
 
@@ -79,6 +82,28 @@ describe("generator nodes", () => {
         status: "done",
       });
     });
+
+    it("preserves an image-result URL ref and keeps fileId null (no files entry)", () => {
+      const url = "https://example.com/result.png";
+      const el = API.createElement({ type: "image" });
+      (el as any).customData = {
+        generator: {
+          ...newGeneratorConfig("image"),
+          state: { status: "done" },
+          result: url,
+        },
+      };
+
+      const [restored] = restore.restoreElements([el], null);
+      const config = (restored.customData as any).generator;
+
+      // the URL ref survives save/load unchanged
+      expect(config.result).toBe(url);
+      expect(config.state).toEqual({ status: "done" });
+      // fileId stays null → serialization writes no `files[fileId]` entry,
+      // so the persisted scene carries only the URL string (no image bytes)
+      expect((restored as any).fileId).toBe(null);
+    });
   });
 
   describe("generation lifecycle", () => {
@@ -95,6 +120,110 @@ describe("generator nodes", () => {
       });
       return h.app.scene.getElement(el.id)!;
     };
+
+    const createSelectedImageGenerator = () => {
+      act(() => h.app.createGeneratorNode("image"));
+      const el = h.app.scene.getNonDeletedElements().find(isGeneratorElement)!;
+      act(() => {
+        h.app.scene.mutateElement(el, {
+          customData: {
+            generator: { ...getGeneratorConfig(el)!, model: "m1" },
+          },
+        });
+      });
+      return h.app.scene.getElement(el.id)!;
+    };
+
+    it("image: done sets result URL ref, leaves fileId null, adds no files entry", async () => {
+      // stub Image so loadHTMLImageElement resolves (jsdom can't load images)
+      mockHTMLImageElement(512, 384);
+
+      const onGeneratorSubmit = vi.fn(async () => ({ jobId: "j1" }));
+      const onGeneratorPoll = vi.fn(async () => ({
+        status: "done" as const,
+        url: "https://example.com/result.png",
+      }));
+
+      await render(
+        <Excalidraw
+          onGeneratorSubmit={onGeneratorSubmit}
+          onGeneratorPoll={onGeneratorPoll}
+          renderGeneratorPanel={() => null}
+        />,
+      );
+
+      const el = createSelectedImageGenerator();
+      expect(el.type).toBe("image");
+
+      vi.useFakeTimers();
+      try {
+        await act(async () => {
+          await (h.app as any).startGeneration(h.app.scene.getElement(el.id));
+        });
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1600);
+        });
+      } finally {
+        vi.useRealTimers();
+      }
+      // allow the loadHTMLImageElement microtask + mutate to settle
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      const done = h.app.scene.getElement(el.id)!;
+      const config = getGeneratorConfig(done)!;
+      expect(config.state.status).toBe("done");
+      // result URL ref persisted on the generator config
+      expect(config.result).toBe("https://example.com/result.png");
+      expect((done as any).status).toBe("saved");
+      // no bytes ingested: fileId stays null and the files store has no entry
+      expect((done as any).fileId).toBe(null);
+      expect(Object.keys(h.app.files)).toHaveLength(0);
+
+      vi.unstubAllGlobals();
+    });
+
+    it("public updateScene primes the cache for a done URL-ref image generator", async () => {
+      // stub Image so loadHTMLImageElement resolves (jsdom can't load images)
+      mockHTMLImageElement(512, 384);
+
+      await render(<Excalidraw renderGeneratorPanel={() => null} />);
+
+      const url = "https://example.com/saved-result.png";
+      // a persisted done image-generator node: URL ref, fileId null, NO files
+      const el = API.createElement({ type: "image" });
+      (el as any).customData = {
+        generator: {
+          ...newGeneratorConfig("image"),
+          state: { status: "done" },
+          result: url,
+        },
+      };
+
+      const cacheKey = generatedImageCacheKey(url);
+      // not primed before the host loads the scene via the public API
+      expect(h.app.imageCache.has(cacheKey)).toBe(false);
+
+      // load the saved canvas the way the downstream integration does:
+      // updateScene({ elements }) — NOT initialData / addFiles
+      await act(async () => {
+        h.app.updateScene({ elements: [el] });
+        // allow the async primeGeneratedImageCache load to settle
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      // the URL ref was loaded into the cache under the synthetic key, so the
+      // render gate resolves it instead of drawing a placeholder
+      expect(h.app.imageCache.has(cacheKey)).toBe(true);
+      // still byte-free: no files entry, element keeps fileId null
+      expect(Object.keys(h.app.files)).toHaveLength(0);
+      const loaded = h.app.scene.getElement(el.id)!;
+      expect((loaded as any).fileId).toBe(null);
+
+      vi.unstubAllGlobals();
+    });
 
     it("video: idle → pending → done sets src", async () => {
       const onGeneratorSubmit = vi.fn(async () => ({ jobId: "j1" }));
@@ -218,6 +347,25 @@ describe("generator nodes", () => {
       } finally {
         vi.useRealTimers();
       }
+    });
+
+    it("toolbar exposes image + video generators but NOT audio", async () => {
+      const { container } = await render(
+        <Excalidraw
+          onGeneratorSubmit={vi.fn(async () => ({ jobId: "j1" }))}
+          onGeneratorPoll={vi.fn(async () => ({ status: "pending" as const }))}
+          renderGeneratorPanel={() => null}
+        />,
+      );
+
+      expect(
+        queryByTestId(container, "toolbar-image-generator"),
+      ).not.toBeNull();
+      expect(
+        queryByTestId(container, "toolbar-video-generator"),
+      ).not.toBeNull();
+      // audio generation is disabled (no audio-generation backend)
+      expect(queryByTestId(container, "toolbar-audio-generator")).toBeNull();
     });
 
     it("cancel returns a pending job to idle", async () => {

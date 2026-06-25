@@ -18,6 +18,18 @@ import type {
   InitializedExcalidrawImageElement,
 } from "./types";
 
+/**
+ * Synthetic, content-addressed `imageCache` key for a generated image that is
+ * rendered from a backend URL reference (no bytes in the scene/`files` store).
+ *
+ * The `imageCache` Map is keyed by `FileId` (a branded string); a synthetic
+ * key is type-compatible after a cast. The `genurl:` prefix guarantees it never
+ * collides with a real content-hash `FileId`. The element keeps `fileId: null`;
+ * the URL lives on `customData.generator.result`.
+ */
+export const generatedImageCacheKey = (url: string): FileId =>
+  `genurl:${url}` as FileId;
+
 export const loadHTMLImageElement = (dataURL: DataURL) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();

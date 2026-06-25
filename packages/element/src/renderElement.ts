@@ -65,6 +65,8 @@ import {
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
+import { getGeneratorConfig } from "./generator";
+import { generatedImageCacheKey } from "./image";
 
 import { ShapeCache } from "./shape";
 
@@ -83,12 +85,36 @@ import type {
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
+/**
+ * The synthetic, content-addressed `imageCache` key for a generator image that
+ * renders from a URL reference (`customData.generator.result`) instead of a
+ * `files`-backed `fileId`. Returns `null` for non-generator / non-result-bearing
+ * images so the regular `fileId` path is used.
+ */
+const getGeneratedImageCacheKey = (element: ExcalidrawElement) => {
+  if (!isImageElement(element) || element.fileId != null) {
+    return null;
+  }
+  const result = getGeneratorConfig(element)?.result;
+  return result ? generatedImageCacheKey(result) : null;
+};
+
 const isPendingImageElement = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
-) =>
-  isInitializedImageElement(element) &&
-  !renderConfig.imageCache.has(element.fileId);
+) => {
+  // generator image rendered from a URL ref (fileId === null): pending until
+  // its synthetic cache entry is a fully-loaded HTMLImageElement
+  const generatedKey = getGeneratedImageCacheKey(element);
+  if (generatedKey) {
+    const entry = renderConfig.imageCache.get(generatedKey);
+    return entry == null || entry.image instanceof Promise;
+  }
+  return (
+    isInitializedImageElement(element) &&
+    !renderConfig.imageCache.has(element.fileId)
+  );
+};
 
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
@@ -481,13 +507,18 @@ const drawElementOnCanvas = (
     }
     case "image": {
       context.save();
-      const cacheEntry =
-        element.fileId !== null
-          ? renderConfig.imageCache.get(element.fileId)
-          : null;
-      const img = isInitializedImageElement(element)
-        ? cacheEntry?.image
-        : undefined;
+      // a generator image (fileId === null) renders from its URL ref via a
+      // synthetic, content-addressed cache key; otherwise use the fileId path
+      const generatedKey = getGeneratedImageCacheKey(element);
+      const cacheEntry = generatedKey
+        ? renderConfig.imageCache.get(generatedKey)
+        : element.fileId !== null
+        ? renderConfig.imageCache.get(element.fileId)
+        : null;
+      const img =
+        generatedKey || isInitializedImageElement(element)
+          ? cacheEntry?.image
+          : undefined;
 
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {

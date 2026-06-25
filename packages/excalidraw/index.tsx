@@ -411,6 +411,14 @@ export type {
   GeneratorPanelContext,
 } from "./types";
 
+// the canonical generator config/kind/ref types live in @excalidraw/element;
+// re-export them from the package entry so consumers get a single import surface
+export type {
+  GeneratorKind,
+  GeneratorRef,
+  GeneratorConfig,
+} from "@excalidraw/element/types";
+
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export {
   getCommonBounds,
