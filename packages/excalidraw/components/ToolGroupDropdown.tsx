@@ -33,6 +33,12 @@ type ToolGroupDropdownProps = {
   onLastSelectedTypeChange: (type: string) => void;
   /** override how a tool is activated (defaults to app.setActiveTool) */
   onSelectTool?: (type: string) => void;
+  /**
+   * Whether clicking the trigger also activates the displayed tool (default).
+   * Set to `false` when activating a tool has an immediate side effect (e.g.
+   * the upload tools open a file picker) so the trigger only reveals the menu.
+   */
+  activateOnOpen?: boolean;
 };
 
 /**
@@ -54,6 +60,7 @@ export const ToolGroupDropdown = ({
   lastSelectedType,
   onLastSelectedTypeChange,
   onSelectTool,
+  activateOnOpen = true,
 }: ToolGroupDropdownProps) => {
   const activeOption = options.find((o) => o.type === activeToolType);
   const displayedOption =
@@ -94,9 +101,14 @@ export const ToolGroupDropdown = ({
         aria-label={title}
         data-testid={dataTestId}
         onPointerDown={() => {
-          onOpenChange(!isOpen);
-          // mirror the native tool buttons: interacting activates the tool
-          activateTool(displayedOption.type);
+          const willOpen = !isOpen;
+          onOpenChange(willOpen);
+          // mirror the native tool buttons by activating the displayed tool,
+          // unless doing so has a side effect (e.g. opening a file picker), in
+          // which case the trigger only reveals the menu
+          if (activateOnOpen && willOpen) {
+            activateTool(displayedOption.type);
+          }
         }}
       />
       <div

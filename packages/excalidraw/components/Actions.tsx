@@ -1253,6 +1253,9 @@ export const ShapesSwitcher = ({
           onOpenChange={(open) => setOpenGroup(open ? "upload" : null)}
           lastSelectedType={lastUploadType}
           onLastSelectedTypeChange={setLastUploadType}
+          // activating image/video/audio opens a file picker, so the trigger
+          // should only reveal the menu rather than fire it immediately
+          activateOnOpen={false}
         />
       )}
 
