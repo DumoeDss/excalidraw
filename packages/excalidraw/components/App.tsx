@@ -2071,8 +2071,9 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Imperatively reconciles hover-to-preview playback: the hovered media node
-   * plays (muted), all others pause & rewind. Skipped while the modal viewer
-   * is open (it owns playback then). Called from componentDidUpdate.
+   * plays (muted), all others pause but keep their position (so the next hover
+   * resumes from where it paused). Skipped while the modal viewer is open (it
+   * owns playback then). Called from componentDidUpdate.
    */
   private syncMediaPlayback = () => {
     const hoveredId = this.state.hoveredMediaElementId;
@@ -2087,11 +2088,8 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         try {
           node.pause();
-          if (node.currentTime !== 0) {
-            node.currentTime = 0;
-          }
         } catch {
-          // ignore: media element not ready / not seekable
+          // ignore: media element not ready
         }
       }
     });
