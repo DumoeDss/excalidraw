@@ -1,0 +1,31 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .tool-group-dropdown {
+    position: relative;
+    display: inline-flex;
+
+    &__menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      inset-inline-start: 0;
+      z-index: var(--zIndex-layerUI);
+      // kept mounted so each tool's data-testid stays queryable; only shown
+      // when the group is open
+      display: none;
+    }
+
+    &__menu--open {
+      display: block;
+    }
+
+    &__container {
+      min-width: 11.875rem;
+    }
+
+    &__item {
+      // labeled rows reuse the native dropdown-menu-item look
+      text-align: start;
+    }
+  }
+}
