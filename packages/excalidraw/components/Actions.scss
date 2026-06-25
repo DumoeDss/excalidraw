@@ -5,6 +5,29 @@
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
 
+// media icon decorated with a small sparkle, used for AI generator tools
+.generator-tool-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  &__sparkle {
+    position: absolute;
+    inset-inline-end: -2px;
+    bottom: -2px;
+    display: inline-flex;
+    color: var(--color-promo);
+
+    svg {
+      width: 0.625rem !important;
+      height: 0.625rem !important;
+    }
+  }
+}
+
 .zoom-button,
 .undo-redo-buttons button {
   border-radius: 0 !important;

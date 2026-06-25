@@ -311,9 +311,12 @@
   "toolBar": {
     "selection": "Selection",
     "lasso": "Lasso selection",
+    "select": "Select",
     "image": "Insert image",
     "video": "Insert video",
     "audio": "Insert audio",
+    "upload": "Upload",
+    "shapes": "Shapes",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
