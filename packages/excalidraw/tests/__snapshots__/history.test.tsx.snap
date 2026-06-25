@@ -4,6 +4,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -57,6 +58,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -638,6 +640,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -691,6 +694,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1200,6 +1204,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1253,6 +1258,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1560,6 +1566,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1613,6 +1620,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1922,6 +1930,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1975,6 +1984,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2185,6 +2195,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -2238,6 +2249,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2672,6 +2684,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -2725,6 +2738,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2975,6 +2989,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3028,6 +3043,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3294,6 +3310,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3347,6 +3364,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3588,6 +3606,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3641,6 +3660,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3874,6 +3894,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3927,6 +3948,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4109,6 +4131,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4162,6 +4185,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4366,6 +4390,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4419,6 +4444,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4637,6 +4663,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4690,6 +4717,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4866,6 +4894,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4919,6 +4948,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5095,6 +5125,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5148,6 +5179,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5342,6 +5374,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5395,6 +5428,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5598,6 +5632,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5651,6 +5686,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5856,6 +5892,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5909,6 +5946,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6185,6 +6223,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -6238,6 +6277,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6612,6 +6652,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -6665,6 +6706,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6986,6 +7028,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7039,6 +7082,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7298,6 +7342,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7351,6 +7396,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7591,6 +7637,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7644,6 +7691,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7821,6 +7869,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7874,6 +7923,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8173,6 +8223,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8226,6 +8277,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8525,6 +8577,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8578,6 +8631,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8931,6 +8985,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8984,6 +9039,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9210,6 +9266,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9263,6 +9320,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9474,6 +9532,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9527,6 +9586,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9739,6 +9799,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9792,6 +9853,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9971,6 +10033,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10024,6 +10087,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10268,6 +10332,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10321,6 +10386,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10586,6 +10652,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10639,6 +10706,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10822,6 +10890,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10875,6 +10944,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -11747,6 +11817,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -11800,6 +11871,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12007,6 +12079,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12060,6 +12133,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12242,6 +12316,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12295,6 +12370,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12479,6 +12555,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12532,6 +12609,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12870,6 +12948,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12923,6 +13002,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13080,6 +13160,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13133,6 +13214,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13287,6 +13369,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13340,6 +13423,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "gridStep": 5,
   "height": 1000,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13588,6 +13672,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13641,6 +13726,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "gridStep": 5,
   "height": 1000,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13886,6 +13972,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13939,6 +14026,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14131,6 +14219,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14184,6 +14273,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14368,6 +14458,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14421,6 +14512,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14605,6 +14697,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14658,6 +14751,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14852,6 +14946,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14905,6 +15000,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15183,6 +15279,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -15236,6 +15333,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15353,6 +15451,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -15406,6 +15505,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15637,6 +15737,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -15690,6 +15791,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15900,6 +16002,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -15953,6 +16056,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -16053,6 +16157,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -16106,6 +16211,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -16335,6 +16441,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -16388,6 +16495,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -16497,6 +16605,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -16550,6 +16659,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -17246,6 +17356,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -17299,6 +17410,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -17893,6 +18005,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -17946,6 +18059,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -18540,6 +18654,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -18593,6 +18708,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -19290,6 +19406,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -19343,6 +19460,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -20059,6 +20177,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -20112,6 +20231,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -20539,6 +20659,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -20592,6 +20713,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -21050,6 +21172,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -21103,6 +21226,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -21509,6 +21633,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -21562,6 +21687,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "gridStep": 5,
   "height": 0,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,

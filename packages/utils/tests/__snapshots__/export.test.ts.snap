@@ -4,6 +4,7 @@ exports[`exportToSvg > with default arguments 1`] = `
 {
   "activeEmbeddable": null,
   "activeLockedId": null,
+  "activeMediaViewer": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -57,6 +58,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "gridSize": 20,
   "gridStep": 5,
   "hoveredElementIds": {},
+  "hoveredMediaElementId": null,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
