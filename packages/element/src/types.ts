@@ -294,7 +294,7 @@ export type Ordered<TElement extends ExcalidrawElement> = TElement & {
 export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
-  isDeleted: boolean;
+  isDeleted: false;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
@@ -453,12 +453,20 @@ export type ExcalidrawElbowArrowElement = Merge<
   }
 >;
 
+export type StrokeVariability = "variable" | "constant";
+
+export type StrokeOptions = Readonly<{
+  variability: StrokeVariability;
+  streamline: number;
+}>;
+
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    strokeOptions: StrokeOptions;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
@@ -505,6 +513,10 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+export type NonDeletedElementsMapOrArray =
+  | readonly NonDeletedExcalidrawElement[]
+  | Readonly<NonDeletedElementsMap | NonDeletedSceneElementsMap>;
 
 export type ExcalidrawLinearElementSubType =
   | "line"

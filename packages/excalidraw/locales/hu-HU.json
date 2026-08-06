@@ -3,6 +3,10 @@
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
     "moveCanvas": "Vászon mozgatása",
@@ -31,6 +35,9 @@
     "strokeStyle_dashed": "Szaggatott",
     "strokeStyle_dotted": "Pontozott",
     "sloppiness": "Stílus",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Áttetszőség",
     "textAlign": "Szöveg igazítása",
     "edges": "Szélek",
@@ -49,7 +56,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "Nyíl típus",
     "arrowtype_sharp": "Hegyes nyíl",
     "arrowtype_round": "Ívelt nyíl",
@@ -171,7 +185,14 @@
     "linkToElement": "Hivatkozás az objektumhoz",
     "wrapSelectionInFrame": "",
     "tab": "Tab",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Hivatkozás az objektumhoz",
@@ -310,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "Lézermutató",
+    "autoshape": "",
     "hand": "",
     "extraTools": "További eszközök",
     "mermaidToExcalidraw": "",
@@ -345,6 +367,7 @@
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +418,10 @@
   },
   "errorDialog": {
     "title": "Hiba"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Mentés lemezre",
@@ -576,7 +604,9 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +646,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

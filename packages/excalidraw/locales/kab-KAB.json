@@ -3,6 +3,10 @@
     "paste": "Senṭeḍ",
     "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Fren akk",
     "multiSelect": "Rnu aferdis ɣer tefrayt",
     "moveCanvas": "Smutti taɣzut n usuneɣ",
@@ -31,6 +35,9 @@
     "strokeStyle_dashed": "S tjerriḍin",
     "strokeStyle_dotted": "S tenqiḍin",
     "sloppiness": "Astehzi",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Tiḍullest",
     "textAlign": "Areyyec n uḍris",
     "edges": "Leryuf",
@@ -49,7 +56,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +185,14 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
@@ -345,6 +367,7 @@
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +418,10 @@
   },
   "errorDialog": {
     "title": "Tuccḍa"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Sekles deg uḍebsi",
@@ -576,7 +604,9 @@
     "colors": "Initen",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +646,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

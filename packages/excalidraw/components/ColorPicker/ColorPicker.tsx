@@ -36,7 +36,7 @@ import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-import type { AppState } from "../../types";
+import type { AppState, UIAppState } from "../../types";
 
 interface ColorPickerProps {
   type: ColorPickerType;
@@ -48,10 +48,12 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: UIAppState;
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
+  /** palette colors to hide from the popup, keeping hotkey positions */
+  excludedColors?: readonly string[];
 }
 
 const ColorPickerPopupContent = ({
@@ -64,6 +66,7 @@ const ColorPickerPopupContent = ({
   updateData,
   getOpenPopup,
   appState,
+  excludedColors,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -74,6 +77,7 @@ const ColorPickerPopupContent = ({
   | "palette"
   | "updateData"
   | "appState"
+  | "excludedColors"
 > & {
   getOpenPopup: () => AppState["openPopup"];
 }) => {
@@ -151,6 +155,7 @@ const ColorPickerPopupContent = ({
         <Picker
           ref={colorPickerContentRef}
           palette={palette}
+          excludedColors={excludedColors}
           color={color}
           onChange={(changedColor) => {
             // Save caret position before color change if editing text
@@ -289,6 +294,7 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  excludedColors,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
@@ -352,6 +358,7 @@ export const ColorPicker = ({
               label={label}
               elements={elements}
               palette={palette}
+              excludedColors={excludedColors}
               updateData={updateData}
               getOpenPopup={() => openRef.current}
               appState={appState}

@@ -11,6 +11,7 @@
   --zIndex-eyeDropperBackdrop: 5;
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
+  --zIndex-cursorHint: 8;
 
   --zIndex-ui-bottom: 60;
   --zIndex-ui-context-menu: 90;
@@ -38,6 +39,23 @@ body.excalidraw-cursor-resize * {
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
+  --viewport-status-frame-border-width: 0px;
+  --viewport-status-label-offset: 0px;
+  --viewport-status-mobile-toolbar-offset: 0px;
+
+  &.excalidraw--viewport-status-border {
+    --viewport-status-frame-border-width: 4px;
+  }
+
+  &.excalidraw--viewport-status-label {
+    --viewport-status-label-offset: 0.75rem;
+  }
+
+  &.excalidraw--mobile.excalidraw--mobile-toolbar.excalidraw--viewport-status-label {
+    // 2.25rem toolbar control + 0.5rem island padding + 10px scrollbar gap.
+    --viewport-status-mobile-toolbar-offset: calc(2.75rem + 10px);
+  }
+
   font-family: var(--ui-font);
 
   position: relative;
@@ -253,6 +271,23 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // an icon button rendered outside a .buttonList context (e.g. the font
+  // picker trigger)
+  button.standalone {
+    @include outlineButtonIconStyles;
+
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    & > * {
+      // disallow pointer events on children, so we always have event.target
+      // on the button itself
+      pointer-events: none;
+    }
+  }
+
   .App-top-bar {
     z-index: var(--zIndex-ui-top);
     display: flex;
@@ -366,8 +401,13 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:first-child {
-    justify-self: flex-start;
+  .App-menu_top > .App-menu_top__left {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .App-menu_top > .shapes-section {
+    grid-column: 2;
   }
 
   .selected-shape-actions-container {
@@ -378,8 +418,9 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top > *:last-child {
-    justify-self: flex-end;
+  .App-menu_top > .layer-ui__wrapper__top-right {
+    grid-column: 3;
+    justify-self: end;
   }
 
   .App-menu_bottom {
@@ -486,8 +527,13 @@ body.excalidraw-cursor-resize * {
     padding: 10px 20px;
     position: absolute;
     left: 50%;
-    bottom: 30px;
+    bottom: calc(30px + var(--viewport-status-label-offset));
     transform: translateX(-50%);
+    box-sizing: border-box;
+    max-width: calc(
+      100% - var(--viewport-status-frame-border-width) -
+        var(--viewport-status-frame-border-width)
+    );
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
@@ -502,9 +548,9 @@ body.excalidraw-cursor-resize * {
 
   .floating-status-stack {
     position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
+    left: var(--viewport-status-frame-border-width);
+    right: var(--viewport-status-frame-border-width);
+    bottom: calc(30px + var(--viewport-status-label-offset));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -516,6 +562,7 @@ body.excalidraw-cursor-resize * {
       left: auto;
       bottom: auto;
       transform: none;
+      max-width: 100%;
       pointer-events: var(--ui-pointerEvents);
     }
   }
@@ -559,9 +606,23 @@ body.excalidraw-cursor-resize * {
     aside {
       display: none;
     }
+
+    .floating-status-stack {
+      bottom: calc(30px + var(--viewport-status-label-offset) + var(--sab, 0));
+      z-index: var(--zIndex-ui-bottom);
+    }
+
     .scroll-back-to-content {
-      bottom: calc(100px + var(--sab, 0));
+      bottom: calc(
+        1.5rem + var(--viewport-status-label-offset) +
+          var(--viewport-status-mobile-toolbar-offset) + var(--sab, 0)
+      );
       z-index: -1;
+    }
+
+    .floating-status-stack .scroll-back-to-content {
+      bottom: auto;
+      z-index: auto;
     }
   }
 
@@ -595,6 +656,44 @@ body.excalidraw-cursor-resize * {
     .App-menu {
       display: flex;
       justify-content: space-between;
+    }
+  }
+
+  &.excalidraw--non-interactive {
+    user-select: none;
+
+    canvas {
+      // let the page handle scrolling over the editor, but not the browser
+      // zoom gestures (pinch, double-tap)
+      touch-action: pan-x pan-y;
+      // no !important — inline cursor styles must win so that
+      // `interaction: { enabled: { links: true } }` can show a pointer over
+      // links
+      cursor: default;
+    }
+
+    &.excalidraw--allow-browser-zoom canvas {
+      touch-action: auto;
+    }
+
+    // with navigation allowed, touch input drives the canvas pan/zoom again
+    &.excalidraw--navigation canvas {
+      touch-action: none;
+    }
+
+    // with the active tool allowed (`interaction.enabled.tools`), touch
+    // input drives the tool again — e.g. laser strokes must not scroll the
+    // page
+    &.excalidraw--tools canvas {
+      touch-action: none;
+    }
+
+    // override inline pointer-events set when embeddable is active
+    // (also covers custom `renderEmbeddable` content) — unless embeds are
+    // an allowed interaction, in which case the inline (activation-driven)
+    // pointer-events apply, same as in view mode
+    &:not(.excalidraw--embeds) .excalidraw__embeddable-container__inner {
+      pointer-events: none !important;
     }
   }
 

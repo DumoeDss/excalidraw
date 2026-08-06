@@ -3,6 +3,10 @@
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "எல்லாம் தேர்ந்தெடு",
     "multiSelect": "உறுப்பைத் தெரிவில் சேர்",
     "moveCanvas": "கித்தானை நகர்த்து",
@@ -31,6 +35,9 @@
     "strokeStyle_dashed": "கோடிட்ட",
     "strokeStyle_dotted": "புள்ளியிட்ட",
     "sloppiness": "அசட்டுத்தனம்",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ஒளிபுகாவியல்பு",
     "textAlign": "உரைச் சீரமைப்பு",
     "edges": "விளிம்புகள்",
@@ -49,7 +56,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "கூடுதல் விருப்பங்கள்",
+    "cardinality": "",
     "arrowtypes": "அம்புக்குறி வகை",
     "arrowtype_sharp": "கூர்மையான குறி",
     "arrowtype_round": "வளைந்தக் குறி",
@@ -171,7 +185,14 @@
     "linkToElement": "இணைப்பு",
     "wrapSelectionInFrame": "தேர்வை வடிவத்தில் சுற்று",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "இணைப்பு",
@@ -310,6 +331,7 @@
     "magicframe": "",
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
+    "autoshape": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
     "mermaidToExcalidraw": "",
@@ -345,6 +367,7 @@
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
     "embeddable": "இழுத்து வலை நுழைப்பு உருவாக்கு",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +418,10 @@
   },
   "errorDialog": {
     "title": "பிழை"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "வட்டில் சேமி",
@@ -576,7 +604,9 @@
     "colors": "நிறங்கள்",
     "shades": "சாயல்கள்",
     "hexCode": "ஹெக்ஸ் குறியீடு",
-    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை"
+    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +646,8 @@
     "syntax": "மெர்மெய்டு தொடரியல்",
     "preview": "முன்னோட்டம்",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

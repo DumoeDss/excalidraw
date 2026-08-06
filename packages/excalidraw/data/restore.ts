@@ -3,6 +3,7 @@ import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 import {
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
@@ -18,6 +19,9 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  STROKE_WIDTH,
+  STROKE_WIDTH_KEYS,
+  type StrokeWidthKey,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -26,6 +30,7 @@ import {
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
+  isNonDeletedElement,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
@@ -46,7 +51,11 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import {
+  normalizeBoundElementsOrder,
+  syncInvalidIndices,
+  syncMovedIndices,
+} from "@excalidraw/element";
 
 import { refreshTextDimensions } from "@excalidraw/element";
 
@@ -70,8 +79,10 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
+  StrokeVariability,
   StrokeRoundness,
   GeneratorConfig,
 } from "@excalidraw/element/types";
@@ -99,7 +110,38 @@ type RestoredAppState = Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
 
-const MAX_ARROW_PX = 75_000;
+const MAX_LINEAR_PX = 75_000;
+
+// Last resort fix for extremely large linear elements (lines / arrows), which
+// would otherwise freeze the editor while rendering — e.g. a dotted or dashed
+// stroke spanning a huge distance generates an enormous dash array.
+// https://github.com/excalidraw/excalidraw/issues/11497
+const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
+  element: T,
+): T => {
+  if (element.width <= MAX_LINEAR_PX && element.height <= MAX_LINEAR_PX) {
+    return element;
+  }
+
+  const label =
+    element.type === "arrow"
+      ? `${isElbowArrow(element) ? "elbow" : "simple"} arrow`
+      : element.type;
+
+  console.error(
+    `Removing extremely large ${label} ${element.id} (width: ${element.width}, height: ${element.height}, x: ${element.x}, y: ${element.y})`,
+  );
+
+  return {
+    ...element,
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+    isDeleted: true,
+  };
+};
 
 const restoreLinearElementPoints = (
   points: unknown,
@@ -184,13 +226,52 @@ export const AllowedExcalidrawActiveTools: Record<
   embeddable: true,
   hand: true,
   laser: false,
+  autoshape: false,
   magicframe: false,
+  bucketfill: true,
 };
 
 export type RestoredDataState = {
   elements: OrderedExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
+};
+
+const ALLOWED_STROKE_VARIABILITIES = new Set<StrokeVariability>([
+  "constant",
+  "variable",
+]);
+
+const restoreStrokeVariability = (
+  variability: unknown,
+  defaultValue: StrokeVariability,
+): StrokeVariability => {
+  return typeof variability === "string" &&
+    ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
+    ? (variability as StrokeVariability)
+    : defaultValue;
+};
+
+const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
+  return isFiniteNumber(strokeWidth)
+    ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
+    : null;
+};
+
+const restoreFreedrawStrokeOptions = (
+  strokeOptions: unknown,
+): { variability: StrokeVariability; streamline: number } => {
+  const options =
+    strokeOptions && typeof strokeOptions === "object"
+      ? (strokeOptions as { variability?: unknown; streamline?: unknown })
+      : null;
+
+  return {
+    variability: restoreStrokeVariability(options?.variability, "variable"),
+    streamline: isFiniteNumber(options?.streamline)
+      ? options?.streamline
+      : DEFAULT_STROKE_STREAMLINE,
+  };
 };
 
 const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
@@ -276,6 +357,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       const mode = isPointInElement(p, boundElement, elementsMap)
         ? "inside"
         : "orbit";
+
+      if (!isNonDeletedElement(element)) {
+        console.error("[NONDELETED][INVARIANT] Restoring a deleted element");
+      }
+
       const safeElement = {
         ...element,
         startBinding: element.startBinding?.elementId
@@ -305,8 +391,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-        safeElement,
-        boundElement,
+        safeElement as NonDeleted<ExcalidrawArrowElement>,
+        boundElement as NonDeleted<ExcalidrawBindableElement>,
         startOrEnd,
         elementsMap,
         focusPoint,
@@ -518,6 +604,7 @@ export const restoreElement = (
       return restoreElementWithProperties(element, {
         points,
         simulatePressure: element.simulatePressure,
+        strokeOptions: restoreFreedrawStrokeOptions(element.strokeOptions),
         pressures,
       });
     }
@@ -566,7 +653,7 @@ export const restoreElement = (
           } as ExcalidrawLinearElement));
       }
 
-      return restoreElementWithProperties(element, {
+      const restoredLine = restoreElementWithProperties(element, {
         type: "line",
         startBinding: null,
         endBinding: null,
@@ -584,6 +671,8 @@ export const restoreElement = (
           : {}),
         ...getSizeFromPoints(points),
       });
+
+      return handleOversizedLinearElements(restoredLine);
     case "arrow": {
       const startArrowhead = normalizeArrowhead(element.startArrowhead);
       const endArrowhead =
@@ -650,37 +739,7 @@ export const restoreElement = (
         ),
       };
 
-      // Last resort fix for extremely large arrows
-      if (
-        normalizedRestoredElement.width > MAX_ARROW_PX ||
-        normalizedRestoredElement.height > MAX_ARROW_PX
-      ) {
-        console.error(
-          `Removing extremely large arrow ${
-            normalizedRestoredElement.id
-          } (type: ${
-            isElbowArrow(normalizedRestoredElement) ? "elbow" : "simple"
-          }, width: ${normalizedRestoredElement.width}, height: ${
-            normalizedRestoredElement.height
-          }, x: ${normalizedRestoredElement.x}, y: ${
-            normalizedRestoredElement.y
-          })`,
-        );
-        return {
-          ...normalizedRestoredElement,
-          x: 0,
-          y: 0,
-          width: 100,
-          height: 100,
-          points: [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(100, 100),
-          ],
-          isDeleted: true,
-        };
-      }
-
-      return normalizedRestoredElement;
+      return handleOversizedLinearElements(normalizedRestoredElement);
     }
 
     // generic elements
@@ -790,6 +849,34 @@ const repairBoundElement = (
     boundElements.push({ type: "text", id: boundElement.id });
     container.boundElements = boundElements;
   }
+};
+
+/**
+ * Places bound text directly after its container while preserving the
+ * container's fractional index.
+ *
+ * NOTE mutates indices of reordered bound text elements.
+ */
+const repairBoundTextElementOrder = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const originalPositions = new Map(
+    elements.map((element, index) => [element.id, index]),
+  );
+  const normalizedElements = normalizeBoundElementsOrder(elements);
+  const reorderedBoundTextElements = normalizedElements.filter(
+    (element, index) =>
+      isTextElement(element) &&
+      element.containerId &&
+      originalPositions.get(element.id) !== index,
+  );
+
+  return reorderedBoundTextElements.length
+    ? syncMovedIndices(
+        normalizedElements,
+        arrayToMap(reorderedBoundTextElements),
+      )
+    : normalizedElements;
 };
 
 /**
@@ -925,9 +1012,11 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
+  const repairedElements = repairBoundTextElementOrder(restoredElements);
+
   // NOTE (mtolmacs): Temporary fix for invalid/self-bound elbow arrows
   // Need to iterate again so we have attached text nodes in elementsMap
-  return restoredElements.map((element) => {
+  return repairedElements.map((element) => {
     if (
       isElbowArrow(element) &&
       !isArrowBoundToElement(element) &&
@@ -1105,6 +1194,13 @@ export const restoreAppState = (
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
 
+  // legacy
+  if ((appState as any).currentItemStrokeWidth !== undefined) {
+    nextAppState.currentItemStrokeWidthKey =
+      getStrokeWidthKey((appState as any).currentItemStrokeWidth) ??
+      defaultAppState.currentItemStrokeWidthKey;
+  }
+
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",
@@ -1146,10 +1242,9 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
-  const elements = restoreElements(
-    getNonDeletedElements(libraryItem.elements),
-    null,
+const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
+  const elements = getNonDeletedElements(
+    restoreElements(libraryItem.elements, null),
   );
   return elements.length ? { ...libraryItem, elements } : null;
 };
