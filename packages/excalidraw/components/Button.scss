@@ -1,7 +1,10 @@
-@use "../css/theme" as *;
+@use "./primitives/button" as *;
 
 .excalidraw {
+  // Marker class kept so any external CSS targeting `.excalidraw-button` still
+  // applies. The unified `uiButtonStyles` base (owned focus-visible, `selected`
+  // state, `--ui-*` tokens) replaces the former `outlineButtonStyles`.
   .excalidraw-button {
-    @include outlineButtonStyles;
+    @include uiButtonStyles;
   }
 }

@@ -43,15 +43,14 @@ import {
   GithubIcon,
   DiscordIcon,
   XBrandIcon,
-  settingsIcon,
   emptyIcon,
 } from "../icons";
+import { HelpIcon, settingsIcon } from "../primitives/chrome-icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
   ExportIcon,
   ExportImageIcon,
-  HelpIcon,
   LoadIcon,
   MoonIcon,
   save,

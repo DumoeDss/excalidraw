@@ -466,7 +466,8 @@ import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { CursorHint, CursorHints } from "./CursorHint";
-import { MagicIcon, copyIcon, fullscreenIcon, playerPlayIcon } from "./icons";
+import { MagicIcon, fullscreenIcon, playerPlayIcon } from "./icons";
+import { copyIcon } from "./primitives/chrome-icons";
 import { MediaViewer } from "./MediaViewer";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 

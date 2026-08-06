@@ -22,8 +22,8 @@ import {
   bucketFillIcon,
   MagicIcon,
   mermaidLogoIcon,
-  DotsIcon,
 } from "./icons";
+import { DotsIcon } from "./primitives/chrome-icons";
 import {
   ArrowToolButton,
   DiamondToolButton,

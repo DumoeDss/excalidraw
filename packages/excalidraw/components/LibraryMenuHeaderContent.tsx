@@ -20,12 +20,12 @@ import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
-  DotsIcon,
   ExportIcon,
   LoadIcon,
   publishIcon,
   TrashIcon,
 } from "./icons";
+import { DotsIcon } from "./primitives/chrome-icons";
 
 import type Library from "../data/library";
 import type { LibraryItem, LibraryItems, UIAppState } from "../types";

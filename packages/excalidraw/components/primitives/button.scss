@@ -1,0 +1,195 @@
+// =============================================================================
+// primitives/button.scss — Unified INTERNAL UI button primitive.
+//
+// Single source of truth for button rendering in the redesign. Exposes:
+//   • @mixin uiButtonStyles — the shared base. Adopted by the legacy
+//     `.excalidraw-button` and `.dropdown-menu-button` surfaces (it replaces
+//     the former `outlineButtonStyles` mixin) AND consumed by the `.ui-button`
+//     class family below, so adopted surfaces and the canonical component
+//     share one render path.
+//   • .ui-button class family — the concrete classes rendered by <UiButton>
+//     (variants default/solid/ghost/danger, sizes md/lg, states, focus ring).
+//
+// Conventions (see primitives/README.md):
+//   • One state model — `selected` is canonical. The mixin matches
+//     `&.selected`, `&.ui-button--selected`, AND `&[aria-pressed="true"]`.
+//   • Owned focus-visible — the `:focus-visible` rule lives in this mixin, so
+//     under `.excalidraw` it compiles to `.excalidraw .ui-button:focus-visible`
+//     (and the adopted-surface equivalents) at specificity (0,3,0), which
+//     beats the legacy global `.excalidraw button:focus-visible` (0,2,1). The
+//     2px brand ring wins WITHOUT `!important`.
+//   • Consumes ONLY `--ui-*` tokens + the existing `--color-primary` /
+//     `--color-danger` families. NO new CSS custom properties are introduced.
+// =============================================================================
+
+@use "../../css/variables.module" as *;
+
+@mixin uiButtonStyles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--ui-space-2);
+  box-sizing: border-box;
+  width: var(--button-width, var(--default-button-size));
+  height: var(--button-height, var(--default-button-size));
+  padding: var(--ui-space-3);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--button-border, var(--default-border-color));
+  border-radius: var(--ui-radius-lg);
+  background-color: var(--button-bg, var(--island-bg-color));
+  color: var(--button-color, var(--color-on-surface));
+  font-family: var(--ui-font);
+  font-size: var(--ui-font-size-md);
+  font-weight: var(--ui-font-weight-medium);
+  line-height: var(--ui-line-height-tight);
+  cursor: pointer;
+
+  svg {
+    width: var(--button-width, var(--lg-icon-size));
+    height: var(--button-height, var(--lg-icon-size));
+  }
+
+  &:hover {
+    background-color: var(--button-hover-bg, var(--ui-surface-hover));
+    border-color: var(
+      --button-hover-border,
+      var(--button-border, var(--default-border-color))
+    );
+    color: var(
+      --button-hover-color,
+      var(--button-color, var(--text-primary-color, inherit))
+    );
+  }
+
+  &:active {
+    background-color: var(--button-active-bg, var(--ui-surface-hover));
+    border-color: var(--button-active-border, var(--color-primary-darkest));
+  }
+
+  // One canonical "selected/active/checked" state. `selected` is the canonical
+  // name; `aria-pressed="true"` is honored as a semantic alias so consumers
+  // that prefer the a11y attribute still get the affordance. `.ui-button--selected`
+  // is the class <UiButton> renders for its `selected` prop.
+  &.selected,
+  &.ui-button--selected,
+  &[aria-pressed="true"] {
+    background-color: var(
+      --button-selected-bg,
+      var(--color-surface-primary-container)
+    );
+    border-color: var(
+      --button-selected-border,
+      var(--color-surface-primary-container)
+    );
+
+    &:hover {
+      background-color: var(
+        --button-selected-hover-bg,
+        var(--color-surface-primary-container)
+      );
+    }
+
+    svg {
+      color: var(--button-color, var(--color-on-primary-container));
+    }
+  }
+
+  &:disabled,
+  &[disabled] {
+    cursor: not-allowed;
+    color: var(--button-color, var(--color-disabled));
+    opacity: 0.5;
+  }
+
+  @include isMobile() {
+    width: var(
+      --button-width,
+      var(--mobile-action-button-size, var(--default-button-size))
+    );
+    height: var(
+      --button-height,
+      var(--mobile-action-button-size, var(--default-button-size))
+    );
+  }
+
+  // Owned focus-visible ring (2px brand). Declared last in the mixin so, within
+  // a pure `.ui-button`, it wins over the mixin's own `:active`. Under
+  // `.excalidraw` this is specificity (0,3,0) > the legacy global
+  // `.excalidraw button:focus-visible` (0,2,1) — no `!important`.
+  &:focus-visible {
+    outline: transparent;
+    box-shadow: 0 0 0 var(--ui-space-1) var(--color-brand-hover);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// .ui-button class family — concrete classes rendered by <UiButton>.
+// `.ui-button` is the base (the `default`/outline variant + `md` size come from
+// the shared mixin); the modifier classes layer variant/size specifics on top
+// by repointing the `--button-*` override contract, so the shared state rules
+// (hover/active/selected/focus/disabled) keep applying uniformly.
+// -----------------------------------------------------------------------------
+
+.excalidraw {
+  .ui-button {
+    @include uiButtonStyles;
+  }
+
+  // --- Sizes -----------------------------------------------------------------
+  .ui-button--md {
+    width: var(--button-width, var(--default-button-size));
+    height: var(--button-height, var(--default-button-size));
+  }
+
+  .ui-button--lg {
+    width: var(--button-width, var(--lg-button-size));
+    height: var(--button-height, var(--lg-button-size));
+  }
+
+  // --- Variants --------------------------------------------------------------
+  // `default` (outline) is the base mixin. The other variants only repoint the
+  // `--button-*` custom properties consumed above — no direct property
+  // overrides, so the unified state rules stay in force.
+
+  // Solid: brand-filled. Foreground flips to the canvas color so it reads on
+  // the theme-flipping brand purple in both light and dark.
+  .ui-button--solid {
+    --button-bg: var(--color-primary);
+    --button-color: var(--default-bg-color);
+    --button-border: var(--color-primary);
+    --button-hover-bg: var(--color-primary-hover);
+    --button-active-bg: var(--color-primary-darker);
+    --button-active-border: var(--color-primary-darkest);
+    --button-selected-bg: var(--color-primary-darkest);
+    --button-selected-border: var(--color-primary-darkest);
+  }
+
+  // Ghost: borderless + transparent; surfaces only on hover/active/selected.
+  .ui-button--ghost {
+    --button-bg: transparent;
+    --button-border: transparent;
+    --button-hover-bg: var(--ui-surface-hover);
+    --button-active-bg: var(--ui-surface-selected);
+    --button-active-border: transparent;
+    --button-selected-bg: var(--ui-surface-selected);
+    --button-selected-border: transparent;
+  }
+
+  // Danger: destructive action.
+  .ui-button--danger {
+    --button-bg: var(--color-danger);
+    --button-color: var(--default-bg-color);
+    --button-border: var(--color-danger);
+    --button-hover-bg: var(--color-danger-darker);
+    --button-active-bg: var(--color-danger-darkest);
+    --button-active-border: var(--color-danger-darkest);
+    --button-selected-bg: var(--color-danger-darkest);
+    --button-selected-border: var(--color-danger-darkest);
+  }
+
+  // Full-width convenience modifier.
+  .ui-button--full-width {
+    width: 100%;
+  }
+}

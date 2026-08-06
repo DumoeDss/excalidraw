@@ -27,7 +27,8 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
-import { copyIcon, downloadIcon, helpIcon } from "./icons";
+import { downloadIcon, helpIcon } from "./icons";
+import { copyIcon } from "./primitives/chrome-icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";

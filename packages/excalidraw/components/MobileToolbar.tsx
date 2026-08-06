@@ -25,7 +25,6 @@ import {
 import {
   TextIcon,
   ImageIcon,
-  DotsIcon,
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
@@ -34,6 +33,7 @@ import {
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
+import { DotsIcon } from "./primitives/chrome-icons";
 
 import "./ToolIcon.scss";
 import "./MobileToolbar.scss";

@@ -5,7 +5,7 @@ import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
-import { PlusIcon } from "./icons";
+import { PlusIcon } from "./primitives/chrome-icons";
 
 import "./LibraryUnit.scss";
 

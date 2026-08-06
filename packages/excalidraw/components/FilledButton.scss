@@ -66,12 +66,12 @@
       &.ExcButton--variant-filled,
       &:hover {
         --back-color: var(--color-surface-low) !important;
-        --text-color: var(--color-on-surface-variant) !important;
+        --text-color: var(--color-disabled) !important;
       }
 
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
-        --text-color: var(--color-on-surface-variant);
+        --text-color: var(--color-disabled);
         --border-color: var(--color-surface-high);
       }
     }

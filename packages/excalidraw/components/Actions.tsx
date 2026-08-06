@@ -53,10 +53,10 @@ import {
   elbowArrowIcon,
   TextSizeIcon,
   adjustmentsIcon,
-  DotsHorizontalIcon,
   SelectionIcon,
   pencilIcon,
 } from "./icons";
+import { DotsHorizontalIcon } from "./primitives/chrome-icons";
 
 import { Island } from "./Island";
 

@@ -2,7 +2,7 @@ import React from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { chevronRight } from "../icons";
+import { chevronRight } from "../primitives/chrome-icons";
 
 import { getDropdownMenuItemClassName } from "./common";
 import MenuItemContent from "./DropdownMenuItemContent";

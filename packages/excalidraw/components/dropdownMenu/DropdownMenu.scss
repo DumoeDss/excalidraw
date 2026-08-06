@@ -1,4 +1,5 @@
 @use "../../css/variables.module" as *;
+@use "../primitives/button" as *;
 
 .excalidraw {
   .dropdown-menu {
@@ -232,7 +233,7 @@
   }
 
   .dropdown-menu-button {
-    @include outlineButtonStyles;
+    @include uiButtonStyles;
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 

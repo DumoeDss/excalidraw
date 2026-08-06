@@ -5,7 +5,8 @@ import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useEditorInterface, useExcalidrawActionManager } from "../App";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
-import { HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { LoadIcon, usersIcon } from "../icons";
+import { HelpIcon } from "../primitives/chrome-icons";
 
 import type { JSX } from "react";
 
