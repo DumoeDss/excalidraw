@@ -171,14 +171,14 @@ body.excalidraw-cursor-resize * {
   .selected-shape-actions {
     display: flex;
     flex-direction: column;
-    row-gap: 0.75rem;
+    row-gap: var(--ui-space-4);
 
     h3,
     legend,
     .control-label {
       margin: 0;
       margin-bottom: 0.25rem;
-      font-size: 0.75rem;
+      font-size: var(--ui-font-size-xs);
       color: var(--text-primary-color);
       font-weight: 400;
       display: block;
@@ -201,8 +201,8 @@ body.excalidraw-cursor-resize * {
     .buttonList {
       flex-wrap: wrap;
       display: flex;
-      column-gap: 0.5rem;
-      row-gap: 0.5rem;
+      column-gap: var(--ui-space-3);
+      row-gap: var(--ui-space-3);
 
       label {
         font-size: 0.75rem;

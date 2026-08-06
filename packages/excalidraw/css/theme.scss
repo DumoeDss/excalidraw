@@ -22,7 +22,7 @@
   --input-border-color: #{$color-gray-4};
   --input-hover-bg-color: #{$color-gray-1};
   --input-label-color: #{$color-gray-7};
-  --island-bg-color: #ffffff;
+  --island-bg-color: var(--ui-surface-panel);
   --island-bg-color-alt: #fff;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$color-blue-7};
@@ -39,10 +39,10 @@
   --shadow-island-stronger: 0px 0px 1px 0px rgba(0, 0, 0, 0.17),
     0px 0px 3px 0px rgba(0, 0, 0, 0.08), 0px 7px 14px 0px rgb(0 0 0 / 18%);
 
-  --button-hover-bg: var(--color-surface-high);
-  --button-active-bg: var(--color-surface-high);
+  --button-hover-bg: var(--ui-surface-hover);
+  --button-active-bg: var(--ui-surface-hover);
   --button-active-border: var(--color-brand-active);
-  --default-border-color: var(--color-surface-high);
+  --default-border-color: var(--ui-border);
 
   --default-button-size: 2rem;
   --default-icon-size: 1rem;
@@ -57,19 +57,9 @@
   --color-slider-track: hsl(240, 100%, 90%);
   --color-slider-thumb: var(--color-gray-80);
 
-  --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
-    0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
-    0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
-    0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
-    0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
-    0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+  --modal-shadow: var(--ui-shadow-4);
   --avatar-border-color: var(--color-gray-20);
-  --sidebar-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
-    0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
-    0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
-    0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
-    0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
-    0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+  --sidebar-shadow: var(--ui-shadow-4);
   --sidebar-border-color: var(--color-surface-high);
   --sidebar-bg-color: var(--island-bg-color);
   --library-dropdown-shadow: 0px 15px 6px rgba(0, 0, 0, 0.01),
@@ -165,6 +155,69 @@
   --color-badge: #0b6513;
   --background-color-badge: #d3ffd2;
 
+  /* === --ui-* design-token layer ===
+     Semantic presentational primitives (spacing, radius, typography, elevation)
+     plus a neutral cool blue-gray surface/border ramp. The scales are
+     theme-invariant (defined once here, not re-declared under .theme--dark);
+     only the surface/border family carries dark overrides further below. This
+     layer is purely additive and leaves every legacy token -- --space-factor,
+     --border-radius-*, --shadow-island, --modal-shadow, --sidebar-shadow,
+     --color-primary and family, --color-surface-*, --color-gray-* -- defined
+     and untouched. High-level surface levers in this file consume the ramp. */
+  --ui-space-1: 0.125rem;
+  --ui-space-2: 0.25rem;
+  --ui-space-3: 0.5rem;
+  --ui-space-4: 0.75rem;
+  --ui-space-5: 1rem;
+  --ui-space-6: 1.25rem;
+  --ui-space-7: 1.75rem;
+  --ui-space-8: 2rem;
+
+  --ui-radius-xs: 0.125rem;
+  --ui-radius-sm: 0.25rem;
+  --ui-radius-md: 0.375rem;
+  --ui-radius-lg: 0.5625rem;
+  --ui-radius-xl: 0.6875rem;
+  --ui-radius-pill: 999px;
+
+  --ui-font-size-xs: 0.75rem;
+  --ui-font-size-sm: 0.8125rem;
+  --ui-font-size-md: 0.875rem;
+  --ui-font-size-lg: 1rem;
+  --ui-font-size-xl: 1.25rem;
+  --ui-font-weight-regular: 400;
+  --ui-font-weight-medium: 500;
+  --ui-font-weight-semibold: 600;
+  --ui-font-weight-bold: 700;
+  --ui-line-height-tight: 1.25;
+  --ui-line-height-base: 1.4;
+  --ui-line-height-relaxed: 1.5;
+
+  --ui-shadow-color: rgba(0, 0, 0, 0.12);
+  --ui-shadow-1: 0px 1px 2px var(--ui-shadow-color);
+  --ui-shadow-2: 0px 0px 1px 0px rgba(0, 0, 0, 0.17),
+    0px 0px 3px 0px rgba(0, 0, 0, 0.08), 0px 7px 14px 0px rgba(0, 0, 0, 0.05);
+  --ui-shadow-3: 0px 8px 24px var(--ui-shadow-color),
+    0px 2px 6px var(--ui-shadow-color);
+  --ui-shadow-4: 0px 100px 80px rgba(0, 0, 0, 0.07),
+    0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
+    0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
+    0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
+    0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
+    0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+
+  /* Neutral cool blue-gray surface ramp (hue ~225-235). Panels are elevated
+     relative to the canvas (panel is the lightest neutral here), and one
+     --ui-surface-selected tier is reserved for selection/active affordances,
+     deliberately distinct from the brand accent. */
+  --ui-surface-canvas: #eceef2;
+  --ui-surface-panel: #fcfcfe;
+  --ui-surface-hover: #eef0f5;
+  --ui-surface-selected: #dde2ec;
+  --ui-border: #e1e4eb;
+  --ui-border-strong: #c8cdd8;
+  /* === end --ui-* design-token layer === */
+
   @include isMobile {
     --editor-container-padding: 0.75rem;
   }
@@ -202,7 +255,7 @@
     --input-border-color: #2e2e2e;
     --input-hover-bg-color: #181818;
     --input-label-color: #{$color-gray-2};
-    --island-bg-color: #232329;
+    --island-bg-color: var(--ui-surface-panel);
     --island-bg-color-alt: hsl(240, 12%, 12%);
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$color-blue-4};
@@ -212,12 +265,6 @@
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$color-blue-4};
 
-    --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
-      0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
-      0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
-      0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
-      0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
-      0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
     --avatar-border-color: var(--color-gray-85);
 
     --scrollbar-thumb: #{$color-gray-8};
@@ -277,5 +324,18 @@
     --color-border-outline: #8e8d9c;
     --color-border-outline-variant: #46464f;
     --color-surface-primary-container: #403e6a;
+
+    /* === --ui-* dark overrides (surface + border only) ===
+       The spacing/radius/typography/elevation tiers are theme-invariant and
+       are intentionally not re-declared here. Panels stay elevated relative
+       to the canvas (lighter than the near-black canvas) to preserve the
+       existing elevation direction. */
+    --ui-surface-canvas: #121315;
+    --ui-surface-panel: #23252e;
+    --ui-surface-hover: #2c2e37;
+    --ui-surface-selected: #353842;
+    --ui-border: #2e3038;
+    --ui-border-strong: #44474f;
+    /* === end --ui-* dark overrides === */
   }
 }

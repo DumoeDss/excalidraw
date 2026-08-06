@@ -115,7 +115,7 @@ $color-blue-8: #1971c2;
   border-width: 1px;
   border-style: solid;
   border-color: var(--button-border, var(--default-border-color));
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--ui-radius-lg);
   cursor: pointer;
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--color-on-surface));
