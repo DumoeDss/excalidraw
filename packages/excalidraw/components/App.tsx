@@ -510,7 +510,6 @@ import type {
   ExcalidrawImperativeAPIEventMap,
   GenerateDiagramToCode,
   NullableGridSize,
-  Offsets,
   GeneratorModel,
   GeneratorPanelContext,
   DataURL,

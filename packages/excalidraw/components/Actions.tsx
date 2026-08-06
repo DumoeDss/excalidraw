@@ -2,11 +2,7 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { Popover } from "radix-ui";
 
-import {
-  CLASSES,
-  KEYS,
-  capitalizeString,
-} from "@excalidraw/common";
+import { CLASSES, KEYS, capitalizeString } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -28,12 +24,13 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import { trackEvent } from "../analytics";
+import { useTunnels } from "../context/tunnels";
 
 import { SHAPES } from "./shapes";
 
 import "./Actions.scss";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer, useStylesPanelMode } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { ToolGroupDropdown } from "./ToolGroupDropdown";
@@ -71,7 +68,6 @@ import type {
   AppClassProperties,
   AppProps,
   UIAppState,
-  Zoom,
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";

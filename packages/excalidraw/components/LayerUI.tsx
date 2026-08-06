@@ -27,7 +27,11 @@ import { useAtom, useAtomValue } from "../editor-jotai";
 import { t } from "../i18n";
 import { getScrollToContentState } from "../scene";
 
-import { SelectedShapeActions, CompactShapeActions } from "./Actions";
+import {
+  SelectedShapeActions,
+  CompactShapeActions,
+  ShapesSwitcher,
+} from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
@@ -55,7 +59,8 @@ import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
-import { Toolbar } from "./Toolbar";
+import { LockButton } from "./LockButton";
+import { HintViewer } from "./HintViewer";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -353,15 +358,43 @@ const LayerUI = ({
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <Toolbar
-                          app={app}
-                          appState={appState}
-                          setAppState={setAppState}
-                          UIOptions={UIOptions}
-                          onPenModeToggle={onPenModeToggle}
-                          onLockToggle={onLockToggle}
-                          heading={heading}
-                        />
+                        <Island
+                          padding={spacing.islandPadding}
+                          className={clsx("App-toolbar", {
+                            "zen-mode": appState.zenModeEnabled,
+                            "App-toolbar--compact": isCompactStylesPanel,
+                          })}
+                        >
+                          <HintViewer
+                            appState={appState}
+                            isMobile={editorInterface.formFactor === "phone"}
+                            editorInterface={editorInterface}
+                            app={app}
+                          />
+                          {heading}
+                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
+                            <PenModeButton
+                              checked={appState.penMode}
+                              onChange={() => onPenModeToggle(null)}
+                              title={t("toolBar.penMode")}
+                              penDetected={appState.penDetected}
+                            />
+                            <LockButton
+                              checked={appState.activeTool.locked}
+                              onChange={onLockToggle}
+                              title={t("toolBar.lock")}
+                            />
+
+                            <div className="App-toolbar__divider" />
+
+                            <ShapesSwitcher
+                              setAppState={setAppState}
+                              activeTool={appState.activeTool}
+                              UIOptions={UIOptions}
+                              app={app}
+                            />
+                          </Stack.Row>
+                        </Island>
                         {isCollaborating && (
                           <Island
                             style={{
