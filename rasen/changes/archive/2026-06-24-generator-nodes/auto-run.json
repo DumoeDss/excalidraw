@@ -1,0 +1,24 @@
+{
+  "pipeline": "small-feature",
+  "classification": "small-feature",
+  "tier": "B",
+  "notes": "LEAD authors propose+apply (holds full design + media-node context). Author!=verifier enforced via an independent reviewer subagent for verify/review-loop. Gates auto-continued per explicit user pre-authorization ('不要停下').",
+  "decisions": {
+    "generation": "async job + poll",
+    "models": "dynamic fetch (onListGeneratorModels)",
+    "panel": "render hook (host-rendered, renderGeneratorPanel)",
+    "refs": "uploaded files + canvas element selection"
+  },
+  "stages": {
+    "propose": { "status": "done", "worker": { "role": "lead", "agentId": "lead" } },
+    "apply": { "status": "done", "worker": { "role": "lead", "agentId": "lead" }, "selfCheck": "typecheck+eslint+prettier+fullsuite green (106 files/1420 tests)" },
+    "verify": { "status": "done", "worker": { "role": "reviewer", "agentId": "a30beec021b9119e7" }, "result": "1 Blocker, 3 Major, 6 Minor, 3 Trivial" },
+    "review-loop": { "status": "done", "worker": { "role": "reviewer", "agentId": "a30beec021b9119e7" }, "note": "round 1: LEAD fixed all 1 Blocker + 3 Major + 6 Minor + 3 Trivial; non-author re-review (twice) confirmed every Blocker/Major resolved — clean." },
+    "ship": { "status": "done", "worker": { "role": "lead", "agentId": "lead" }, "commits": ["dce7de6f", "02606725"] },
+    "archive": { "status": "done" }
+  },
+  "rounds": 1,
+  "openFindings": [],
+  "acceptedKnown": ["image-resize has no jsdom unit test (jsdom doesn't decode images); covered by code review + video lifecycle + delete-mid-job tests"],
+  "verification": "typecheck clean; eslint+prettier clean; full suite 106 files/1421 tests green (bounded workers — unbounded OOMs on this machine)"
+}
