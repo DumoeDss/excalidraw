@@ -288,26 +288,12 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-top-bar {
-    z-index: var(--zIndex-ui-top);
-    display: flex;
-    flex-direction: column;
-  }
-
   .App-welcome-screen {
     z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
-    position: absolute;
-    // account for margins
-    width: calc(100% - 28px);
-    max-width: 450px;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: var(--zIndex-ui-bottom);
     display: flex;
     flex-direction: column;
 
@@ -344,15 +330,9 @@ body.excalidraw-cursor-resize * {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-
-  .App-toolbar-content {
-    display: flex;
-    flex-direction: column;
-
     pointer-events: none;
 
-    & > * {
+    > * {
       pointer-events: var(--ui-pointerEvents);
     }
   }
@@ -384,73 +364,12 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu_top {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 1rem;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
-    }
-
-    @media (min-width: 1536px) {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 3rem;
-    }
-  }
-
-  .App-menu_top > .App-menu_top__left {
-    grid-column: 1;
-    justify-self: start;
-  }
-
-  .App-menu_top > .shapes-section {
-    grid-column: 2;
-  }
-
   .selected-shape-actions-container {
     width: fit-content;
 
     &--compact {
       min-width: 48px;
     }
-  }
-
-  .App-menu_top > .layer-ui__wrapper__top-right {
-    grid-column: 3;
-    justify-self: end;
-  }
-
-  .App-menu_bottom {
-    position: absolute;
-    bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-    box-sizing: border-box;
-    padding: 0 1rem;
-
-    &--transition-left {
-      section {
-        width: 185px;
-      }
-    }
-
-    section {
-      display: flex;
-    }
-  }
-
-  .App-menu_bottom > *:first-child {
-    justify-self: flex-start;
-  }
-
-  .App-menu_bottom > *:last-child {
-    justify-self: flex-end;
   }
 
   .App-menu_left {

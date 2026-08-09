@@ -10,6 +10,12 @@ import Stack from "../Stack";
 
 import type { ActionManager } from "../../actions/manager";
 import type { UIAppState } from "../../types";
+import type { CanvasUiZones } from "../CanvasUiLayout";
+
+type FooterZones = Pick<
+  CanvasUiZones,
+  "bottomStart" | "bottomCenter" | "bottomEnd"
+>;
 
 const Footer = ({
   appState,
@@ -18,6 +24,7 @@ const Footer = ({
   renderWelcomeScreen,
   defaultUIEnabled,
   zoomUIEnabled,
+  children,
 }: {
   appState: UIAppState;
   actionManager: ActionManager;
@@ -25,16 +32,14 @@ const Footer = ({
   renderWelcomeScreen: boolean;
   defaultUIEnabled: boolean;
   zoomUIEnabled: boolean;
+  children: (zones: FooterZones) => React.ReactNode;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
   const app = useApp();
 
-  return (
-    <footer
-      role="contentinfo"
-      className="layer-ui__wrapper__footer App-menu App-menu_bottom"
-    >
-      {(defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled())) && (
+  return children({
+    bottomStart:
+      defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled()) ? (
         <div
           className={clsx(
             "layer-ui__wrapper__footer-left zen-mode-transition",
@@ -62,35 +67,37 @@ const Footer = ({
             </Section>
           </Stack.Col>
         </div>
-      )}
-      <FooterCenterTunnel.Out />
-      {(defaultUIEnabled || renderWelcomeScreen) && (
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-right zen-mode-transition",
-            {
-              "transition-right": appState.zenModeEnabled,
-            },
-          )}
-        >
-          <div style={{ position: "relative" }}>
-            {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
-            {defaultUIEnabled && (
-              <HelpButton
-                onClick={() => actionManager.executeAction(actionShortcuts)}
-              />
+      ) : null,
+    bottomCenter: <FooterCenterTunnel.Out />,
+    bottomEnd:
+      defaultUIEnabled || renderWelcomeScreen ? (
+        <>
+          <div
+            className={clsx(
+              "layer-ui__wrapper__footer-right zen-mode-transition",
+              {
+                "transition-right": appState.zenModeEnabled,
+              },
             )}
+          >
+            <div style={{ position: "relative" }}>
+              {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
+              {defaultUIEnabled && (
+                <HelpButton
+                  onClick={() => actionManager.executeAction(actionShortcuts)}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      )}
-      {defaultUIEnabled && (
-        <ExitZenModeButton
-          actionManager={actionManager}
-          showExitZenModeBtn={showExitZenModeBtn}
-        />
-      )}
-    </footer>
-  );
+          {defaultUIEnabled && (
+            <ExitZenModeButton
+              actionManager={actionManager}
+              showExitZenModeBtn={showExitZenModeBtn}
+            />
+          )}
+        </>
+      ) : null,
+  });
 };
 
 export default Footer;
