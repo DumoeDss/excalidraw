@@ -1,0 +1,179 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .adaptive-editor-toolbar {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible;
+
+    &__primary,
+    &__measurement {
+      display: flex;
+      align-items: center;
+      column-gap: var(--ui-space-2);
+    }
+
+    &__primary {
+      min-width: 0;
+      justify-content: center;
+    }
+
+    &__measurement {
+      position: absolute;
+      inset: auto auto 0 0;
+      visibility: hidden;
+      pointer-events: none;
+      user-select: none;
+      z-index: -1;
+      white-space: nowrap;
+    }
+
+    &__action,
+    &__group-trigger,
+    &__menu-trigger,
+    &__overflow-trigger {
+      flex: 0 0 2.25rem;
+      width: 2.25rem;
+      height: 2.25rem;
+      min-width: 2.25rem;
+      min-height: 2.25rem;
+      border: 0;
+      border-radius: var(--ui-radius-md);
+      background: transparent;
+      color: var(--icon-fill-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background-color 120ms ease, color 120ms ease,
+        box-shadow 120ms ease;
+
+      &:hover {
+        background: var(--ui-surface-hover);
+      }
+
+      &:active {
+        background: var(--ui-surface-selected);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 var(--ui-space-1) var(--color-brand-hover);
+      }
+
+      &--selected,
+      &[aria-pressed="true"] {
+        background: var(--ui-surface-selected);
+        color: var(--color-on-primary-container);
+      }
+
+      &:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    .tool-group-dropdown .ToolIcon__icon,
+    .ToolIcon__icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--ui-radius-md);
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__menu {
+      margin: 0 0 var(--ui-space-2);
+      min-width: 12.5rem;
+      max-height: min(
+        32rem,
+        var(--radix-dropdown-menu-content-available-height, calc(100vh - 6rem))
+      );
+      overflow-y: auto;
+
+      .dropdown-menu-container {
+        max-height: inherit;
+      }
+
+      &.adaptive-editor-toolbar__menu--phone {
+        // Local stacking above the adjacent phone action row. This does not
+        // change unrelated menus or the canvas-layout stacking context.
+        z-index: 3;
+      }
+    }
+
+    &__tunnel-item {
+      display: contents;
+    }
+
+    &--phone {
+      width: 100%;
+
+      .adaptive-editor-toolbar__primary {
+        justify-content: space-between;
+      }
+
+      .adaptive-editor-toolbar__action,
+      .adaptive-editor-toolbar__group-trigger,
+      .adaptive-editor-toolbar__menu-trigger,
+      .adaptive-editor-toolbar__overflow-trigger,
+      .tool-group-dropdown .ToolIcon__icon,
+      .ToolIcon__icon {
+        flex-basis: 2.75rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+      }
+    }
+  }
+
+  .adaptive-toolbar-shell {
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-xl);
+    background: color-mix(in srgb, var(--ui-surface-panel) 96%, transparent);
+    box-shadow: var(--ui-shadow-2);
+    padding: var(--ui-space-2);
+    backdrop-filter: blur(12px);
+
+    :where(button, input, select, textarea, a[href], [role="button"]) {
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  .App-bottom-bar > .Island.adaptive-toolbar-shell {
+    pointer-events: none;
+  }
+
+  .layer-ui__bottom-center-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ui-space-3);
+    min-width: 0;
+    max-width: 100%;
+    pointer-events: none;
+
+    > *,
+    .Stack,
+    .App-toolbar-container {
+      pointer-events: none;
+    }
+  }
+
+  &[data-toolbar-menu-open="true"] .mobile-shape-actions {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

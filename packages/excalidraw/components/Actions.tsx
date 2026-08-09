@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Popover } from "radix-ui";
 
-import { CLASSES, KEYS, capitalizeString } from "@excalidraw/common";
+import { CLASSES } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -23,37 +23,19 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
-
-import { SHAPES } from "./shapes";
-
 import "./Actions.scss";
 
 import { useExcalidrawContainer, useStylesPanelMode } from "./App";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { ToolGroupDropdown } from "./ToolGroupDropdown";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { AdaptiveEditorToolbar } from "./AdaptiveEditorToolbar";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
-  EmbedIcon,
-  VideoIcon,
-  AudioIcon,
-  ImageIcon,
-  extraToolsIcon,
-  frameToolIcon,
-  mermaidLogoIcon,
-  laserPointerToolIcon,
-  MagicIcon,
-  LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
   TextSizeIcon,
   adjustmentsIcon,
-  SelectionIcon,
   pencilIcon,
 } from "./icons";
 import { DotsHorizontalIcon } from "./primitives/chrome-icons";
@@ -63,7 +45,6 @@ import { Island } from "./Island";
 import { getShapeActionPredicates } from "./shapeActionPredicates";
 
 import type { ShapeActionPredicates } from "./shapeActionPredicates";
-import type { ToolGroupOption } from "./ToolGroupDropdown";
 import type {
   AppClassProperties,
   AppProps,
@@ -71,7 +52,6 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
-import type { JSX } from "react";
 
 // re-exported for consumers outside the styles panel (e.g. CommandPalette)
 export {
@@ -84,20 +64,6 @@ const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
-
-/** lookup of a toolbar tool's static config (icon, keybindings) by value */
-const SHAPE_BY_VALUE = SHAPES.reduce((acc, shape) => {
-  acc[shape.value] = shape;
-  return acc;
-}, {} as Record<string, typeof SHAPES[number]>);
-
-/** a media icon decorated with a sparkle to denote an AI generator node */
-const GeneratorToolIcon = ({ base }: { base: JSX.Element }) => (
-  <span className="generator-tool-icon">
-    {base}
-    <span className="generator-tool-icon__sparkle">{MagicIcon}</span>
-  </span>
-);
 
 /**
  * The "arrange" (z-order) fieldset, identical across every styles-panel layout.
@@ -924,344 +890,25 @@ export const ShapesSwitcher = ({
   setAppState,
   app,
   UIOptions,
+  maxWidth,
 }: {
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
+  maxWidth?: number;
 }) => {
-  const [openGroup, setOpenGroup] = useState<
-    "selection" | "upload" | "shapes" | "extra" | null
-  >(null);
-  // remember the last picked tool per group so the trigger reflects it
-  const [lastSelectionType, setLastSelectionType] = useState("selection");
-  const [lastUploadType, setLastUploadType] = useState("image");
-  const [lastShapeType, setLastShapeType] = useState("rectangle");
-
-  const stylesPanelMode = useStylesPanelMode();
-  const isFullStylesPanel = stylesPanelMode === "full";
-
-  const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected =
-    isFullStylesPanel &&
-    activeTool.type === "lasso" &&
-    app.state.preferredSelectionTool.type !== "lasso";
-  const embeddableToolSelected = activeTool.type === "embeddable";
-
-  const { TTDDialogTriggerTunnel } = useTunnels();
-
-  // close any open group dropdown when the user starts drawing on the canvas
-  useEffect(() => {
-    const unsubscribe = app.onPointerDownEmitter.on(() => setOpenGroup(null));
-    return () => unsubscribe?.();
-  }, [app]);
-
-  const isToolEnabled = (value: string) =>
-    (UIOptions.tools as Record<string, boolean | undefined> | undefined)?.[
-      value
-    ] !== false;
-
-  const labelFor = (
-    value:
-      | "selection"
-      | "hand"
-      | "select"
-      | "image"
-      | "video"
-      | "audio"
-      | "upload"
-      | "rectangle"
-      | "diamond"
-      | "ellipse"
-      | "arrow"
-      | "line"
-      | "shapes",
-  ) => capitalizeString(t(`toolBar.${value}`));
-
-  const selectionOptions: ToolGroupOption[] = (
-    [
-      {
-        type: "selection",
-        icon: SelectionIcon,
-        label: labelFor("selection"),
-        shortcut: capitalizeString(KEYS.V),
-        fillable: true,
-      },
-      {
-        type: "hand",
-        icon: SHAPE_BY_VALUE.hand.icon,
-        label: labelFor("hand"),
-        shortcut: capitalizeString(KEYS.H),
-      },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  const uploadOptions: ToolGroupOption[] = (
-    [
-      { type: "image", icon: ImageIcon, label: labelFor("image") },
-      { type: "video", icon: VideoIcon, label: labelFor("video") },
-      { type: "audio", icon: AudioIcon, label: labelFor("audio") },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  const shapeOptions: ToolGroupOption[] = (
-    [
-      {
-        type: "rectangle",
-        icon: SHAPE_BY_VALUE.rectangle.icon,
-        label: labelFor("rectangle"),
-        shortcut: capitalizeString(KEYS.R),
-        fillable: true,
-      },
-      {
-        type: "diamond",
-        icon: SHAPE_BY_VALUE.diamond.icon,
-        label: labelFor("diamond"),
-        shortcut: capitalizeString(KEYS.D),
-        fillable: true,
-      },
-      {
-        type: "ellipse",
-        icon: SHAPE_BY_VALUE.ellipse.icon,
-        label: labelFor("ellipse"),
-        shortcut: capitalizeString(KEYS.O),
-        fillable: true,
-      },
-      {
-        type: "arrow",
-        icon: SHAPE_BY_VALUE.arrow.icon,
-        label: labelFor("arrow"),
-        shortcut: capitalizeString(KEYS.A),
-        fillable: true,
-      },
-      {
-        type: "line",
-        icon: SHAPE_BY_VALUE.line.icon,
-        label: labelFor("line"),
-        shortcut: capitalizeString(KEYS.L),
-        fillable: true,
-      },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  // freedraw / text / eraser stay as standalone toolbar buttons
-  const renderStandaloneTool = (value: "freedraw" | "text" | "eraser") => {
-    if (!isToolEnabled(value)) {
-      return null;
-    }
-    const shape = SHAPE_BY_VALUE[value];
-    const label = t(`toolBar.${value}`);
-    const letter =
-      shape.key &&
-      capitalizeString(
-        typeof shape.key === "string" ? shape.key : shape.key[0],
-      );
-    const shortcut = letter
-      ? `${letter} ${t("helpDialog.or")} ${shape.numericKey}`
-      : `${shape.numericKey}`;
-    return (
-      <ToolButton
-        className={clsx("Shape", { fillable: shape.fillable })}
-        key={value}
-        type="radio"
-        icon={shape.icon}
-        checked={activeTool.type === value}
-        name="editor-current-shape"
-        title={`${capitalizeString(label)} — ${shortcut}`}
-        keyBindingLabel={shape.numericKey || letter || undefined}
-        aria-label={capitalizeString(label)}
-        aria-keyshortcuts={shortcut}
-        data-testid={`toolbar-${value}`}
-        onPointerDown={({ pointerType }) => {
-          if (!app.state.penDetected && pointerType === "pen") {
-            app.togglePenMode(true);
-          }
-        }}
-        onChange={() => {
-          if (app.state.activeTool.type !== value) {
-            trackEvent("toolbar", value, "ui");
-          }
-          app.setActiveTool({ type: value });
-        }}
-      />
-    );
-  };
-
+  const isFullStylesPanel = useStylesPanelMode() === "full";
   return (
-    <>
-      {selectionOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={selectionOptions}
-          title={labelFor("select")}
-          data-testid="toolbar-selection-group"
-          isOpen={openGroup === "selection"}
-          onOpenChange={(open) => setOpenGroup(open ? "selection" : null)}
-          lastSelectedType={lastSelectionType}
-          onLastSelectedTypeChange={setLastSelectionType}
-        />
-      )}
-
-      {uploadOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={uploadOptions}
-          title={labelFor("upload")}
-          data-testid="toolbar-upload-group"
-          isOpen={openGroup === "upload"}
-          onOpenChange={(open) => setOpenGroup(open ? "upload" : null)}
-          lastSelectedType={lastUploadType}
-          onLastSelectedTypeChange={setLastUploadType}
-          // activating image/video/audio opens a file picker, so the trigger
-          // should only reveal the menu rather than fire it immediately
-          activateOnOpen={false}
-        />
-      )}
-
-      {shapeOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={shapeOptions}
-          title={labelFor("shapes")}
-          data-testid="toolbar-shapes-group"
-          isOpen={openGroup === "shapes"}
-          onOpenChange={(open) => setOpenGroup(open ? "shapes" : null)}
-          lastSelectedType={lastShapeType}
-          onLastSelectedTypeChange={setLastShapeType}
-        />
-      )}
-
-      {renderStandaloneTool("freedraw")}
-      {renderStandaloneTool("text")}
-      {renderStandaloneTool("eraser")}
-
-      {!!app.props.renderGeneratorPanel && (
-        <>
-          <div className="App-toolbar__divider" />
-          <ToolButton
-            className="Shape"
-            type="button"
-            icon={<GeneratorToolIcon base={ImageIcon} />}
-            title={t("toolBar.imageGenerator")}
-            aria-label={t("toolBar.imageGenerator")}
-            data-testid="toolbar-image-generator"
-            onClick={() => app.createGeneratorNode("image")}
-          />
-          {/* audio generation is disabled (no audio-generation backend); the
-              audio player node, audio upload tool, and audio-as-reference are
-              unaffected. `app.createGeneratorNode("audio")` stays available
-              programmatically. */}
-          <ToolButton
-            className="Shape"
-            type="button"
-            icon={<GeneratorToolIcon base={VideoIcon} />}
-            title={t("toolBar.videoGenerator")}
-            aria-label={t("toolBar.videoGenerator")}
-            data-testid="toolbar-video-generator"
-            onClick={() => app.createGeneratorNode("video")}
-          />
-        </>
-      )}
-
-      <div className="App-toolbar__divider" />
-
-      <DropdownMenu open={openGroup === "extra"}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => {
-            setOpenGroup(openGroup === "extra" ? null : "extra");
-            setAppState({ openMenu: null, openPopup: null });
-          }}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setOpenGroup(null)}
-          onSelect={() => setOpenGroup(null)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          {isFullStylesPanel && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "lasso" })}
-              icon={LassoIcon}
-              data-testid="toolbar-lasso"
-              selected={lassoToolSelected}
-            >
-              {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-mermaid"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <DropdownMenu.Item
-              onSelect={() => app.onMagicframeToolSelect()}
-              icon={MagicIcon}
-              data-testid="toolbar-magicframe"
-              badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
-            >
-              {t("toolBar.magicframe")}
-            </DropdownMenu.Item>
-          )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-    </>
+    <AdaptiveEditorToolbar
+      activeTool={activeTool}
+      setAppState={setAppState}
+      app={app}
+      UIOptions={UIOptions}
+      isFullStylesPanel={isFullStylesPanel}
+      variant="desktop"
+      maxWidth={maxWidth}
+    />
   );
 };
 

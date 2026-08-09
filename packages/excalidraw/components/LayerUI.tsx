@@ -333,29 +333,39 @@ const LayerUI = ({
       </Stack.Col>
     );
 
-    const topCenter =
+    const bottomToolbar =
       defaultUIEnabled &&
       !appState.viewModeEnabled &&
       appState.openDialog?.name !== "elementLinkSelector" ? (
-        <Section heading="shapes" className="shapes-section">
+        <Section
+          heading="shapes"
+          className="shapes-section"
+          style={{ pointerEvents: "none" }}
+        >
           {(heading: React.ReactNode) => (
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", pointerEvents: "none" }}>
               {renderWelcomeScreen && (
                 <tunnels.WelcomeScreenToolbarHintTunnel.Out />
               )}
-              <Stack.Col gap={spacing.toolbarColGap} align="start">
+              <Stack.Col
+                gap={spacing.toolbarColGap}
+                align="start"
+                style={{ pointerEvents: "none" }}
+              >
                 <Stack.Row
                   gap={spacing.toolbarRowGap}
+                  style={{ pointerEvents: "none" }}
                   className={clsx("App-toolbar-container", {
                     "zen-mode": appState.zenModeEnabled,
                   })}
                 >
                   <Island
                     padding={spacing.islandPadding}
-                    className={clsx("App-toolbar", {
+                    className={clsx("App-toolbar adaptive-toolbar-shell", {
                       "zen-mode": appState.zenModeEnabled,
                       "App-toolbar--compact": isCompactStylesPanel,
                     })}
+                    data-viewport-ui="bottom"
                   >
                     <HintViewer
                       appState={appState}
@@ -371,11 +381,13 @@ const LayerUI = ({
                         title={t("toolBar.penMode")}
                         penDetected={appState.penDetected}
                       />
-                      <LockButton
-                        checked={appState.activeTool.locked}
-                        onChange={onLockToggle}
-                        title={t("toolBar.lock")}
-                      />
+                      {app.props.activeTool == null && (
+                        <LockButton
+                          checked={appState.activeTool.locked}
+                          onChange={onLockToggle}
+                          title={t("toolBar.lock")}
+                        />
+                      )}
 
                       <div className="App-toolbar__divider" />
 
@@ -384,27 +396,28 @@ const LayerUI = ({
                         activeTool={appState.activeTool}
                         UIOptions={UIOptions}
                         app={app}
+                        maxWidth={Math.max(
+                          180,
+                          Math.min(420, appState.width - 360),
+                        )}
                       />
+                      {isCollaborating && (
+                        <>
+                          <div className="App-toolbar__divider" />
+                          <LaserPointerButton
+                            title={t("toolBar.laser")}
+                            checked={
+                              appState.activeTool.type === TOOL_TYPE.laser
+                            }
+                            onChange={() =>
+                              app.setActiveTool({ type: TOOL_TYPE.laser })
+                            }
+                            isMobile
+                          />
+                        </>
+                      )}
                     </Stack.Row>
                   </Island>
-                  {isCollaborating && (
-                    <Island
-                      style={{
-                        marginLeft: spacing.collabMarginLeft,
-                        alignSelf: "center",
-                        height: "fit-content",
-                      }}
-                    >
-                      <LaserPointerButton
-                        title={t("toolBar.laser")}
-                        checked={appState.activeTool.type === TOOL_TYPE.laser}
-                        onChange={() =>
-                          app.setActiveTool({ type: TOOL_TYPE.laser })
-                        }
-                        isMobile
-                      />
-                    </Island>
-                  )}
                 </Stack.Row>
               </Stack.Col>
             </div>
@@ -445,6 +458,16 @@ const LayerUI = ({
       </div>
     );
 
+    const bottomCenter = (
+      <div
+        className="layer-ui__bottom-center-stack"
+        style={{ pointerEvents: "none" }}
+      >
+        {bottomToolbar}
+        {footerZones.bottomCenter}
+      </div>
+    );
+
     return (
       <CanvasUiLayout
         mode="desktop"
@@ -453,7 +476,13 @@ const LayerUI = ({
             isSidebarDocked &&
             editorInterface.canFitSidebar,
         )}
-        zones={{ topStart, topCenter, topEnd, ...footerZones }}
+        zones={{
+          topStart,
+          topCenter: null,
+          topEnd,
+          ...footerZones,
+          bottomCenter,
+        }}
       />
     );
   };

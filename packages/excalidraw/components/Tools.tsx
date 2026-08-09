@@ -255,6 +255,32 @@ type ToolButtonBehavior = {
 };
 
 /**
+ * Runs the shared pointer-aware toolbar activation path. Renderers that do not
+ * use `createToolButton()` still delegate here so first-pen detection, event
+ * tracking, and the active-tool authority stay consistent.
+ */
+export const activateToolbarTool = (
+  app: AppClassProperties,
+  type: string,
+  pointerType: PointerType | null,
+  onSelect?: ToolButtonBehavior["onSelect"],
+) => {
+  if (!app.state.penDetected && pointerType === "pen") {
+    app.togglePenMode(true);
+  }
+
+  if (onSelect) {
+    onSelect(app, { pointerType });
+    return;
+  }
+
+  if (app.state.activeTool.type !== type) {
+    trackEvent("toolbar", type, "ui");
+    app.setActiveTool({ type: type as any });
+  }
+};
+
+/**
  * Creates a toolbar button component for the given tool. Activation is
  * uniform: track + `setActiveTool` (recording the previous tool for toggle
  * tools), with pen detection on the first pen interaction.
@@ -292,19 +318,7 @@ const createToolButton = (
         aria-keyshortcuts={shortcut ?? undefined}
         data-testid={`toolbar-${type}`}
         onSelect={({ pointerType }) => {
-          if (!app.state.penDetected && pointerType === "pen") {
-            app.togglePenMode(true);
-          }
-
-          if (behavior?.onSelect) {
-            behavior.onSelect(app, { pointerType });
-            return;
-          }
-
-          if (app.state.activeTool.type !== type) {
-            trackEvent("toolbar", type, "ui");
-            app.setActiveTool({ type });
-          }
+          activateToolbarTool(app, type, pointerType, behavior?.onSelect);
         }}
       />
     );

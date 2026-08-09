@@ -1,10 +1,10 @@
 import clsx from "clsx";
-import { useCallback } from "react";
+import { useCallback, useId, useRef } from "react";
 
-import { trackEvent } from "../analytics";
+import type { PointerType } from "@excalidraw/element/types";
 
-import { ToolButton } from "./ToolButton";
-import { Island } from "./Island";
+import { activateToolbarTool } from "./Tools";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 
 import "./ToolGroupDropdown.scss";
 
@@ -17,6 +17,7 @@ export type ToolGroupOption = {
   label: string;
   shortcut?: string;
   fillable?: boolean;
+  disabled?: boolean;
   "data-testid"?: string;
 };
 
@@ -31,23 +32,22 @@ type ToolGroupDropdownProps = {
   /** remembers the last picked tool so the trigger reflects it */
   lastSelectedType: string;
   onLastSelectedTypeChange: (type: string) => void;
-  /** override how a tool is activated (defaults to app.setActiveTool) */
-  onSelectTool?: (type: string) => void;
+  /** override how a tool is activated (defaults to the shared authority) */
+  onSelectTool?: (type: string, pointerType: PointerType | null) => void;
   /**
    * Whether clicking the trigger also activates the displayed tool (default).
    * Set to `false` when activating a tool has an immediate side effect (e.g.
    * the upload tools open a file picker) so the trigger only reveals the menu.
    */
   activateOnOpen?: boolean;
+  menuClassName?: string;
+  collisionBoundary?: Element | null;
 };
 
 /**
- * A toolbar button that groups related tools (e.g. selection/hand, the shapes)
- * behind a single trigger and reveals them in a vertical, labeled dropdown.
- *
- * The dropdown content stays mounted and is toggled via CSS so that each tool's
- * `data-testid` remains queryable/clickable (the test-suite selects tools
- * without opening the group).
+ * A collision-aware toolbar menu for semantic tool groups. The trigger and
+ * menu delegate activation to the same pointer-aware authority as standalone
+ * tool buttons.
  */
 export const ToolGroupDropdown = ({
   app,
@@ -61,94 +61,139 @@ export const ToolGroupDropdown = ({
   onLastSelectedTypeChange,
   onSelectTool,
   activateOnOpen = true,
+  menuClassName,
+  collisionBoundary,
 }: ToolGroupDropdownProps) => {
-  const activeOption = options.find((o) => o.type === activeToolType);
+  const menuId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const lastPointerTypeRef = useRef<PointerType | null>(null);
+  const activeOption = options.find((option) => option.type === activeToolType);
   const displayedOption =
     activeOption ??
-    options.find((o) => o.type === lastSelectedType) ??
+    options.find((option) => option.type === lastSelectedType) ??
     options[0];
   const isGroupActive = Boolean(activeOption);
 
   const activateTool = useCallback(
-    (type: string) => {
+    (type: string, pointerType: PointerType | null) => {
       onLastSelectedTypeChange(type);
-      // re-activating the current tool is a no-op, mirroring the native radio
-      // tool buttons (otherwise it would trigger a redundant scene render)
-      if (app.state.activeTool.type === type) {
-        return;
-      }
-      trackEvent("toolbar", type, "ui");
       if (onSelectTool) {
-        onSelectTool(type);
+        onSelectTool(type, pointerType);
       } else {
-        app.setActiveTool({ type: type as any });
+        activateToolbarTool(app, type, pointerType);
       }
     },
     [app, onSelectTool, onLastSelectedTypeChange],
   );
 
+  const closeAndFocusTrigger = useCallback(() => {
+    onOpenChange(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  }, [onOpenChange]);
+
+  const rememberPointerType = (pointerType: string) => {
+    lastPointerTypeRef.current = (pointerType || null) as PointerType | null;
+  };
+  const clearPointerTypeAfterActivation = () => {
+    requestAnimationFrame(() => {
+      lastPointerTypeRef.current = null;
+    });
+  };
+
   return (
-    <div className="tool-group-dropdown">
-      <ToolButton
-        className={clsx("Shape", {
+    <DropdownMenu open={isOpen}>
+      <DropdownMenu.Trigger
+        ref={triggerRef}
+        className={clsx("Shape adaptive-editor-toolbar__group-trigger", {
           fillable: displayedOption.fillable && isGroupActive,
+          "adaptive-editor-toolbar__group-trigger--selected":
+            isGroupActive || isOpen,
         })}
-        type="radio"
-        icon={displayedOption.icon}
-        checked={isGroupActive}
-        name="editor-current-shape"
         title={title}
         aria-label={title}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-controls={menuId}
+        aria-pressed={isGroupActive || undefined}
         data-testid={dataTestId}
-        onPointerDown={() => {
+        disabled={options.every((option) => option.disabled)}
+        onPointerDown={(event) => rememberPointerType(event.pointerType)}
+        onPointerUp={clearPointerTypeAfterActivation}
+        onToggle={() => {
           const willOpen = !isOpen;
           onOpenChange(willOpen);
-          // mirror the native tool buttons by activating the displayed tool,
-          // unless doing so has a side effect (e.g. opening a file picker), in
-          // which case the trigger only reveals the menu
           if (activateOnOpen && willOpen) {
-            activateTool(displayedOption.type);
+            activateTool(displayedOption.type, lastPointerTypeRef.current);
           }
         }}
-      />
-      <div
-        className={clsx("tool-group-dropdown__menu dropdown-menu", {
-          "tool-group-dropdown__menu--open": isOpen,
-        })}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+            return;
+          }
+          event.preventDefault();
+          if (!isOpen) {
+            onOpenChange(true);
+          }
+          requestAnimationFrame(() => {
+            const entries = Array.from(
+              document
+                .getElementById(menuId)
+                ?.querySelectorAll<HTMLButtonElement>(
+                  '[role="menuitemradio"]:not(:disabled)',
+                ) ?? [],
+            );
+            const entry =
+              event.key === "ArrowDown" ? entries[0] : entries.at(-1);
+            entry?.focus();
+          });
+        }}
       >
-        <Island
-          className="dropdown-menu-container tool-group-dropdown__container"
-          padding={2}
-        >
-          {options.map(
-            ({ type, icon, label, shortcut, "data-testid": testId }) => (
-              <button
-                key={type}
-                type="button"
-                className={clsx(
-                  "dropdown-menu-item dropdown-menu-item-base tool-group-dropdown__item",
-                  {
-                    "dropdown-menu-item--selected": activeToolType === type,
-                  },
-                )}
-                title={label}
-                aria-label={label}
-                data-testid={testId ?? `toolbar-${type}`}
-                onClick={() => {
-                  activateTool(type);
-                  onOpenChange(false);
-                }}
-              >
-                <div className="dropdown-menu-item__icon">{icon}</div>
-                <div className="dropdown-menu-item__text">{label}</div>
-                {shortcut && (
-                  <div className="dropdown-menu-item__shortcut">{shortcut}</div>
-                )}
-              </button>
-            ),
-          )}
-        </Island>
-      </div>
-    </div>
+        <div className="ToolIcon__icon" aria-hidden="true">
+          {displayedOption.icon}
+        </div>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content
+        id={menuId}
+        onClickOutside={closeAndFocusTrigger}
+        onSelect={() => onOpenChange(false)}
+        className={clsx(
+          "tool-group-dropdown__menu adaptive-editor-toolbar__menu",
+          menuClassName,
+        )}
+        align="center"
+        side="top"
+        collisionBoundary={collisionBoundary}
+      >
+        {options.map(
+          ({
+            type,
+            icon,
+            label,
+            shortcut,
+            disabled,
+            "data-testid": testId,
+          }) => (
+            <DropdownMenu.Item
+              key={type}
+              icon={icon}
+              shortcut={shortcut}
+              selected={activeToolType === type}
+              title={label}
+              aria-label={label}
+              aria-keyshortcuts={shortcut}
+              role="menuitemradio"
+              aria-checked={activeToolType === type}
+              data-testid={testId ?? `toolbar-${type}`}
+              disabled={disabled}
+              onPointerDown={(event) => rememberPointerType(event.pointerType)}
+              onPointerUp={clearPointerTypeAfterActivation}
+              onSelect={() => activateTool(type, lastPointerTypeRef.current)}
+            >
+              {label}
+            </DropdownMenu.Item>
+          ),
+        )}
+      </DropdownMenu.Content>
+    </DropdownMenu>
   );
 };

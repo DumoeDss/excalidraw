@@ -133,7 +133,6 @@ export const MobileMenu = ({
       style={{
         marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
       }}
-      data-viewport-ui="bottom"
     >
       <MobileShapeActions
         appState={appState}
@@ -143,7 +142,10 @@ export const MobileMenu = ({
         setAppState={setAppState}
       />
 
-      <Island className="App-toolbar">
+      <Island
+        className="App-toolbar adaptive-toolbar-shell"
+        data-viewport-ui="bottom"
+      >
         {appState.openDialog?.name !== "elementLinkSelector" && renderToolbar()}
         {scrollBackToContentButton}
       </Island>
