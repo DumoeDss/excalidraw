@@ -31,6 +31,11 @@ import {
   zoomToFitBounds,
 } from "../viewport";
 
+import {
+  getStylesPanelFallback,
+  isPropertyMeasurementValid,
+} from "./propertyPlacement";
+
 import type {
   AppProps,
   AppState,
@@ -42,6 +47,7 @@ import type {
   ViewportUIDock,
   ViewportUIName,
 } from "../types";
+
 import type App from "./App";
 
 export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
@@ -60,15 +66,6 @@ const SCROLL_CONSTRAINTS_SNAP_BACK_DELAY = 200;
 
 /** single source of truth for the `--right-sidebar-width` CSS variable */
 export const RIGHT_SIDEBAR_WIDTH = 302;
-
-/**
- * Approximate styles panel footprints (panel width + editor edge inset),
- * used by `getOffsets` to reserve space for the panel before it was ever
- * rendered (= measured). Keep roughly in sync with the CSS
- * (`.App-menu__left` width / `.compact-shape-actions-island` min-width +
- * `--editor-container-padding`).
- */
-const STYLES_PANEL_APPROX_WIDTH = { full: 216, compact: 64 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
 
@@ -558,22 +555,29 @@ export class AppViewport {
       const reserveSurface = (
         name: ViewportUIName,
         fallback: { side: "left" | "right"; offset: number },
+        expectedSide?: "left" | "right",
       ) => {
         if (renderedSurfaces.has(name)) {
           return;
         }
-        const { side, offset } = this.uiLastMeasured.get(name) ?? fallback;
+        const cached = this.uiLastMeasured.get(name);
+        const validCached =
+          cached &&
+          (!expectedSide ||
+            isPropertyMeasurementValid(cached.side, expectedSide));
+        if (cached && !validCached) {
+          this.uiLastMeasured.delete(name);
+        }
+        const { side, offset } = validCached ? cached : fallback;
         measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
       };
 
       if (opts.reserve.stylesPanel) {
-        reserveSurface("stylesPanel", {
-          side: isRTL ? "right" : "left",
-          offset:
-            this.dependencies.getStylesPanelMode() === "compact"
-              ? STYLES_PANEL_APPROX_WIDTH.compact
-              : STYLES_PANEL_APPROX_WIDTH.full,
-        });
+        const fallback = getStylesPanelFallback(
+          this.dependencies.getStylesPanelMode(),
+          isRTL ? "rtl" : "ltr",
+        );
+        reserveSurface("stylesPanel", fallback, fallback.side);
       }
       if (opts.reserve.sidebar) {
         reserveSurface("sidebar", {

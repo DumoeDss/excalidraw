@@ -26,6 +26,13 @@
 
       &--top {
         top: calc(var(--editor-container-padding) + var(--sat));
+        bottom: calc(var(--editor-container-padding) + var(--sab) + 4.5rem);
+
+        > .canvas-ui-layout__zone,
+        > .canvas-ui-layout__zone > .canvas-ui-layout__content {
+          block-size: 100%;
+          max-block-size: 100%;
+        }
       }
 
       &--bottom {

@@ -13,7 +13,7 @@
 
     &__top-right {
       display: flex;
-      width: 100%;
+      width: auto;
       justify-content: flex-end;
       gap: 0.75rem;
       pointer-events: none !important;
@@ -115,9 +115,46 @@
     }
   }
 
-  // on tablet, the pen mode button is rendered as a separate floating button
-  // below the compact actions menu (see LayerUI.tsx)
-  .layer-ui__top-start > .ToolIcon__penMode {
+  .layer-ui__top-end-zone {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--ui-space-3);
+    block-size: 100%;
+    max-block-size: 100%;
+    pointer-events: none;
+  }
+
+  .layer-ui__property-stack {
+    display: flex;
+    flex: 0 0 17.5rem;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ui-space-3);
+    block-size: 100%;
+    max-block-size: 100%;
+    pointer-events: none;
+
+    &--compact {
+      flex-basis: 3.5rem;
+    }
+
+    .property-panel-section {
+      display: flex;
+      inline-size: 100%;
+      min-block-size: 0;
+      max-block-size: 100%;
+      pointer-events: none;
+    }
+
+    .Island {
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  // On compact desktop/tablet, pen mode remains a separate leaf below the rail.
+  .layer-ui__property-stack > .ToolIcon__penMode {
     pointer-events: var(--ui-pointerEvents);
     justify-self: center;
 
@@ -132,10 +169,6 @@
     &.ToolIcon--checked .ToolIcon__icon {
       box-shadow: none;
     }
-  }
-
-  .layer-ui__top-start .selected-shape-actions-container .Island {
-    pointer-events: var(--ui-pointerEvents);
   }
 
   .disable-view-mode {

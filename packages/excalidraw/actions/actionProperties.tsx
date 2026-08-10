@@ -790,7 +790,8 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
       const isVariable = strokeVariability === "variable";
       return (
         <IconButton
-          type="button"
+          type="toggle"
+          checked={isVariable}
           icon={
             isVariable
               ? strokeVariabilityVariableIcon
@@ -798,7 +799,7 @@ export const actionChangeFreedrawMode = register<StrokeVariability>({
           }
           title={t("labels.pressure")}
           aria-label={t("labels.pressure")}
-          onClick={() => updateData(isVariable ? "constant" : "variable")}
+          onSelect={() => updateData(isVariable ? "constant" : "variable")}
         />
       );
     }

@@ -5,7 +5,9 @@ import React, { type ReactNode } from "react";
 import { isInteractive } from "@excalidraw/common";
 
 import { useEditorInterface } from "./App";
+import { useStylesPanelMode } from "./App";
 import { Island } from "./Island";
+import { resolvePropertyPlacement } from "./propertyPlacement";
 
 interface PropertiesPopoverProps {
   className?: string;
@@ -18,6 +20,7 @@ interface PropertiesPopoverProps {
   onFocusOutside?: Popover.PopoverContentProps["onFocusOutside"];
   onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
   preventAutoFocusOnTouch?: boolean;
+  returnFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const PropertiesPopover = React.forwardRef<
@@ -36,12 +39,29 @@ export const PropertiesPopover = React.forwardRef<
       onPointerLeave,
       onPointerDownOutside,
       preventAutoFocusOnTouch = false,
+      returnFocusRef,
     },
     ref,
   ) => {
     const editorInterface = useEditorInterface();
-    const isMobilePortrait =
-      editorInterface.formFactor === "phone" && !editorInterface.isLandscape;
+    const stylesPanelMode = useStylesPanelMode();
+    const direction =
+      container?.closest<HTMLElement>(".excalidraw")?.getAttribute("dir") ===
+        "rtl" || document.documentElement.getAttribute("dir") === "rtl"
+        ? "rtl"
+        : "ltr";
+    const placement = resolvePropertyPlacement({
+      formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
+      isLandscape: editorInterface.isLandscape,
+      direction,
+      surface:
+        editorInterface.formFactor === "phone"
+          ? "phone"
+          : stylesPanelMode === "full"
+          ? "full"
+          : "compact",
+      collisionBoundary: container,
+    });
 
     return (
       <Popover.Portal container={container}>
@@ -49,15 +69,14 @@ export const PropertiesPopover = React.forwardRef<
           ref={ref}
           className={clsx("focus-visible-none", className)}
           data-prevent-outside-click
-          side={isMobilePortrait ? "bottom" : "right"}
-          align={isMobilePortrait ? "center" : "start"}
-          alignOffset={-16}
-          sideOffset={20}
-          collisionBoundary={container ?? undefined}
+          side={placement.popoverSide}
+          align={placement.popoverAlign}
+          alignOffset={0}
+          sideOffset={10}
+          collisionBoundary={placement.collisionBoundary ?? undefined}
+          collisionPadding={placement.collisionPadding}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
-            marginLeft:
-              editorInterface.formFactor === "phone" ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
@@ -74,14 +93,23 @@ export const PropertiesPopover = React.forwardRef<
             // prevents focusing the trigger
             e.preventDefault();
 
+            onClose();
+
+            if (
+              returnFocusRef?.current &&
+              !preventAutoFocusOnTouch &&
+              !isInteractive(document.activeElement)
+            ) {
+              returnFocusRef.current.focus();
+              return;
+            }
+
             // return focus to excalidraw container unless
             // user focuses an interactive element, such as a button, or
             // enters the text editor by clicking on canvas with the text tool
             if (container && !isInteractive(document.activeElement)) {
               container.focus();
             }
-
-            onClose();
           }}
         >
           <Island padding={3} style={style}>

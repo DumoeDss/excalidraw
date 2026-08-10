@@ -35,18 +35,22 @@ export interface UiButtonProps
  * new surfaces; legacy buttons (`Button`, `.dropdown-menu-button`) already
  * share the same SCSS base (`uiButtonStyles`) via their class selectors.
  */
-export const UiButton = ({
-  variant = "default",
-  size = "md",
-  selected = false,
-  fullWidth = false,
-  className,
-  type = "button",
-  ...rest
-}: UiButtonProps) => {
-  return (
+export const UiButton = React.forwardRef<HTMLButtonElement, UiButtonProps>(
+  (
+    {
+      variant = "default",
+      size = "md",
+      selected = false,
+      fullWidth = false,
+      className,
+      type = "button",
+      ...rest
+    },
+    ref,
+  ) => (
     <button
       {...rest}
+      ref={ref}
       type={type}
       aria-pressed={selected ? true : undefined}
       className={clsx(
@@ -60,5 +64,7 @@ export const UiButton = ({
         className,
       )}
     />
-  );
-};
+  ),
+);
+
+UiButton.displayName = "UiButton";

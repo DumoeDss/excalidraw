@@ -247,21 +247,16 @@ const LayerUI = ({
     return (
       <Section
         heading="selectedShapeActions"
-        className={clsx("selected-shape-actions zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
+        className={clsx("property-panel-section zen-mode-transition", {
+          "transition-right": appState.zenModeEnabled,
         })}
       >
         {isCompactStylesPanel ? (
           <Island
-            className={clsx("compact-shape-actions-island")}
+            className="compact-shape-actions-island property-rail-island"
             padding={0}
             data-viewport-ui="side"
             data-viewport-ui-name="stylesPanel"
-            style={{
-              // we want to make sure this doesn't overflow so subtracting the
-              // approximate height of hamburgerMenu + footer
-              maxHeight: `${appState.height - 166}px`,
-            }}
           >
             <CompactShapeActions
               appState={appState}
@@ -273,13 +268,11 @@ const LayerUI = ({
           </Island>
         ) : (
           <Island
-            className={CLASSES.SHAPE_ACTIONS_MENU}
-            padding={2}
-            style={{
-              // we want to make sure this doesn't overflow so subtracting the
-              // approximate height of hamburgerMenu + footer
-              maxHeight: `${appState.height - 166}px`,
-            }}
+            className={clsx(
+              CLASSES.SHAPE_ACTIONS_MENU,
+              "property-inspector-island",
+            )}
+            padding={0}
             data-viewport-ui="side"
             data-viewport-ui-name="stylesPanel"
           >
@@ -309,27 +302,6 @@ const LayerUI = ({
     const topStart = (
       <Stack.Col gap={spacing.menuTopGap} className="layer-ui__top-start">
         {renderCanvasActions()}
-        {defaultUIEnabled && (
-          <div
-            className={clsx("selected-shape-actions-container", {
-              "selected-shape-actions-container--compact": isCompactStylesPanel,
-            })}
-          >
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
-          </div>
-        )}
-        {defaultUIEnabled &&
-          isCompactStylesPanel &&
-          !appState.viewModeEnabled &&
-          shouldRenderSelectedShapeActions && (
-            <PenModeButton
-              checked={appState.penMode}
-              onChange={() => onPenModeToggle(null)}
-              title={t("toolBar.penMode")}
-              isMobile
-              penDetected={appState.penDetected}
-            />
-          )}
       </Stack.Col>
     );
 
@@ -425,7 +397,7 @@ const LayerUI = ({
         </Section>
       ) : null;
 
-    const topEnd = (
+    const topEndChrome = (
       <div
         className={clsx("layer-ui__wrapper__top-right zen-mode-transition", {
           "transition-right": appState.zenModeEnabled,
@@ -455,6 +427,35 @@ const LayerUI = ({
             renderCustomStats={renderCustomStats}
           />
         )}
+      </div>
+    );
+
+    const propertyStack = defaultUIEnabled ? (
+      <div
+        className={clsx("layer-ui__property-stack", {
+          "layer-ui__property-stack--compact": isCompactStylesPanel,
+        })}
+        data-property-stack="top-end"
+      >
+        {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+        {isCompactStylesPanel &&
+          !appState.viewModeEnabled &&
+          shouldRenderSelectedShapeActions && (
+            <PenModeButton
+              checked={appState.penMode}
+              onChange={() => onPenModeToggle(null)}
+              title={t("toolBar.penMode")}
+              isMobile
+              penDetected={appState.penDetected}
+            />
+          )}
+      </div>
+    ) : null;
+
+    const topEnd = (
+      <div className="layer-ui__top-end-zone">
+        {topEndChrome}
+        {propertyStack}
       </div>
     );
 
