@@ -86,11 +86,6 @@ export const ToolGroupDropdown = ({
     [app, onSelectTool, onLastSelectedTypeChange],
   );
 
-  const closeAndFocusTrigger = useCallback(() => {
-    onOpenChange(false);
-    requestAnimationFrame(() => triggerRef.current?.focus());
-  }, [onOpenChange]);
-
   const rememberPointerType = (pointerType: string) => {
     lastPointerTypeRef.current = (pointerType || null) as PointerType | null;
   };
@@ -101,7 +96,18 @@ export const ToolGroupDropdown = ({
   };
 
   return (
-    <DropdownMenu open={isOpen}>
+    <DropdownMenu
+      open={isOpen}
+      ownerIdentity={menuId}
+      onOpenChange={(open) => {
+        onOpenChange(open);
+        if (open && activateOnOpen) {
+          activateTool(displayedOption.type, lastPointerTypeRef.current);
+        } else if (!open) {
+          requestAnimationFrame(() => triggerRef.current?.focus());
+        }
+      }}
+    >
       <DropdownMenu.Trigger
         ref={triggerRef}
         className={clsx("Shape adaptive-editor-toolbar__group-trigger", {
@@ -119,13 +125,6 @@ export const ToolGroupDropdown = ({
         disabled={options.every((option) => option.disabled)}
         onPointerDown={(event) => rememberPointerType(event.pointerType)}
         onPointerUp={clearPointerTypeAfterActivation}
-        onToggle={() => {
-          const willOpen = !isOpen;
-          onOpenChange(willOpen);
-          if (activateOnOpen && willOpen) {
-            activateTool(displayedOption.type, lastPointerTypeRef.current);
-          }
-        }}
         onKeyDown={(event) => {
           if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
             return;
@@ -154,7 +153,6 @@ export const ToolGroupDropdown = ({
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         id={menuId}
-        onClickOutside={closeAndFocusTrigger}
         onSelect={() => onOpenChange(false)}
         className={clsx(
           "tool-group-dropdown__menu adaptive-editor-toolbar__menu",
@@ -162,6 +160,8 @@ export const ToolGroupDropdown = ({
         )}
         align="center"
         side="top"
+        surfaceKind="toolbar-menu"
+        placementIntent="toolbar-up"
         collisionBoundary={collisionBoundary}
       >
         {options.map(

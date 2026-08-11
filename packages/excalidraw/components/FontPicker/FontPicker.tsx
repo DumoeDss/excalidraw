@@ -15,6 +15,10 @@ import {
   FreedrawIcon,
 } from "../icons";
 
+import { useExcalidrawContainer } from "../App";
+
+import { useFloatingSurfaceOwner } from "../floatingSurface";
+
 import { FontPickerList } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
 
@@ -73,6 +77,13 @@ export const FontPicker = React.memo(
     onPopupChange,
     compactMode = false,
   }: FontPickerProps) => {
+    const { id: editorId } = useExcalidrawContainer();
+    useFloatingSurfaceOwner({
+      scope: `${editorId ?? "editor"}:picker`,
+      identity: "font-family",
+      open: isOpened,
+      onOpenChange: onPopupChange,
+    });
     const defaultFonts = useMemo(() => DEFAULT_FONTS, []);
     const onSelectCallback = useCallback(
       (value: number | false) => {

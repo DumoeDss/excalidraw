@@ -42,9 +42,11 @@ export const ChatHistoryMenu = ({
       )}
       {savedChats.length > 0 && (
         <div className="ttd-dialog-panel__menu-wrapper">
-          <DropdownMenu open={isOpen}>
+          <DropdownMenu
+            open={isOpen}
+            onOpenChange={(open) => (open ? onToggle() : onClose())}
+          >
             <DropdownMenu.Trigger
-              onToggle={onToggle}
               className="ttd-dialog-menu-trigger"
               disabled={disabled}
               title={t("chat.menu")}
@@ -52,7 +54,7 @@ export const ChatHistoryMenu = ({
             >
               {historyIcon}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content onClickOutside={onClose} onSelect={onClose}>
+            <DropdownMenu.Content onSelect={onClose}>
               <>
                 {savedChats.map((chat) => (
                   <DropdownMenu.ItemCustom

@@ -13,7 +13,7 @@ const DropdownMenuItemCustom = ({
   return (
     <div
       {...rest}
-      className={`dropdown-menu-item-base dropdown-menu-item-custom ${className} ${
+      className={`floating-surface__item dropdown-menu-item-base dropdown-menu-item-custom ${className} ${
         selected ? `dropdown-menu-item--selected` : ``
       }`.trim()}
     >

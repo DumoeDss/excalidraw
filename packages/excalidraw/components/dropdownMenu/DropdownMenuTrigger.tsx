@@ -10,10 +10,10 @@ const MenuTrigger = React.forwardRef<
   {
     className?: string;
     children: React.ReactNode;
-    onToggle: () => void;
+    onToggle?: React.MouseEventHandler<HTMLButtonElement>;
     title?: string;
   } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">
->(({ className = "", children, onToggle, title, ...rest }, ref) => {
+>(({ className = "", children, onToggle, onClick, title, ...rest }, ref) => {
   const editorInterface = useEditorInterface();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
@@ -25,7 +25,16 @@ const MenuTrigger = React.forwardRef<
   return (
     <DropdownMenuPrimitive.Trigger
       className={classNames}
-      onClick={onToggle}
+      onClick={(event) => {
+        onClick?.(event);
+        // Radix owns complete pointer sequences. This fallback only forwards
+        // click-only activation (assistive technology and test hosts) to the
+        // same root onOpenChange transition. Trusted pointer clicks have a
+        // positive detail and were already handled on pointerdown.
+        if (!event.defaultPrevented && event.detail === 0) {
+          onToggle?.(event);
+        }
+      }}
       type="button"
       data-testid="dropdown-menu-button"
       title={title}

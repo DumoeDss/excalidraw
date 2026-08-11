@@ -154,6 +154,23 @@ describe("ColorInput error handling", () => {
     return container.querySelector(".color-picker-input") as HTMLInputElement;
   };
 
+  it("keeps color-picker semantics inside the shared bounded frame", async () => {
+    const colorInput = await openCanvasBackgroundColorPicker();
+    const frame = document.querySelector(
+      '[data-floating-surface][data-surface-kind="color-picker"]',
+    );
+
+    expect(frame).not.toBeNull();
+    expect(frame).toContainElement(colorInput);
+    expect(
+      frame?.querySelector(".floating-surface__scroll-viewport"),
+    ).not.toBeNull();
+    expect(frame?.closest(".floating-surface-positioner")).not.toHaveAttribute(
+      "data-floating-surface",
+    );
+    expect(frame).not.toHaveAttribute("data-viewport-ui");
+  });
+
   it("shows error for invalid hex length (too short)", async () => {
     const colorInput = await openCanvasBackgroundColorPicker();
 

@@ -2,6 +2,8 @@ import React from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
+import { FloatingSurfaceItemVisual } from "../floatingSurface";
+
 import MenuItemContent from "./DropdownMenuItemContent";
 import {
   getDropdownMenuItemClassName,
@@ -39,18 +41,20 @@ const DropdownMenuItemLink = ({
       onSelect={handleSelect}
       asChild
     >
-      <a
-        {...rest}
-        href={href}
-        target="_blank"
-        rel={`noopener ${rel}`}
-        className={getDropdownMenuItemClassName(className, selected)}
-        title={rest.title ?? rest["aria-label"]}
-      >
-        <MenuItemContent icon={icon} shortcut={shortcut}>
-          {children}
-        </MenuItemContent>
-      </a>
+      <FloatingSurfaceItemVisual asChild selected={selected}>
+        <a
+          {...rest}
+          href={href}
+          target="_blank"
+          rel={`noopener ${rel}`}
+          className={getDropdownMenuItemClassName(className, selected)}
+          title={rest.title ?? rest["aria-label"]}
+        >
+          <MenuItemContent icon={icon} shortcut={shortcut}>
+            {children}
+          </MenuItemContent>
+        </a>
+      </FloatingSurfaceItemVisual>
     </DropdownMenuPrimitive.Item>
   );
 };

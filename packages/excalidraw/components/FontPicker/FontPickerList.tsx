@@ -4,6 +4,7 @@ import React, {
   useRef,
   useEffect,
   useCallback,
+  useId,
   type KeyboardEventHandler,
 } from "react";
 
@@ -14,6 +15,7 @@ import {
   debounce,
   FONT_FAMILY,
   getFontFamilyString,
+  KEYS,
 } from "@excalidraw/common";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -114,6 +116,7 @@ export const FontPickerList = React.memo(
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const listboxId = useId();
     const allFonts = useMemo(
       () =>
         Array.from(Fonts.registered.entries())
@@ -257,9 +260,20 @@ export const FontPickerList = React.memo(
         if (handled) {
           event.preventDefault();
           event.stopPropagation();
+
+          if (event.key === KEYS.ARROW_DOWN || event.key === KEYS.ARROW_UP) {
+            document.getElementById(listboxId)?.focus();
+          }
         }
       },
-      [hoveredFont, filteredFonts, wrappedOnSelect, onHover, onClose],
+      [
+        hoveredFont,
+        filteredFonts,
+        wrappedOnSelect,
+        onHover,
+        onClose,
+        listboxId,
+      ],
     );
 
     useEffect(() => {
@@ -291,6 +305,7 @@ export const FontPickerList = React.memo(
       const ref = useRef<HTMLButtonElement>(null);
       const isHovered = font.value === hoveredFont?.value;
       const isSelected = font.value === selectedFontFamily;
+      const optionId = `${listboxId}-option-${font.value}`;
 
       useEffect(() => {
         if (!isHovered) {
@@ -307,12 +322,19 @@ export const FontPickerList = React.memo(
       return (
         <button
           ref={ref}
+          id={optionId}
           type="button"
           value={font.value}
-          className={getDropdownMenuItemClassName("", isSelected, isHovered)}
+          className={`floating-surface__item ${getDropdownMenuItemClassName(
+            "",
+            isSelected,
+            isHovered,
+          )}`}
           title={font.text}
-          // allow to tab between search and selected font
-          tabIndex={isSelected ? 0 : -1}
+          role="option"
+          aria-selected={isSelected}
+          data-highlighted={isHovered || undefined}
+          tabIndex={-1}
           onClick={(e) => {
             wrappedOnSelect(Number(e.currentTarget.value));
           }}
@@ -371,6 +393,7 @@ export const FontPickerList = React.memo(
       <PropertiesPopover
         className="properties-content"
         container={container}
+        surfaceKind="font-picker"
         style={{ width: "15rem" }}
         onClose={() => {
           onClose();
@@ -399,8 +422,15 @@ export const FontPickerList = React.memo(
           />
         )}
         <ScrollableList
-          className="dropdown-menu fonts manual-hover"
+          id={listboxId}
+          className="dropdown-menu fonts manual-hover font-picker-listbox"
           placeholder={t("fontList.empty")}
+          semanticMode="picker-listbox"
+          tabIndex={0}
+          aria-label={t("labels.fontFamily")}
+          aria-activedescendant={
+            hoveredFont ? `${listboxId}-option-${hoveredFont.value}` : undefined
+          }
         >
           {groups.length ? groups : null}
         </ScrollableList>

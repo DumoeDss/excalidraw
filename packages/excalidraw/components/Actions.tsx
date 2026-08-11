@@ -1007,13 +1007,16 @@ export const MobileShapeActions = ({
     .filter((descriptor) => !directDescriptorIds.has(descriptor.id))
     .map((descriptor) => descriptor.id);
   const propertyPopupOpen = popupOwner.isOpen("compactOtherProperties");
+  const propertyForegroundOpen =
+    propertyPopupOpen ||
+    (appState.openPopup !== null && appState.openPopup !== "canvasBackground");
   const propertyPopupMaxBlockSize = Math.max(
     128,
     Math.min(340, Math.floor(appState.height * 0.42)),
   );
 
   useEffect(() => {
-    if (!propertyPopupOpen || !container) {
+    if (!propertyForegroundOpen || !container) {
       return;
     }
     const toolbar = container.querySelector<HTMLElement>(
@@ -1048,7 +1051,7 @@ export const MobileShapeActions = ({
         toolbar.setAttribute("aria-hidden", previous.ariaHidden);
       }
     };
-  }, [container, propertyPopupOpen]);
+  }, [container, propertyForegroundOpen]);
 
   const renderUnit = (id: string) => {
     const descriptor = phoneDescriptors.find((item) => item.id === id);

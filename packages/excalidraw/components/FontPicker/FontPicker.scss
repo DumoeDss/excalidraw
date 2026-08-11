@@ -17,4 +17,13 @@
       grid-template-columns: none;
     }
   }
+
+  .font-picker-listbox:focus {
+    outline: none;
+  }
+
+  .font-picker-listbox:focus-visible
+    .floating-surface__item[data-highlighted="true"] {
+    box-shadow: inset 0 0 0 2px var(--floating-surface-focus);
+  }
 }

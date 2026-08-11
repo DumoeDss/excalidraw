@@ -1,3 +1,11 @@
+import {
+  claimFloatingSurfaceOwnership,
+  createFloatingSurfaceOwnerClaim,
+  isCurrentFloatingSurfaceOwner,
+  releaseFloatingSurfaceOwnership,
+  shouldCleanupFloatingSurface,
+} from "./floatingSurface";
+
 import type { AppState } from "../types";
 
 export const PROPERTY_POPUP_IDENTITIES = [
@@ -9,35 +17,32 @@ export const PROPERTY_POPUP_IDENTITIES = [
 
 export type PropertyPopupIdentity = typeof PROPERTY_POPUP_IDENTITIES[number];
 
-export type PropertyPopupOwnerClaim = symbol;
+export type PropertyPopupOwnerClaim = ReturnType<
+  typeof createFloatingSurfaceOwnerClaim
+>;
 
-const currentOwnerClaims = new Map<
-  PropertyPopupIdentity,
-  PropertyPopupOwnerClaim
->();
+const PROPERTY_POPUP_OWNER_SCOPE = "property-popup";
 
 export const createPropertyPopupOwnerClaim = (): PropertyPopupOwnerClaim =>
-  Symbol("property-popup-owner");
+  createFloatingSurfaceOwnerClaim();
 
 export const claimPropertyPopupOwnership = (
   identity: PropertyPopupIdentity,
   claim: PropertyPopupOwnerClaim,
 ) => {
-  currentOwnerClaims.set(identity, claim);
+  claimFloatingSurfaceOwnership(PROPERTY_POPUP_OWNER_SCOPE, identity, claim);
 };
 
 export const isCurrentPropertyPopupOwner = (
   identity: PropertyPopupIdentity,
   claim: PropertyPopupOwnerClaim,
-) => currentOwnerClaims.get(identity) === claim;
+) => isCurrentFloatingSurfaceOwner(PROPERTY_POPUP_OWNER_SCOPE, identity, claim);
 
 export const releasePropertyPopupOwnership = (
   identity: PropertyPopupIdentity,
   claim: PropertyPopupOwnerClaim,
 ) => {
-  if (isCurrentPropertyPopupOwner(identity, claim)) {
-    currentOwnerClaims.delete(identity);
-  }
+  releaseFloatingSurfaceOwnership(PROPERTY_POPUP_OWNER_SCOPE, identity, claim);
 };
 
 export const isOwnedPropertyPopup = (
@@ -56,4 +61,10 @@ export const shouldClearOwnedPropertyPopup = (
   current: AppState["openPopup"],
   owned: PropertyPopupIdentity,
   claim: PropertyPopupOwnerClaim,
-) => current === owned && isCurrentPropertyPopupOwner(owned, claim);
+) =>
+  shouldCleanupFloatingSurface(
+    PROPERTY_POPUP_OWNER_SCOPE,
+    current,
+    owned,
+    claim,
+  );

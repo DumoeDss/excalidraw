@@ -74,7 +74,15 @@ const ExtraToolsDropdown = ({
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   return (
-    <DropdownMenu open={isExtraToolsMenuOpen}>
+    <DropdownMenu
+      open={isExtraToolsMenuOpen}
+      onOpenChange={(open) => {
+        setIsExtraToolsMenuOpen(open);
+        if (open) {
+          setAppState({ openMenu: null, openPopup: null });
+        }
+      }}
+    >
       <DropdownMenu.Trigger
         className={clsx("App-toolbar__extra-tools-trigger", {
           "App-toolbar__extra-tools-trigger--selected":
@@ -88,10 +96,6 @@ const ExtraToolsDropdown = ({
             // on top of it
             (laserToolSelected && !app.props.isCollaborating),
         })}
-        onToggle={() => {
-          setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
-          setAppState({ openMenu: null, openPopup: null });
-        }}
         title={t("toolBar.extraTools")}
       >
         {frameToolSelected
@@ -109,9 +113,9 @@ const ExtraToolsDropdown = ({
           : DotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
-        onClickOutside={() => setIsExtraToolsMenuOpen(false)}
         onSelect={() => setIsExtraToolsMenuOpen(false)}
         className="App-toolbar__extra-tools-dropdown"
+        surfaceKind="toolbar-menu"
       >
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "frame" })}

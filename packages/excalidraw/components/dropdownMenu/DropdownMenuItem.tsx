@@ -7,6 +7,10 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { useExcalidrawAppState } from "../App";
+import {
+  FloatingSurfaceBadge,
+  FloatingSurfaceItemVisual,
+} from "../floatingSurface";
 
 import {
   getDropdownMenuItemClassName,
@@ -44,18 +48,25 @@ const DropdownMenuItem = ({
     <DropdownMenuPrimitive.Item
       className="radix-menu-item"
       onSelect={handleSelect}
+      disabled={rest.disabled}
       asChild
     >
-      <button
-        {...rest}
-        value={value}
-        className={getDropdownMenuItemClassName(className, selected)}
-        title={rest.title ?? rest["aria-label"]}
+      <FloatingSurfaceItemVisual
+        asChild
+        disabled={rest.disabled}
+        selected={selected}
       >
-        <MenuItemContent icon={icon} shortcut={shortcut} badge={badge}>
-          {children}
-        </MenuItemContent>
-      </button>
+        <button
+          {...rest}
+          value={value}
+          className={getDropdownMenuItemClassName(className, selected)}
+          title={rest.title ?? rest["aria-label"]}
+        >
+          <MenuItemContent icon={icon} shortcut={shortcut} badge={badge}>
+            {children}
+          </MenuItemContent>
+        </button>
+      </FloatingSurfaceItemVisual>
     </DropdownMenuPrimitive.Item>
   );
 };
@@ -107,9 +118,9 @@ export const DropDownMenuItemBadge = ({
   }
 
   return (
-    <div className="DropDownMenuItemBadge" style={style}>
+    <FloatingSurfaceBadge className="DropDownMenuItemBadge" style={style}>
       {children}
-    </div>
+    </FloatingSurfaceBadge>
   );
 };
 DropDownMenuItemBadge.displayName = "DropdownMenuItemBadge";

@@ -14,6 +14,7 @@ import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { FloatingSurfaceHeading } from "../floatingSurface";
 
 import { CustomColorList } from "./CustomColorList";
 import PickerColorList from "./PickerColorList";
@@ -169,7 +170,11 @@ export const Picker = React.forwardRef(
           // to allow focusing by clicking but not by tabbing
           tabIndex={-1}
         >
-          {title && <div className="color-picker__title">{title}</div>}
+          {title && (
+            <FloatingSurfaceHeading className="color-picker__title">
+              {title}
+            </FloatingSurfaceHeading>
+          )}
 
           {!!customColors.length && (
             <div>

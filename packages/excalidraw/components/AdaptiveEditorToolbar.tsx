@@ -337,7 +337,21 @@ export const AdaptiveEditorToolbar = ({
           ]
         : unit.items;
     return (
-      <DropdownMenu open={isOpen} key={unit.id}>
+      <DropdownMenu
+        open={isOpen}
+        key={unit.id}
+        ownerIdentity={menuId}
+        onOpenChange={(open) => {
+          setOpenMenu(open ? unit.id : null);
+          if (open) {
+            setAppState({ openMenu: null, openPopup: null });
+          } else {
+            requestAnimationFrame(() =>
+              menuTriggerRefs.current.get(unit.id)?.focus(),
+            );
+          }
+        }}
+      >
         <DropdownMenu.Trigger
           ref={(node) => {
             if (node) {
@@ -353,10 +367,6 @@ export const AdaptiveEditorToolbar = ({
             "adaptive-editor-toolbar__menu-trigger--selected":
               Boolean(selectedItem) || isOpen,
           })}
-          onToggle={() => {
-            setOpenMenu(isOpen ? null : unit.id);
-            setAppState({ openMenu: null, openPopup: null });
-          }}
           title={t("toolBar.extraTools")}
           aria-label={t("toolBar.extraTools")}
           aria-haspopup="menu"
@@ -368,12 +378,6 @@ export const AdaptiveEditorToolbar = ({
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           id={menuId}
-          onClickOutside={() => {
-            setOpenMenu(null);
-            requestAnimationFrame(() =>
-              menuTriggerRefs.current.get(unit.id)?.focus(),
-            );
-          }}
           onSelect={() => setOpenMenu(null)}
           className={clsx(
             "App-toolbar__extra-tools-dropdown adaptive-editor-toolbar__menu",
@@ -381,6 +385,8 @@ export const AdaptiveEditorToolbar = ({
           )}
           align="center"
           side="top"
+          surfaceKind="toolbar-menu"
+          placementIntent="toolbar-up"
           collisionBoundary={container}
         >
           {menuItems.map((item) => renderMenuItem(item, false))}
@@ -502,7 +508,20 @@ export const AdaptiveEditorToolbar = ({
       <div className="adaptive-editor-toolbar__primary">
         {primaryUnits.map(renderUnit)}
         {overflowItems.length > 0 && (
-          <DropdownMenu open={overflowOpen}>
+          <DropdownMenu
+            open={overflowOpen}
+            ownerIdentity={overflowMenuId}
+            onOpenChange={(open) => {
+              setOpenMenu(open ? "overflow" : null);
+              if (open) {
+                setAppState({ openMenu: null, openPopup: null });
+              } else {
+                requestAnimationFrame(() =>
+                  overflowTriggerRef.current?.focus(),
+                );
+              }
+            }}
+          >
             <DropdownMenu.Trigger
               ref={overflowTriggerRef}
               className={clsx("adaptive-editor-toolbar__overflow-trigger", {
@@ -512,10 +531,6 @@ export const AdaptiveEditorToolbar = ({
                 "adaptive-editor-toolbar__overflow-trigger--selected":
                   Boolean(projectedItem) || overflowOpen,
               })}
-              onToggle={() => {
-                setOpenMenu(overflowOpen ? null : "overflow");
-                setAppState({ openMenu: null, openPopup: null });
-              }}
               title={overflowLabel}
               aria-label={overflowLabel}
               aria-haspopup="menu"
@@ -527,12 +542,6 @@ export const AdaptiveEditorToolbar = ({
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               id={overflowMenuId}
-              onClickOutside={() => {
-                setOpenMenu(null);
-                requestAnimationFrame(() =>
-                  overflowTriggerRef.current?.focus(),
-                );
-              }}
               onSelect={() => setOpenMenu(null)}
               className={clsx(
                 "App-toolbar__extra-tools-dropdown adaptive-editor-toolbar__menu",
@@ -540,6 +549,8 @@ export const AdaptiveEditorToolbar = ({
               )}
               align="center"
               side="top"
+              surfaceKind="toolbar-menu"
+              placementIntent="toolbar-up"
               collisionBoundary={container}
             >
               {overflowItems.map((item) => renderMenuItem(item, true))}

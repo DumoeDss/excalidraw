@@ -1,6 +1,7 @@
 import { useEditorInterface } from "../App";
 import { Ellipsify } from "../Ellipsify";
 import { RadioGroup } from "../RadioGroup";
+import { FloatingSurfaceShortcut } from "../floatingSurface";
 
 type Props<T> = {
   value: T;
@@ -42,9 +43,9 @@ const DropdownMenuItemContentRadio = <T,>({
         />
       </div>
       {shortcut && editorInterface.formFactor !== "phone" && (
-        <div className="dropdown-menu-item__shortcut dropdown-menu-item__shortcut--orphaned">
+        <FloatingSurfaceShortcut className="dropdown-menu-item__shortcut dropdown-menu-item__shortcut--orphaned">
           {shortcut}
-        </div>
+        </FloatingSurfaceShortcut>
       )}
     </>
   );

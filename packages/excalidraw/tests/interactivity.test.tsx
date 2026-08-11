@@ -805,13 +805,13 @@ describe("property adapter live behavior", () => {
     });
   });
 
-  it("shields and restores the phone toolbar while properties own foreground", async () => {
+  it("shields and restores the phone toolbar while property shells and direct pickers own foreground", async () => {
     await render(<Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />);
     fireEvent.resize(window);
     await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
     await selectRectangle();
 
-    const trigger = await waitFor(() => {
+    const actionsTrigger = await waitFor(() => {
       const node = queryContainer(
         '[data-property-adapter="phone"] button[aria-label="Actions"]',
       );
@@ -821,24 +821,36 @@ describe("property adapter live behavior", () => {
     const toolbar = queryContainer(
       ".App-bottom-bar > .adaptive-toolbar-shell",
     ) as HTMLElement;
+    const expectShielded = async () => {
+      await waitFor(() => {
+        expect(toolbar).toHaveAttribute("data-property-popup-shielded", "true");
+        expect(toolbar).toHaveAttribute("aria-hidden", "true");
+        expect(toolbar.inert).toBe(true);
+        expect(toolbar.style.opacity).toBe("0");
+        expect(toolbar.style.pointerEvents).toBe("none");
+      });
+    };
+    const expectRestored = async () => {
+      await waitFor(() => {
+        expect(toolbar).not.toHaveAttribute("data-property-popup-shielded");
+        expect(toolbar).not.toHaveAttribute("aria-hidden");
+        expect(toolbar.inert).not.toBe(true);
+        expect(toolbar.style.opacity).toBe("");
+        expect(toolbar.style.pointerEvents).toBe("");
+      });
+    };
 
-    fireEvent.click(trigger);
-    await waitFor(() => {
-      expect(toolbar).toHaveAttribute("data-property-popup-shielded", "true");
-      expect(toolbar).toHaveAttribute("aria-hidden", "true");
-      expect(toolbar.inert).toBe(true);
-      expect(toolbar.style.opacity).toBe("0");
-      expect(toolbar.style.pointerEvents).toBe("none");
-    });
+    act(() => API.setAppState({ openPopup: "elementStroke" }));
+    await expectShielded();
+
+    act(() => API.setAppState({ openPopup: null }));
+    await expectRestored();
+
+    fireEvent.click(actionsTrigger);
+    await expectShielded();
 
     fireEvent.keyDown(document, { key: "Escape" });
-    await waitFor(() => {
-      expect(toolbar).not.toHaveAttribute("data-property-popup-shielded");
-      expect(toolbar).not.toHaveAttribute("aria-hidden");
-      expect(toolbar.inert).not.toBe(true);
-      expect(toolbar.style.opacity).toBe("");
-      expect(toolbar.style.pointerEvents).toBe("");
-    });
+    await expectRestored();
   });
 });
 

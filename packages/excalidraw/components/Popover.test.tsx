@@ -62,12 +62,12 @@ describe("Popover", () => {
       );
       const popover = container.querySelector<HTMLDivElement>(".popover")!;
 
-      expect(popover.style.width).toBe("180px");
-      expect(popover.style.height).toBe("180px");
+      expect(popover.style.maxWidth).toBe("180px");
+      expect(popover.style.maxHeight).toBe("180px");
       expect(popover.style.left).toBe("10px");
       expect(popover.style.top).toBe("10px");
-      expect(popover.style.overflowX).toBe("scroll");
-      expect(popover.style.overflowY).toBe("scroll");
+      expect(popover.style.overflowX).toBe("");
+      expect(popover.style.overflowY).toBe("");
     } finally {
       restoreDimensions();
     }

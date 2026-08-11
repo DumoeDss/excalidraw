@@ -19,12 +19,7 @@ import PublishLibrary from "./PublishLibrary";
 import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import {
-  ExportIcon,
-  LoadIcon,
-  publishIcon,
-  TrashIcon,
-} from "./icons";
+import { ExportIcon, LoadIcon, publishIcon, TrashIcon } from "./icons";
 import { DotsIcon } from "./primitives/chrome-icons";
 
 import type Library from "../data/library";
@@ -191,14 +186,12 @@ export const LibraryDropdownMenuButton: React.FC<{
 
   const renderLibraryMenu = () => {
     return (
-      <DropdownMenu open={isLibraryMenuOpen}>
-        <DropdownMenu.Trigger
-          onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
-        >
-          {DotsIcon}
-        </DropdownMenu.Trigger>
+      <DropdownMenu
+        open={isLibraryMenuOpen}
+        onOpenChange={setIsLibraryMenuOpen}
+      >
+        <DropdownMenu.Trigger>{DotsIcon}</DropdownMenu.Trigger>
         <DropdownMenu.Content
-          onClickOutside={() => setIsLibraryMenuOpen(false)}
           onSelect={() => setIsLibraryMenuOpen(false)}
           className="library-menu"
         >

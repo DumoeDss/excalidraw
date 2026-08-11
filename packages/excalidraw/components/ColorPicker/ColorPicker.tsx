@@ -19,6 +19,7 @@ import { useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
+import { useFloatingSurfaceOwner } from "../floatingSurface";
 import { slashIcon, strokeIcon } from "../icons";
 import {
   saveCaretPosition,
@@ -113,6 +114,7 @@ const ColorPickerPopupContent = ({
   return (
     <PropertiesPopover
       container={container}
+      surfaceKind="color-picker"
       style={{ maxWidth: "13rem" }}
       // Improve focus handling for text editing scenarios
       preventAutoFocusOnTouch={!!appState.editingTextElement}
@@ -296,12 +298,29 @@ export const ColorPicker = ({
   appState,
   excludedColors,
 }: ColorPickerProps) => {
+  const { id: editorId } = useExcalidrawContainer();
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
+  const isOpen = appState.openPopup === type;
+  const onPopupChange = (open: boolean) => {
+    updateData({
+      openPopup: open
+        ? type
+        : appState.openPopup === type
+        ? null
+        : appState.openPopup,
+    });
+  };
+  useFloatingSurfaceOwner({
+    scope: `${editorId ?? "editor"}:picker`,
+    identity: type,
+    open: isOpen,
+    onOpenChange: onPopupChange,
+  });
 
   return (
     <div>
@@ -321,14 +340,7 @@ export const ColorPicker = ({
           />
         )}
         {!isCompactMode && <ButtonSeparator />}
-        <Popover.Root
-          open={appState.openPopup === type}
-          onOpenChange={(open) => {
-            if (open) {
-              updateData({ openPopup: type });
-            }
-          }}
-        >
+        <Popover.Root open={isOpen} onOpenChange={onPopupChange}>
           {/* serves as an active color indicator as well */}
           <ColorPickerTrigger
             color={color}
@@ -350,7 +362,7 @@ export const ColorPicker = ({
             }}
           />
           {/* popup content */}
-          {appState.openPopup === type && (
+          {isOpen && (
             <ColorPickerPopupContent
               type={type}
               color={color}

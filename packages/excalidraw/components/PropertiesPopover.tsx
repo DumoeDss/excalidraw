@@ -6,14 +6,21 @@ import { isInteractive } from "@excalidraw/common";
 
 import { useEditorInterface } from "./App";
 import { useStylesPanelMode } from "./App";
-import { Island } from "./Island";
+import {
+  FloatingSurfaceFrame,
+  FloatingSurfaceScrollViewport,
+  readEditorSafeAreaInsets,
+  resolveFloatingSurfacePolicy,
+} from "./floatingSurface";
 import { resolvePropertyPlacement } from "./propertyPlacement";
+
+import type { FloatingSurfaceKind } from "./floatingSurface";
 
 interface PropertiesPopoverProps {
   className?: string;
   container: HTMLDivElement | null;
   children: ReactNode;
-  style?: object;
+  style?: React.CSSProperties;
   onClose: () => void;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   onPointerLeave?: React.PointerEventHandler<HTMLDivElement>;
@@ -21,6 +28,10 @@ interface PropertiesPopoverProps {
   onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
   preventAutoFocusOnTouch?: boolean;
   returnFocusRef?: React.RefObject<HTMLElement | null>;
+  surfaceKind?: Extract<
+    FloatingSurfaceKind,
+    "property-popover" | "color-picker" | "font-picker"
+  >;
 }
 
 export const PropertiesPopover = React.forwardRef<
@@ -40,6 +51,7 @@ export const PropertiesPopover = React.forwardRef<
       onPointerDownOutside,
       preventAutoFocusOnTouch = false,
       returnFocusRef,
+      surfaceKind = "property-popover",
     },
     ref,
   ) => {
@@ -62,19 +74,31 @@ export const PropertiesPopover = React.forwardRef<
           : "compact",
       collisionBoundary: container,
     });
+    const policy = resolveFloatingSurfacePolicy({
+      kind: surfaceKind,
+      intent:
+        editorInterface.formFactor === "phone"
+          ? "phone-up"
+          : "property-canvas-inward",
+      formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
+      direction,
+      pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+      collisionPadding: placement.collisionPadding,
+      safeArea: readEditorSafeAreaInsets(container),
+      availableBlockSize: container?.clientHeight ?? 0,
+    });
 
     return (
       <Popover.Portal container={container}>
         <Popover.Content
-          ref={ref}
-          className={clsx("focus-visible-none", className)}
+          className="floating-surface-positioner focus-visible-none properties-popover-positioner"
           data-prevent-outside-click
           side={placement.popoverSide}
           align={placement.popoverAlign}
           alignOffset={0}
           sideOffset={10}
           collisionBoundary={placement.collisionBoundary ?? undefined}
-          collisionPadding={placement.collisionPadding}
+          collisionPadding={policy.collisionPadding}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
           }}
@@ -112,10 +136,22 @@ export const PropertiesPopover = React.forwardRef<
             }
           }}
         >
-          <Island padding={3} style={style}>
-            {children}
-          </Island>
+          <FloatingSurfaceFrame
+            ref={ref}
+            className={clsx("properties-popover-frame", className)}
+            density={policy.density}
+            kind={surfaceKind}
+            style={{
+              ...style,
+              ["--floating-surface-available-block-size" as string]: `min(${policy.maxBlockSize}px, var(--radix-popover-content-available-height))`,
+            }}
+          >
+            <FloatingSurfaceScrollViewport className="properties-popover-scroll-viewport">
+              {children}
+            </FloatingSurfaceScrollViewport>
+          </FloatingSurfaceFrame>
           <Popover.Arrow
+            className="properties-popover-arrow"
             width={20}
             height={10}
             style={{

@@ -1,5 +1,10 @@
 import React from "react";
 
+import {
+  FloatingSurfaceHeading,
+  FloatingSurfaceSection,
+} from "../floatingSurface";
+
 const MenuGroup = ({
   children,
   className = "",
@@ -12,10 +17,17 @@ const MenuGroup = ({
   title?: string;
 }) => {
   return (
-    <div className={`dropdown-menu-group ${className}`} style={style}>
-      {title && <p className="dropdown-menu-group-title">{title}</p>}
+    <FloatingSurfaceSection
+      className={`dropdown-menu-group ${className}`}
+      style={style}
+    >
+      {title && (
+        <FloatingSurfaceHeading className="dropdown-menu-group-title">
+          {title}
+        </FloatingSurfaceHeading>
+      )}
       {children}
-    </div>
+    </FloatingSurfaceSection>
   );
 };
 

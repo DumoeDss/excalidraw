@@ -1,69 +1,142 @@
 import clsx from "clsx";
+import { useLayoutEffect, useState } from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { useCallback, useState } from "react";
+import { useEditorInterface, useExcalidrawContainer } from "../App";
+import {
+  FloatingSurfaceFrame,
+  FloatingSurfaceScrollViewport,
+  readEditorSafeAreaInsets,
+  resolveFloatingSurfaceInlineShift,
+  resolveFloatingSurfacePolicy,
+  useFloatingSurfaceAvailableBlockSize,
+} from "../floatingSurface";
 
-import { useEditorInterface } from "../App";
-import { Island } from "../Island";
-import Stack from "../Stack";
-
-const BASE_ALIGN_OFFSET = -4;
 const BASE_SIDE_OFFSET = 4;
 
 const DropdownMenuSubContent = ({
   children,
   className,
+  onEscape,
 }: {
   children?: React.ReactNode;
   className?: string;
+  onEscape?: () => void;
 }) => {
   const editorInterface = useEditorInterface();
+  const { container } = useExcalidrawContainer();
+  const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
+  const direction =
+    container?.getAttribute("dir") === "rtl" ||
+    container?.closest<HTMLElement>("[dir=rtl]")
+      ? "rtl"
+      : "ltr";
+  const policy = resolveFloatingSurfacePolicy({
+    kind: "submenu",
+    intent: "nested-submenu-inline",
+    formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
+    direction,
+    pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+    availableBlockSize: container?.clientHeight ?? 0,
+    safeArea: readEditorSafeAreaInsets(container),
+  });
+  const availableBlockSize = useFloatingSurfaceAvailableBlockSize({
+    boundary: container,
+    frame: frameElement,
+    padding: policy.collisionPadding,
+  });
+  const collisionPaddingLeft = policy.collisionPadding.left;
+  const collisionPaddingRight = policy.collisionPadding.right;
 
   const classNames = clsx(`dropdown-menu dropdown-submenu ${className}`, {
     "dropdown-menu--mobile": editorInterface.formFactor === "phone",
   }).trim();
 
-  const callbacksRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      const parentContainer = node.closest(".dropdown-menu-container");
-      const parentRect = parentContainer?.getBoundingClientRect();
-      if (parentRect) {
-        const menuWidth = node.getBoundingClientRect().width;
-
-        const viewportWidth = window.innerWidth;
-        const spaceRemaining = viewportWidth - parentRect.right;
-        if (spaceRemaining < menuWidth + 20) {
-          setSideOffset(spaceRemaining - menuWidth + BASE_ALIGN_OFFSET);
-          setAlignOffset(BASE_ALIGN_OFFSET + 8);
-        }
-      }
+  useLayoutEffect(() => {
+    const frame = frameElement;
+    const content = frame?.parentElement;
+    if (!frame || !content || !container) {
+      return;
     }
-  }, []);
 
-  const [sideOffset, setSideOffset] = useState(BASE_SIDE_OFFSET);
-  const [alignOffset, setAlignOffset] = useState(BASE_ALIGN_OFFSET);
+    const fitInline = () => {
+      content.style.transform = "";
+      const surfaceRect = frame.getBoundingClientRect();
+      const boundaryRect = container.getBoundingClientRect();
+      const shift = resolveFloatingSurfaceInlineShift({
+        boundary: boundaryRect,
+        surface: surfaceRect,
+        padding: {
+          left: collisionPaddingLeft,
+          right: collisionPaddingRight,
+        },
+      });
+      content.style.transform = shift ? `translateX(${shift}px)` : "";
+    };
+
+    fitInline();
+    const ownerWindow = content.ownerDocument.defaultView;
+    const deferredFit = ownerWindow?.setTimeout(fitInline, 0);
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(fitInline);
+    const positionObserver =
+      typeof MutationObserver === "undefined"
+        ? null
+        : new MutationObserver(fitInline);
+    observer?.observe(frame);
+    observer?.observe(container);
+    if (content.parentElement) {
+      positionObserver?.observe(content.parentElement, {
+        attributeFilter: ["style"],
+        attributes: true,
+      });
+    }
+
+    return () => {
+      if (deferredFit !== undefined) {
+        ownerWindow?.clearTimeout(deferredFit);
+      }
+      observer?.disconnect();
+      positionObserver?.disconnect();
+      content.style.transform = "";
+    };
+  }, [container, frameElement, collisionPaddingLeft, collisionPaddingRight]);
 
   return (
-    <DropdownMenuPrimitive.SubContent
-      className={classNames}
-      sideOffset={sideOffset}
-      alignOffset={alignOffset}
-      collisionPadding={8}
-      ref={callbacksRef}
-    >
-      {editorInterface.formFactor === "phone" ? (
-        <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
-      ) : (
-        <Island
-          className="dropdown-menu-container"
-          padding={2}
-          style={{ zIndex: 1 }}
+    <DropdownMenuPrimitive.Portal container={container}>
+      <DropdownMenuPrimitive.SubContent
+        className="floating-surface-positioner dropdown-menu-positioner"
+        sideOffset={BASE_SIDE_OFFSET}
+        collisionBoundary={container ?? undefined}
+        collisionPadding={policy.collisionPadding}
+        onEscapeKeyDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onEscape?.();
+        }}
+      >
+        <FloatingSurfaceFrame
+          className={classNames}
+          density={policy.density}
+          kind="submenu"
+          ref={setFrameElement}
+          style={{
+            ["--floating-surface-available-block-size" as string]: `min(${
+              policy.maxBlockSize
+            }px, ${
+              availableBlockSize ?? policy.maxBlockSize
+            }px, var(--radix-dropdown-menu-content-available-height))`,
+          }}
         >
-          {children}
-        </Island>
-      )}
-    </DropdownMenuPrimitive.SubContent>
+          <FloatingSurfaceScrollViewport className="dropdown-menu-container">
+            {children}
+          </FloatingSurfaceScrollViewport>
+        </FloatingSurfaceFrame>
+      </DropdownMenuPrimitive.SubContent>
+    </DropdownMenuPrimitive.Portal>
   );
 };
 
