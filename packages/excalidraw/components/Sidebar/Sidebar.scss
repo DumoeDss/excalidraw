@@ -5,9 +5,9 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
+    top: var(--sidebar-safe-top, 0);
+    right: var(--sidebar-safe-right, 0);
+    bottom: var(--sidebar-safe-bottom, 0);
     z-index: var(--zIndex-ui-library);
     margin: 0;
     padding: 0;
@@ -20,12 +20,18 @@
 
     overflow: hidden;
     border-radius: 0;
-    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
+    width: var(
+      --sidebar-inline-size,
+      calc(var(--right-sidebar-width) - var(--space-factor) * 2)
+    );
+    max-width: calc(
+      100% - var(--sidebar-safe-left, 0) - var(--sidebar-safe-right, 0)
+    );
 
     border-left: 1px solid var(--sidebar-border-color);
 
     :root[dir="rtl"] & {
-      left: 0;
+      left: var(--sidebar-safe-left, 0);
       right: auto;
     }
 
@@ -33,9 +39,49 @@
       box-shadow: none;
     }
 
+    &--overlay {
+      box-shadow: var(--ui-shadow-3);
+    }
+
     :root[dir="rtl"] & {
       border-right: 1px solid var(--sidebar-border-color);
       border-left: 0;
+    }
+
+    &__resize-handle {
+      position: absolute;
+      z-index: 1;
+      inset-block: 0;
+      inset-inline-start: -6px;
+      width: 12px;
+      cursor: ew-resize;
+      touch-action: none;
+      pointer-events: auto;
+
+      &[data-coarse-pointer="true"] {
+        inset-inline-start: -12px;
+        width: 24px;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: 5px;
+        width: 2px;
+        background: transparent;
+        transition: background-color 120ms ease-out;
+      }
+
+      &:hover::after,
+      &:focus-visible::after {
+        background: var(--color-primary);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--focus-highlight-color);
+        outline-offset: -2px;
+      }
     }
   }
 
@@ -99,6 +145,7 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+    min-height: 0;
     padding: 1rem 0;
 
     [role="tabpanel"] {
@@ -109,6 +156,10 @@
       display: flex;
       flex-direction: column;
       outline: none;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
     }
 
     [role="tabpanel"][data-state="inactive"] {

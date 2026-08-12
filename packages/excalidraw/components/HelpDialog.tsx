@@ -12,6 +12,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { useExcalidrawActionManager } from "./App";
 import { Dialog } from "./Dialog";
+import { LargeSurfaceSection } from "./largeSurface";
 import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 
 import "./HelpDialog.scss";
@@ -60,10 +61,10 @@ const Header = () => (
 );
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
-  <>
+  <LargeSurfaceSection>
     <h3>{props.title}</h3>
     <div className="HelpDialog__islands-container">{props.children}</div>
-  </>
+  </LargeSurfaceSection>
 );
 
 const ShortcutIsland = (props: {
@@ -139,6 +140,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         onCloseRequest={handleClose}
         title={t("helpDialog.title")}
         className={"HelpDialog"}
+        size="wide"
       >
         <Header />
         <Section title={t("helpDialog.shortcuts")}>

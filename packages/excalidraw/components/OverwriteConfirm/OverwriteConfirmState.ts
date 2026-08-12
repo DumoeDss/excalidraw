@@ -1,4 +1,5 @@
 import { atom, editorJotaiStore } from "../../editor-jotai";
+import { createSettleOnce } from "../largeSurface/settleOnce";
 
 import type React from "react";
 
@@ -32,11 +33,16 @@ export async function openConfirmModal({
   color: "danger" | "warning";
 }) {
   return new Promise<boolean>((resolve) => {
+    const current = editorJotaiStore.get(overwriteConfirmStateAtom);
+    if (current.active) {
+      current.onReject();
+    }
+    const settle = createSettleOnce(resolve);
     editorJotaiStore.set(overwriteConfirmStateAtom, {
       active: true,
-      onConfirm: () => resolve(true),
-      onClose: () => resolve(false),
-      onReject: () => resolve(false),
+      onConfirm: () => settle(true),
+      onClose: () => settle(false),
+      onReject: () => settle(false),
       title,
       description,
       actionLabel,

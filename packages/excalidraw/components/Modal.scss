@@ -3,29 +3,39 @@
 .excalidraw {
   &.excalidraw-modal-container {
     position: absolute;
+    inset: 0;
     z-index: var(--zIndex-modal);
+    pointer-events: none;
   }
 
   .Modal {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: auto;
-    padding: calc(var(--space-factor) * 10);
-
-    display: flex;
-    flex-direction: column;
+    box-sizing: border-box;
+    min-inline-size: 0;
+    min-block-size: 0;
+    padding: calc(20px + var(--large-surface-safe-top))
+      calc(20px + var(--large-surface-safe-right))
+      calc(20px + var(--large-surface-safe-bottom))
+      calc(20px + var(--large-surface-safe-left));
+    overflow: hidden;
+    pointer-events: none;
 
     .Island {
-      padding: 2.5rem;
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+      flex-direction: column;
+      padding: 0;
       border: 0;
       box-shadow: none;
       border-radius: 0;
+      background: transparent;
     }
 
     &.animations-disabled {
@@ -41,13 +51,11 @@
   }
 
   .Modal__background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: absolute;
+    inset: 0;
     z-index: 1;
-    background-color: rgba(#121212, 0.2);
+    background-color: color-mix(in srgb, #121212 32%, transparent);
+    pointer-events: auto;
 
     animation: Modal__background__fade-in 0.1s linear forwards;
   }
@@ -55,27 +63,26 @@
   .Modal__content {
     position: relative;
     z-index: 2;
-    width: 100%;
-    max-width: var(--max-width);
-    max-height: 100%;
+    inline-size: var(--large-surface-inline-size);
+    max-inline-size: 100%;
+    block-size: auto;
+    max-block-size: var(--large-surface-max-block-size);
 
     opacity: 0;
     transform: translateY(10px);
     animation: Modal__content_fade-in 0.025s ease-out 0s forwards;
 
-    position: relative;
-    overflow-y: auto;
-
-    // for modals, reset blurry bg
-    background: var(--island-bg-color);
-
-    border: 1px solid var(--dialog-border-color);
-    box-shadow: var(--modal-shadow);
-    border-radius: 0.75rem;
-    box-sizing: border-box;
-
     &:focus {
       outline: none;
+    }
+  }
+
+  .Modal[data-large-surface-presentation="sheet"] {
+    align-items: flex-end;
+
+    .Modal__content {
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
     }
   }
 
@@ -119,18 +126,14 @@
 
   .Dialog--fullscreen {
     .Modal {
-      padding: 0;
+      padding: var(--large-surface-safe-top) var(--large-surface-safe-right)
+        var(--large-surface-safe-bottom) var(--large-surface-safe-left);
     }
 
     .Modal__content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      max-width: 100%;
-      border: 0;
-      border-radius: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      max-block-size: 100%;
     }
   }
 }

@@ -1235,6 +1235,7 @@ export type AppClassProperties = {
   plugins: App["plugins"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
+  onToast: App["onToast"];
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];

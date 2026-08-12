@@ -216,10 +216,13 @@ describe("baseline (interactive & ui enabled by default)", () => {
 
     fireEvent.click(queryContainer(".default-sidebar-trigger")!);
     await waitFor(() => {
-      const sidebar = queryContainer(
-        '[data-viewport-ui="side"][data-viewport-ui-name="sidebar"]',
-      );
+      const sidebar = queryContainer(".sidebar");
       expect(sidebar).not.toBe(null);
+      expect(sidebar).toHaveAttribute(
+        "data-large-surface-presentation",
+        "overlay",
+      );
+      expect(sidebar).not.toHaveAttribute("data-viewport-ui");
       expect(sidebar!.closest("[data-canvas-ui-zone]")).toBe(null);
     });
   });

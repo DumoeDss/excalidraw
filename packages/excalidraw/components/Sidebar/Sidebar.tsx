@@ -3,10 +3,10 @@ import React, {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
   forwardRef,
   useImperativeHandle,
   useCallback,
+  useState,
 } from "react";
 
 import {
@@ -20,8 +20,17 @@ import {
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-import { useEditorInterface, useExcalidrawSetAppState } from "../App";
+import {
+  useEditorInterface,
+  useExcalidrawAppState,
+  useExcalidrawContainer,
+  useExcalidrawSetAppState,
+} from "../App";
 import { Island } from "../Island";
+import {
+  readLargeSurfaceSafeAreaInsets,
+  resolveLargeSurfacePolicy,
+} from "../largeSurface";
 
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarTabTrigger } from "./SidebarTabTrigger";
@@ -30,6 +39,15 @@ import { SidebarTrigger } from "./SidebarTrigger";
 import { SidebarPropsContext } from "./common";
 import { SidebarTabs } from "./SidebarTabs";
 import { SidebarTab } from "./SidebarTab";
+import {
+  claimSidebarPresentation,
+  isSidebarPresentationClaim,
+  releaseSidebarPresentation,
+} from "./presentationOwner";
+import {
+  SIDEBAR_DEFAULT_INLINE_SIZE,
+  resolveSidebarResize,
+} from "./resizePolicy";
 
 import "./Sidebar.scss";
 
@@ -67,12 +85,77 @@ export const SidebarInner = forwardRef(
 
     const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom);
 
+    const editorInterface = useEditorInterface();
+    const appState = useExcalidrawAppState();
+    const { container } = useExcalidrawContainer();
+    const direction = document.documentElement.dir === "rtl" ? "rtl" : "ltr";
+    const safeArea = readLargeSurfaceSafeAreaInsets(container);
+    const [requestedInlineSize, setRequestedInlineSize] = useState(
+      SIDEBAR_DEFAULT_INLINE_SIZE,
+    );
+    const resizeHandleRef = useRef<HTMLDivElement>(null);
+    const presentationClaimRef = useRef<symbol | null>(null);
+    const resizeRef = useRef<{
+      pointerId: number;
+      target: HTMLDivElement;
+      startClientX: number;
+      startInlineSize: number;
+    } | null>(null);
+    const effectivelyDocked = !!docked && editorInterface.canFitSidebar;
+    const presentation = effectivelyDocked ? "docked" : "overlay";
+    const resizeAllowed =
+      !!onDock &&
+      docked != null &&
+      editorInterface.formFactor !== "phone" &&
+      editorInterface.canFitSidebar;
+    const policy = resolveLargeSurfacePolicy({
+      kind: "sidebar",
+      presentation,
+      size: "small",
+      requestedInlineSize,
+      container: { width: appState.width, height: appState.height },
+      safeArea,
+      formFactor: editorInterface.formFactor,
+      direction,
+      coarsePointer: editorInterface.isTouchScreen,
+    });
+
+    const availableInlineSize = Math.max(
+      0,
+      appState.width - safeArea.left - safeArea.right,
+    );
+
+    useEffect(
+      () => () => {
+        const activeResize = resizeRef.current;
+        const handle = activeResize?.target ?? resizeHandleRef.current;
+        if (
+          activeResize &&
+          handle?.hasPointerCapture?.(activeResize.pointerId)
+        ) {
+          handle.releasePointerCapture(activeResize.pointerId);
+        }
+        resizeRef.current = null;
+      },
+      [],
+    );
+
     useLayoutEffect(() => {
-      setIsSidebarDockedAtom(!!docked);
+      if (!container) {
+        return;
+      }
+      const token = claimSidebarPresentation(container);
+      presentationClaimRef.current = token;
+      setIsSidebarDockedAtom(effectivelyDocked);
       return () => {
-        setIsSidebarDockedAtom(false);
+        if (releaseSidebarPresentation(container, token)) {
+          setIsSidebarDockedAtom(false);
+        }
+        if (presentationClaimRef.current === token) {
+          presentationClaimRef.current = null;
+        }
       };
-    }, [setIsSidebarDockedAtom, docked]);
+    }, [container, effectivelyDocked, setIsSidebarDockedAtom]);
 
     const headerPropsRef = useRef<SidebarPropsContextValue>(
       {} as SidebarPropsContextValue,
@@ -96,17 +179,21 @@ export const SidebarInner = forwardRef(
       return islandRef.current!;
     });
 
-    const editorInterface = useEditorInterface();
-
     const closeLibrary = useCallback(() => {
-      const isDialogOpen = !!document.querySelector(".Dialog");
+      if (
+        container &&
+        !isSidebarPresentationClaim(container, presentationClaimRef.current)
+      ) {
+        return;
+      }
+      const isDialogOpen = !!container?.querySelector(".Dialog");
 
       // Prevent closing if any dialog is open
       if (isDialogOpen) {
         return;
       }
       setAppState({ openSidebar: null });
-    }, [setAppState]);
+    }, [container, setAppState]);
 
     useOutsideClick(
       islandRef,
@@ -117,20 +204,17 @@ export const SidebarInner = forwardRef(
           if ((event.target as Element).closest(".sidebar-trigger")) {
             return;
           }
-          if (!docked || !editorInterface.canFitSidebar) {
+          if (!effectivelyDocked) {
             closeLibrary();
           }
         },
-        [closeLibrary, docked, editorInterface.canFitSidebar],
+        [closeLibrary, effectivelyDocked],
       ),
     );
 
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (
-          event.key === KEYS.ESCAPE &&
-          (!docked || !editorInterface.canFitSidebar)
-        ) {
+        if (event.key === KEYS.ESCAPE && !effectivelyDocked) {
           closeLibrary();
         }
       };
@@ -138,26 +222,113 @@ export const SidebarInner = forwardRef(
       return () => {
         document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
       };
-    }, [closeLibrary, docked, editorInterface.canFitSidebar]);
+    }, [closeLibrary, effectivelyDocked]);
 
     return (
       <Island
         {...rest}
         className={clsx(
           CLASSES.SIDEBAR,
-          { "sidebar--docked": docked },
+          {
+            "sidebar--docked": effectivelyDocked,
+            "sidebar--overlay": !effectivelyDocked,
+          },
           className,
         )}
-        // on mobile the sidebar shouldn't push the viewport around even
-        // when opened (it's treated as a temporary overlay)
-        data-viewport-ui={
-          editorInterface.formFactor !== "phone" ? "side" : undefined
-        }
-        data-viewport-ui-name={
-          editorInterface.formFactor !== "phone" ? "sidebar" : undefined
+        data-large-surface
+        data-large-surface-kind="sidebar"
+        data-large-surface-presentation={presentation}
+        data-large-surface-density={policy.density}
+        data-large-surface-elevation={policy.elevation}
+        data-viewport-ui={effectivelyDocked ? "side" : undefined}
+        data-viewport-ui-name={effectivelyDocked ? "sidebar" : undefined}
+        style={
+          {
+            "--sidebar-inline-size": `${policy.inlineSize}px`,
+            "--sidebar-safe-top": `${policy.inset.top}px`,
+            "--sidebar-safe-right": `${policy.inset.right}px`,
+            "--sidebar-safe-bottom": `${policy.inset.bottom}px`,
+            "--sidebar-safe-left": `${policy.inset.left}px`,
+          } as React.CSSProperties
         }
         ref={islandRef}
       >
+        {resizeAllowed && (
+          <div
+            className="sidebar__resize-handle"
+            data-sidebar-resize-handle
+            data-coarse-pointer={editorInterface.isTouchScreen || undefined}
+            role="separator"
+            aria-orientation="vertical"
+            aria-valuemin={Math.min(240, availableInlineSize)}
+            aria-valuemax={Math.min(480, availableInlineSize)}
+            aria-valuenow={Math.round(policy.inlineSize)}
+            tabIndex={0}
+            ref={resizeHandleRef}
+            onPointerDown={(event) => {
+              if (event.button !== 0) {
+                return;
+              }
+              resizeRef.current = {
+                pointerId: event.pointerId,
+                target: event.currentTarget,
+                startClientX: event.clientX,
+                startInlineSize: policy.inlineSize,
+              };
+              event.currentTarget.setPointerCapture?.(event.pointerId);
+              event.preventDefault();
+            }}
+            onPointerMove={(event) => {
+              const activeResize = resizeRef.current;
+              if (activeResize?.pointerId !== event.pointerId) {
+                return;
+              }
+              setRequestedInlineSize(
+                resolveSidebarResize({
+                  startInlineSize: activeResize.startInlineSize,
+                  startClientX: activeResize.startClientX,
+                  clientX: event.clientX,
+                  direction,
+                  availableInlineSize,
+                }),
+              );
+            }}
+            onPointerUp={(event) => {
+              if (resizeRef.current?.pointerId !== event.pointerId) {
+                return;
+              }
+              resizeRef.current = null;
+              if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+              }
+            }}
+            onPointerCancel={() => {
+              resizeRef.current = null;
+            }}
+            onLostPointerCapture={() => {
+              resizeRef.current = null;
+            }}
+            onKeyDown={(event) => {
+              if (
+                event.key !== KEYS.ARROW_LEFT &&
+                event.key !== KEYS.ARROW_RIGHT
+              ) {
+                return;
+              }
+              const logicalDelta = event.key === KEYS.ARROW_LEFT ? -8 : 8;
+              setRequestedInlineSize((inlineSize) =>
+                resolveSidebarResize({
+                  startInlineSize: inlineSize,
+                  startClientX: 0,
+                  clientX: logicalDelta,
+                  direction,
+                  availableInlineSize,
+                }),
+              );
+              event.preventDefault();
+            }}
+          />
+        )}
         <SidebarPropsContext.Provider value={headerPropsRef.current}>
           {children}
         </SidebarPropsContext.Provider>
@@ -201,18 +372,6 @@ export const Sidebar = Object.assign(
       return () => setMounted(false);
     }, []);
 
-    // We want to render in the next tick (hence `mounted` flag) so that it's
-    // guaranteed to happen after unmount of the previous sidebar (in case the
-    // previous sidebar is mounted after the next one). This is necessary to
-    // prevent flicker of subcomponents that support fallbacks
-    // (e.g. SidebarHeader). This is because we're using flags to determine
-    // whether prefer the fallback component or not (otherwise both will render
-    // initially), and the flag won't be reset in time if the unmount order
-    // it not correct.
-    //
-    // Alternative, and more general solution would be to namespace the fallback
-    // HoC so that state is not shared between subcomponents when the wrapping
-    // component is of the same type (e.g. Sidebar -> SidebarHeader).
     const shouldRender = mounted && appState.openSidebar?.name === props.name;
 
     if (!shouldRender) {

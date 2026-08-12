@@ -58,7 +58,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
-import { Toast } from "./Toast";
+import { ToastRegion } from "./Toast";
 import { LockButton } from "./LockButton";
 import { HintViewer } from "./HintViewer";
 
@@ -673,38 +673,34 @@ const LayerUI = ({
             >
               {(footerZones) => renderDesktopLayout(footerZones)}
             </Footer>
-            {(appState.toast ||
-              (scrollBackToContentUIEnabled && appState.scrolledOutside)) && (
+            {scrollBackToContentUIEnabled && appState.scrolledOutside && (
               <div className="floating-status-stack">
-                {appState.toast && (
-                  <Toast
-                    message={appState.toast.message}
-                    onClose={() => setAppState({ toast: null })}
-                    duration={appState.toast.duration}
-                    closable={appState.toast.closable}
-                  />
-                )}
-                {!appState.toast &&
-                  scrollBackToContentUIEnabled &&
-                  appState.scrolledOutside && (
-                    <button
-                      type="button"
-                      className="scroll-back-to-content"
-                      onClick={() => {
-                        setAppState((appState) => ({
-                          ...getScrollToContentState(elements, appState),
-                        }));
-                      }}
-                    >
-                      {t("buttons.scrollBackToContent")}
-                    </button>
-                  )}
+                <button
+                  type="button"
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState((appState) => ({
+                      ...getScrollToContentState(elements, appState),
+                    }));
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
               </div>
             )}
           </div>
           {renderSidebars()}
         </>
       )}
+      <ToastRegion
+        toast={appState.toast}
+        subscribe={app.onToast}
+        onConsume={(toast) => {
+          setAppState((current) =>
+            current.toast === toast ? { toast: null } : null,
+          );
+        }}
+      />
     </>
   );
 

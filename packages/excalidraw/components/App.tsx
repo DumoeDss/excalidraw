@@ -783,6 +783,17 @@ class App extends React.Component<AppProps, AppState> {
   onScrollChangeEmitter = new Emitter<
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
+  private toastEmitter = new Emitter<[toast: NonNullable<AppState["toast"]>]>();
+  private pendingToasts: NonNullable<AppState["toast"]>[] = [];
+  onToast = (callback: (toast: NonNullable<AppState["toast"]>) => void) => {
+    const unsubscribe = this.toastEmitter.on(callback);
+    const pendingToasts = this.pendingToasts;
+    this.pendingToasts = [];
+    for (const toast of pendingToasts) {
+      callback(toast);
+    }
+    return unsubscribe;
+  };
 
   missingPointerEventCleanupEmitter = new Emitter<
     [event: PointerEvent | null]
@@ -3735,7 +3746,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
-        hideHyperlinkToolip();
+        hideHyperlinkToolip(this.excalidrawContainerRef.current);
         this.cursor.reset();
       }
     }
@@ -4202,6 +4213,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    hideHyperlinkToolip(this.excalidrawContainerRef.current);
     // abort any in-flight generator jobs / model fetches so their callbacks
     // don't write to the destroyed component
     this.generatorJobs.forEach((controller) => controller.abort());
@@ -4262,6 +4274,8 @@ class App extends React.Component<AppProps, AppState> {
     this.drawShape.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
+    this.toastEmitter.clear();
+    this.pendingToasts = [];
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
     this.appStateObserver.clear();
@@ -5585,6 +5599,13 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   setToast = (toast: AppState["toast"]) => {
+    if (toast) {
+      if (this.toastEmitter.subscribers.length > 0) {
+        this.toastEmitter.trigger(toast);
+      } else {
+        this.pendingToasts.push(toast);
+      }
+    }
     this.setState({ toast });
   };
 
@@ -7743,7 +7764,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip();
+      hideHyperlinkToolip(this.excalidrawContainerRef.current);
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -7787,10 +7808,11 @@ class App extends React.Component<AppProps, AppState> {
         this.hitLinkElement,
         this.state,
         this.scene.getNonDeletedElementsMap(),
+        this.excalidrawContainerRef.current,
       );
       return true;
     }
-    hideHyperlinkToolip();
+    hideHyperlinkToolip(this.excalidrawContainerRef.current);
     return false;
   };
 

@@ -41,6 +41,7 @@ const Footer = ({
     bottomStart:
       defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled()) ? (
         <div
+          data-toast-reservation="bottom"
           className={clsx(
             "layer-ui__wrapper__footer-left zen-mode-transition",
             {
@@ -73,6 +74,7 @@ const Footer = ({
       defaultUIEnabled || renderWelcomeScreen ? (
         <>
           <div
+            data-toast-reservation="bottom"
             className={clsx(
               "layer-ui__wrapper__footer-right zen-mode-transition",
               {

@@ -1,47 +1,62 @@
 @use "../css/variables.module" as *;
 
-// container in body where the actual tooltip is appended to
-.excalidraw-tooltip {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
-  font-family: var(--ui-font);
-  position: fixed;
-  z-index: var(--zIndex-popup);
+.excalidraw {
+  &.excalidraw-tooltip-portal {
+    position: absolute;
+    inset: 0;
+    z-index: var(--zIndex-popup);
+    overflow: hidden;
+    pointer-events: none;
+  }
 
-  padding: 8px;
-  border-radius: 6px;
-  box-sizing: border-box;
-  pointer-events: none;
-  word-wrap: break-word;
+  .excalidraw-tooltip {
+    font-family: var(--ui-font);
+    position: absolute;
 
-  background: #000;
+    box-sizing: border-box;
+    min-width: 6rem;
+    max-width: min(20rem, calc(100% - var(--ui-space-6)));
+    padding: var(--ui-space-2) var(--ui-space-3);
+    border: 1px solid color-mix(in srgb, white 12%, transparent);
+    border-radius: var(--ui-radius-md);
+    background: var(--color-gray-90, #1b1b1f);
+    box-shadow: var(--ui-shadow-2);
+    color: white;
+    font-size: var(--ui-font-size-sm);
+    font-weight: var(--ui-font-weight-medium);
+    line-height: var(--ui-line-height-base);
+    text-align: center;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+    display: none;
+  }
 
-  line-height: 1.5;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
+  .excalidraw-tooltip-canvas-bridge {
+    z-index: var(--zIndex-popup);
+  }
 
-  display: none;
-
-  &.excalidraw-tooltip--visible {
+  .excalidraw-tooltip[role="tooltip"]:not([hidden]),
+  .excalidraw-tooltip--visible {
     display: block;
   }
-}
 
-// wraps the element we want to apply the tooltip to
-.excalidraw-tooltip-wrapper {
-  display: flex;
-}
+  .excalidraw-tooltip[data-tooltip-long="true"] {
+    max-width: min(50ch, calc(100% - var(--ui-space-6)));
+  }
 
-.excalidraw-tooltip-icon {
-  width: 0.9em;
-  height: 0.9em;
-  margin-left: 5px;
-  margin-top: 1px;
-  display: flex;
+  .excalidraw-tooltip-wrapper {
+    display: flex;
+  }
 
-  @include isMobile {
-    display: none;
+  .excalidraw-tooltip-icon {
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: 5px;
+    margin-top: 1px;
+    display: flex;
+
+    @include isMobile {
+      display: none;
+    }
   }
 }

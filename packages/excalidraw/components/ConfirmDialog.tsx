@@ -1,12 +1,14 @@
+import { useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 
 import { useSetAtom } from "../editor-jotai";
 import { t } from "../i18n";
 
+import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import { createSettleOnce } from "./largeSurface/settleOnce";
 
 import "./ConfirmDialog.scss";
 
@@ -26,16 +28,48 @@ const ConfirmDialog = (props: Props) => {
     confirmText = t("buttons.confirm"),
     cancelText = t("buttons.cancel"),
     className = "",
+    closeOnClickOutside = false,
     ...rest
   } = props;
   const setAppState = useExcalidrawSetAppState();
   const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
   const { container } = useExcalidrawContainer();
+  const settleRef = useRef<{
+    confirm: () => void;
+    cancel: () => void;
+  } | null>(null);
+  const lifecycleGenerationRef = useRef(0);
+  if (!settleRef.current) {
+    const settle = createSettleOnce((decision: "confirm" | "cancel") => {
+      if (decision === "confirm") {
+        onConfirm();
+      } else {
+        onCancel();
+      }
+    });
+    settleRef.current = {
+      confirm: () => settle("confirm"),
+      cancel: () => settle("cancel"),
+    };
+  }
+
+  useEffect(() => {
+    const lifecycle = lifecycleGenerationRef;
+    const generation = ++lifecycle.current;
+    return () => {
+      queueMicrotask(() => {
+        if (lifecycle.current === generation) {
+          settleRef.current?.cancel();
+        }
+      });
+    };
+  }, []);
 
   return (
     <Dialog
-      onCloseRequest={onCancel}
+      onCloseRequest={settleRef.current.cancel}
       size="small"
+      closeOnClickOutside={closeOnClickOutside}
       {...rest}
       className={`confirm-dialog ${className}`}
     >
@@ -51,7 +85,7 @@ const ConfirmDialog = (props: Props) => {
             // when `.focus` is invoked with container in some intermediate state
             // (container seems mounted in DOM, but focus still causes a crash)
             flushSync(() => {
-              onCancel();
+              settleRef.current?.cancel();
             });
 
             container?.focus();
@@ -67,7 +101,7 @@ const ConfirmDialog = (props: Props) => {
             // when `.focus` is invoked with container in some intermediate state
             // (container seems mounted in DOM, but focus still causes a crash)
             flushSync(() => {
-              onConfirm();
+              settleRef.current?.confirm();
             });
 
             container?.focus();
