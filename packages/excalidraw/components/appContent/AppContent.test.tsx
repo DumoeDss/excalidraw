@@ -81,6 +81,11 @@ describe("app content presentation", () => {
     expect(styles).toContain("var(--ui-font-size-sm)");
     expect(styles).not.toMatch(/--ui-[\w-]+\s*:/);
     expect(styles).not.toContain("!important");
+    expect(styles).toContain("var(--sal, 0px)");
+    expect(styles).toContain("var(--sar, 0px)");
+    expect(styles).toContain("var(--sat, 0px)");
+    expect(styles).toContain("var(--sab, 0px)");
+    expect(styles).not.toContain("env(safe-area-inset");
   });
 
   it("keeps the editor container a clipping boundary instead of a scrollable ancestor", () => {

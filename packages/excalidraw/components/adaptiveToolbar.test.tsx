@@ -115,8 +115,8 @@ describe("adaptive toolbar interaction surface", () => {
     expect(toolbarStyles).toContain(
       ':where(button, input, select, textarea, a[href], [role="button"]) { pointer-events: var(--ui-pointerEvents);',
     );
-    expect(toolbarStyles).toContain(
-      ".App-bottom-bar > .Island.adaptive-toolbar-shell { pointer-events: none;",
+    expect(toolbarStyles).toMatch(
+      /\.App-bottom-bar > \.Island\.adaptive-toolbar-shell \{[^}]*pointer-events: none;[^}]*overflow: clip;/,
     );
     expect(toolbarStyles).not.toMatch(
       /\.layer-ui__bottom-center-stack \{[^}]*> \* \{[^}]*pointer-events:/,

@@ -32,7 +32,7 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useEditorInterface } from "./App";
+import { useResponsiveEditorShell } from "./App";
 
 import { Button } from "./Button";
 import {
@@ -82,7 +82,7 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -400,7 +400,7 @@ export default function LibraryMenuItems({
     >
       <AppContent
         as="div"
-        density={editorInterface.formFactor === "phone" ? "touch" : "compact"}
+        density={responsive.density}
         label={t("toolBar.library")}
       >
         <AppContentSection>
@@ -414,8 +414,7 @@ export default function LibraryMenuItems({
                       ref={searchInputRef}
                       type="search"
                       className={clsx("library-menu-items-container__search", {
-                        hideCancelButton:
-                          editorInterface.formFactor !== "phone",
+                        hideCancelButton: responsive.adapter !== "phone",
                       })}
                       placeholder={t("library.search.inputPlaceholder")}
                       value={searchInputValue}

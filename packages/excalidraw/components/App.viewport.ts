@@ -21,7 +21,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { getLanguage, t } from "../i18n";
+import { t } from "../i18n";
 import { AnimationController } from "../renderer/animation";
 import {
   constrainScrollState,
@@ -31,10 +31,9 @@ import {
   zoomToFitBounds,
 } from "../viewport";
 
-import {
-  getStylesPanelFallback,
-  isPropertyMeasurementValid,
-} from "./propertyPlacement";
+import { getStylesPanelFallback } from "./propertyPlacement";
+
+import type { ResponsiveEditorShellProfile } from "./responsiveEditorShell/responsiveEditorShell";
 
 import type {
   AppProps,
@@ -68,6 +67,42 @@ const SCROLL_CONSTRAINTS_SNAP_BACK_DELAY = 200;
 export const RIGHT_SIDEBAR_WIDTH = 302;
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
+
+type NamedUIReservation = Readonly<{
+  physicalDock: "left" | "right";
+  offset: number;
+  adapter: "phone" | "desktop";
+  direction: "ltr" | "rtl";
+  presentation: "mobile" | "compact" | "full";
+  profileSignature: string;
+}>;
+
+const normalizeReservationOffset = (offset: number) =>
+  Number.isFinite(offset) && offset > 0 ? Number(offset.toFixed(3)) : 0;
+
+const createNamedUIReservation = (
+  physicalDock: "left" | "right",
+  offset: number,
+  profile: ResponsiveEditorShellProfile,
+): NamedUIReservation => ({
+  physicalDock,
+  offset: normalizeReservationOffset(offset),
+  adapter: profile.adapter,
+  direction: profile.direction,
+  presentation: profile.presentation,
+  profileSignature: profile.signature,
+});
+
+const isNamedUIReservationValid = (
+  reservation: NamedUIReservation,
+  expectedPhysicalDock: "left" | "right",
+  profile: ResponsiveEditorShellProfile,
+) =>
+  reservation.physicalDock === expectedPhysicalDock &&
+  reservation.adapter === profile.adapter &&
+  reservation.direction === profile.direction &&
+  reservation.presentation === profile.presentation &&
+  reservation.profileSignature === profile.signature;
 
 const isSetViewportRect = (target: unknown): target is SetViewportRect => {
   if (!target || typeof target !== "object" || Array.isArray(target)) {
@@ -438,10 +473,7 @@ export class AppViewport {
     target: Viewport & Pick<AppState, "scrollConstraints">;
   } | null = null;
 
-  private uiLastMeasured = new Map<
-    ViewportUIName,
-    { side: "left" | "right"; offset: number }
-  >();
+  private uiLastMeasured = new Map<ViewportUIName, NamedUIReservation>();
 
   constructor(
     private app: App,
@@ -500,7 +532,8 @@ export class AppViewport {
     const excalidrawContainer = this.dependencies.getContainer();
     const excalidrawContainerRect =
       excalidrawContainer?.getBoundingClientRect();
-    const isRTL = getLanguage().rtl;
+    const profile = this.app.editorInterface.responsive;
+    const isRTL = profile.direction === "rtl";
 
     const measuredOffsets = { top: 0, right: 0, bottom: 0, left: 0 };
     const renderedSurfaces = new Set<ViewportUIName>();
@@ -542,7 +575,10 @@ export class AppViewport {
             if (name) {
               renderedSurfaces.add(name);
               if (offset > 0) {
-                this.uiLastMeasured.set(name, { side, offset });
+                this.uiLastMeasured.set(
+                  name,
+                  createNamedUIReservation(side, offset, profile),
+                );
               }
             }
             break;
@@ -551,24 +587,23 @@ export class AppViewport {
       }
     }
 
-    if (opts?.reserve && this.app.editorInterface.formFactor !== "phone") {
+    if (opts?.reserve && profile.adapter !== "phone") {
       const reserveSurface = (
         name: ViewportUIName,
         fallback: { side: "left" | "right"; offset: number },
-        expectedSide?: "left" | "right",
       ) => {
         if (renderedSurfaces.has(name)) {
           return;
         }
         const cached = this.uiLastMeasured.get(name);
         const validCached =
-          cached &&
-          (!expectedSide ||
-            isPropertyMeasurementValid(cached.side, expectedSide));
+          cached && isNamedUIReservationValid(cached, fallback.side, profile);
         if (cached && !validCached) {
           this.uiLastMeasured.delete(name);
         }
-        const { side, offset } = validCached ? cached : fallback;
+        const { physicalDock: side, offset } = validCached
+          ? cached
+          : { physicalDock: fallback.side, offset: fallback.offset };
         measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
       };
 
@@ -577,7 +612,7 @@ export class AppViewport {
           this.dependencies.getStylesPanelMode(),
           isRTL ? "rtl" : "ltr",
         );
-        reserveSurface("stylesPanel", fallback, fallback.side);
+        reserveSurface("stylesPanel", fallback);
       }
       if (opts.reserve.sidebar) {
         reserveSurface("sidebar", {

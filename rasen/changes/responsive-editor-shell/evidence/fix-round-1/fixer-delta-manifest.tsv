@@ -1,0 +1,5 @@
+packages/excalidraw/components/App.tsx	320d75089bf881c3380ab18e589ea44827c673f2
+packages/excalidraw/components/LayerUI.tsx	de0a92c7743732216c360284153ed973f4d51c81
+packages/excalidraw/components/responsiveEditorShell/App.lifecycle.test.tsx	69c41940787dfaa641183b84f5ac0b15f6e0d22d
+packages/excalidraw/components/Sidebar/Sidebar.scss	bdb42cc2e7facd76b1b10771918a28036428be2a
+packages/excalidraw/components/welcome-screen/WelcomeScreen.scss	4a13d59597b017b1bb6307446baafaacd39e4361

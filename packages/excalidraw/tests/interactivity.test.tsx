@@ -258,7 +258,16 @@ describe("baseline (interactive & ui enabled by default)", () => {
     );
 
     try {
-      await setLanguage({ code: "__test__.rtl", label: "rtl", rtl: true });
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="ar-SA"
+        />,
+      );
+      await waitFor(() =>
+        expect(h.app.editorInterface.responsive.direction).toBe("rtl"),
+      );
       expect(
         h.app.viewport.getOffsets({
           padding: 0,
@@ -266,7 +275,16 @@ describe("baseline (interactive & ui enabled by default)", () => {
         }),
       ).toMatchObject({ left: 256, right: 0 });
 
-      await setLanguage({ code: "__test__", label: "ltr" });
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="en"
+        />,
+      );
+      await waitFor(() =>
+        expect(h.app.editorInterface.responsive.direction).toBe("ltr"),
+      );
       expect(
         h.app.viewport.getOffsets({
           padding: 0,
@@ -274,7 +292,13 @@ describe("baseline (interactive & ui enabled by default)", () => {
         }),
       ).toMatchObject({ left: 0, right: 256 });
     } finally {
-      await setLanguage({ code: "__test__", label: "ltr" });
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="en"
+        />,
+      );
     }
   });
 });

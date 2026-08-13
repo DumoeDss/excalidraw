@@ -44,7 +44,12 @@ import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { useAppProps, useEditorInterface, useStylesPanelMode } from "./App";
+import {
+  useAppProps,
+  useEditorInterface,
+  useResponsiveEditorShell,
+  useStylesPanelMode,
+} from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { sidebarRightIcon } from "./primitives/chrome-icons";
 import { DefaultSidebar } from "./DefaultSidebar";
@@ -167,6 +172,7 @@ const LayerUI = ({
   currentUserControls,
 }: LayerUIProps) => {
   const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const appProps = useAppProps();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactStylesPanel = stylesPanelMode === "compact";
@@ -641,7 +647,7 @@ const LayerUI = ({
           }
         />
       )}
-      {editorInterface.formFactor === "phone" && (
+      {responsive.adapter === "phone" && (
         <MobileMenu
           app={app}
           appState={appState}
@@ -659,7 +665,7 @@ const LayerUI = ({
           scrollBackToContentUIEnabled={scrollBackToContentUIEnabled}
         />
       )}
-      {editorInterface.formFactor !== "phone" && (
+      {responsive.adapter === "desktop" && (
         <>
           <div className="layer-ui__wrapper">
             {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}

@@ -1,4 +1,7 @@
-import { resolveLargeSurfacePolicy } from "./policy";
+import {
+  readLargeSurfaceSafeAreaInsets,
+  resolveLargeSurfacePolicy,
+} from "./policy";
 
 describe("large surface policy", () => {
   const base = {
@@ -65,5 +68,21 @@ describe("large surface policy", () => {
     expect(
       resolveLargeSurfacePolicy({ ...base, coarsePointer: true }).density,
     ).toBe("touch");
+  });
+
+  it("reads the canonical base physical variables", () => {
+    const editor = document.createElement("div");
+    editor.style.setProperty("--sat", "7px");
+    editor.style.setProperty("--sar", "13px");
+    editor.style.setProperty("--sab", "17px");
+    editor.style.setProperty("--sal", "23px");
+    editor.style.setProperty("--large-surface-safe-area-top", "99px");
+
+    expect(readLargeSurfaceSafeAreaInsets(editor)).toEqual({
+      top: 7,
+      right: 13,
+      bottom: 17,
+      left: 23,
+    });
   });
 });

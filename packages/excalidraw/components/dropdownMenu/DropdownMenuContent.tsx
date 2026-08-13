@@ -3,11 +3,10 @@ import React, { useState } from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { useEditorInterface, useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer, useResponsiveEditorShell } from "../App";
 import {
   FloatingSurfaceFrame,
   FloatingSurfaceScrollViewport,
-  readEditorSafeAreaInsets,
   resolveFloatingSurfacePolicy,
   useFloatingSurfaceAvailableBlockSize,
 } from "../floatingSurface";
@@ -47,26 +46,20 @@ const MenuContent = ({
   surfaceKind?: FloatingSurfaceKind;
   placementIntent?: FloatingSurfacePlacementIntent;
 }) => {
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const { container } = useExcalidrawContainer();
   const owningContainer = collisionBoundary ?? container;
   const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
-  const direction =
-    container?.getAttribute("dir") === "rtl" ||
-    container?.closest<HTMLElement>("[dir=rtl]")
-      ? "rtl"
-      : "ltr";
-  const safeArea = readEditorSafeAreaInsets(container);
   const policy = resolveFloatingSurfacePolicy({
     kind: surfaceKind,
     intent:
       placementIntent ??
       (side === "top" ? "toolbar-up" : "main-menu-start-bottom"),
-    formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
-    direction,
-    pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+    formFactor: responsive.adapter,
+    direction: responsive.direction,
+    pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
     availableBlockSize: owningContainer?.clientHeight ?? 0,
-    safeArea,
+    safeArea: responsive.safeArea.physical,
   });
   const availableBlockSize = useFloatingSurfaceAvailableBlockSize({
     boundary: owningContainer,
@@ -75,7 +68,7 @@ const MenuContent = ({
   });
 
   const classNames = clsx(`dropdown-menu ${className}`, {
-    "dropdown-menu--mobile": editorInterface.formFactor === "phone",
+    "dropdown-menu--mobile": responsive.adapter === "phone",
   }).trim();
 
   return (

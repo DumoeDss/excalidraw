@@ -154,6 +154,9 @@
 
   .App-bottom-bar > .Island.adaptive-toolbar-shell {
     pointer-events: none;
+    // Keep the intrinsic measurement rail available to the toolbar planner
+    // without letting it expand the editor's scrollable inline extent.
+    overflow: clip;
   }
 
   .layer-ui__bottom-center-stack {

@@ -155,13 +155,9 @@ export const readLargeSurfaceSafeAreaInsets = (
   }
   const styles = getComputedStyle(editor);
   return {
-    top: parseInset(styles.getPropertyValue("--large-surface-safe-area-top")),
-    right: parseInset(
-      styles.getPropertyValue("--large-surface-safe-area-right"),
-    ),
-    bottom: parseInset(
-      styles.getPropertyValue("--large-surface-safe-area-bottom"),
-    ),
-    left: parseInset(styles.getPropertyValue("--large-surface-safe-area-left")),
+    top: parseInset(styles.getPropertyValue("--sat")),
+    right: parseInset(styles.getPropertyValue("--sar")),
+    bottom: parseInset(styles.getPropertyValue("--sab")),
+    left: parseInset(styles.getPropertyValue("--sal")),
   };
 };

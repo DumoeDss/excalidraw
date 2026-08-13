@@ -243,9 +243,9 @@ export const readEditorSafeAreaInsets = (
   }
   const styles = getComputedStyle(editor);
   return {
-    top: parseInset(styles.getPropertyValue("--floating-safe-area-top")),
-    right: parseInset(styles.getPropertyValue("--floating-safe-area-right")),
-    bottom: parseInset(styles.getPropertyValue("--floating-safe-area-bottom")),
-    left: parseInset(styles.getPropertyValue("--floating-safe-area-left")),
+    top: parseInset(styles.getPropertyValue("--sat")),
+    right: parseInset(styles.getPropertyValue("--sar")),
+    bottom: parseInset(styles.getPropertyValue("--sab")),
+    left: parseInset(styles.getPropertyValue("--sal")),
   };
 };

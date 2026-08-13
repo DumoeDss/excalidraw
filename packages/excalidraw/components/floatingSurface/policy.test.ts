@@ -1,11 +1,28 @@
 import {
   fitFloatingSurfacePoint,
+  readEditorSafeAreaInsets,
   resolveFloatingSurfaceAvailableBlockSize,
   resolveFloatingSurfacePolicy,
   resolveFloatingSurfaceInlineShift,
 } from "./policy";
 
 describe("floating surface policy", () => {
+  it("reads the canonical base physical variables", () => {
+    const editor = document.createElement("div");
+    editor.style.setProperty("--sat", "7px");
+    editor.style.setProperty("--sar", "13px");
+    editor.style.setProperty("--sab", "17px");
+    editor.style.setProperty("--sal", "23px");
+    editor.style.setProperty("--floating-safe-area-top", "99px");
+
+    expect(readEditorSafeAreaInsets(editor)).toEqual({
+      top: 7,
+      right: 13,
+      bottom: 17,
+      left: 23,
+    });
+  });
+
   it.each([
     ["main-menu-start-bottom", "ltr", "bottom", "start"],
     ["toolbar-up", "ltr", "top", "center"],
