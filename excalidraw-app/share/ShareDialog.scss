@@ -5,9 +5,17 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 0;
+    overflow: visible;
+
+    > .app-content {
+      padding: 0;
+      overflow: visible;
+    }
 
     @include isMobile {
-      height: calc(100vh - 5rem);
+      max-height: 100%;
+      min-height: 0;
     }
 
     &__separator {

@@ -7,6 +7,12 @@ import { useEditorInterface, useExcalidrawActionManager } from "../App";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
 import { LoadIcon, usersIcon } from "../icons";
 import { HelpIcon } from "../primitives/chrome-icons";
+import {
+  AppContent,
+  AppContentActionGroup,
+  AppContentBody,
+  AppContentSection,
+} from "../appContent/AppContent";
 
 import type { JSX } from "react";
 
@@ -94,16 +100,29 @@ const Center = ({ children }: { children?: React.ReactNode }) => {
   return (
     <WelcomeScreenCenterTunnel.In>
       <div className="welcome-screen-center">
-        {children || (
-          <>
-            <Logo />
-            <Heading>{t("welcomeScreen.defaults.center_heading")}</Heading>
-            <Menu>
-              <MenuItemLoadScene />
-              <MenuItemHelp />
-            </Menu>
-          </>
-        )}
+        <AppContent
+          as="div"
+          density="comfortable"
+          interaction="neutral"
+          label={t("labels.actions")}
+        >
+          <AppContentSection>
+            <AppContentBody>
+              {children || (
+                <>
+                  <Logo />
+                  <Heading>
+                    {t("welcomeScreen.defaults.center_heading")}
+                  </Heading>
+                  <Menu>
+                    <MenuItemLoadScene />
+                    <MenuItemHelp />
+                  </Menu>
+                </>
+              )}
+            </AppContentBody>
+          </AppContentSection>
+        </AppContent>
       </div>
     </WelcomeScreenCenterTunnel.In>
   );
@@ -129,7 +148,13 @@ const Heading = ({ children }: { children: React.ReactNode }) => {
 Heading.displayName = "Heading";
 
 const Menu = ({ children }: { children?: React.ReactNode }) => {
-  return <div className="welcome-screen-menu">{children}</div>;
+  return (
+    <div className="welcome-screen-menu">
+      <AppContentActionGroup label={t("labels.actions")}>
+        {children}
+      </AppContentActionGroup>
+    </div>
+  );
 };
 Menu.displayName = "Menu";
 

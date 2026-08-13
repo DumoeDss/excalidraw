@@ -8,6 +8,7 @@ import type { Theme } from "@excalidraw/element/types";
 import { t } from "../i18n";
 
 import Spinner from "./Spinner";
+import { AppContentState } from "./appContent/AppContent";
 
 export const LoadingMessage: React.FC<{ delay?: number; theme?: Theme }> = ({
   delay,
@@ -17,8 +18,10 @@ export const LoadingMessage: React.FC<{ delay?: number; theme?: Theme }> = ({
 
   useEffect(() => {
     if (!delay) {
+      setIsWaiting(false);
       return;
     }
+    setIsWaiting(true);
     const timer = setTimeout(() => {
       setIsWaiting(false);
     }, delay);
@@ -35,10 +38,13 @@ export const LoadingMessage: React.FC<{ delay?: number; theme?: Theme }> = ({
         "LoadingMessage--dark": theme === THEME.DARK,
       })}
     >
-      <div>
-        <Spinner />
+      <div className="LoadingMessage-state">
+        <AppContentState
+          kind="loading"
+          title={t("labels.loadingScene")}
+          visual={<Spinner />}
+        />
       </div>
-      <div className="LoadingMessage-text">{t("labels.loadingScene")}</div>
     </div>
   );
 };

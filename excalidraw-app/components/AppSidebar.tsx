@@ -5,6 +5,12 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import {
+  AppContent,
+  AppContentActionGroup,
+  AppContentBody,
+  AppContentSection,
+} from "@excalidraw/excalidraw/components/appContent/AppContent";
 
 import "./AppSidebar.scss";
 
@@ -86,44 +92,70 @@ export const AppSidebar = () => {
       </DefaultSidebar.TabTriggers>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
-          <div
-            className="app-sidebar-promo-image"
-            style={{
-              ["--image-source" as any]: `url(/sidebar-comments-promo-${
-                theme === THEME.DARK ? "dark" : "light"
-              }.jpg)`,
-              opacity: 0.9,
-            }}
-          />
-          <SidebarPromoCopy text="Make comments with Excalidraw+" />
-          <LinkButton
-            href={`${
-              import.meta.env.VITE_APP_PLUS_LP
-            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=comments_promo#excalidraw-redirect`}
+          <AppContent
+            as="div"
+            density="compact"
+            interaction="neutral"
+            label="Comments"
           >
-            Sign up now
-          </LinkButton>
+            <AppContentSection>
+              <AppContentBody>
+                <div
+                  className="app-sidebar-promo-image"
+                  style={{
+                    ["--image-source" as any]: `url(/sidebar-comments-promo-${
+                      theme === THEME.DARK ? "dark" : "light"
+                    }.jpg)`,
+                    opacity: 0.9,
+                  }}
+                />
+                <SidebarPromoCopy text="Make comments with Excalidraw+" />
+              </AppContentBody>
+              <AppContentActionGroup label="Comments actions">
+                <LinkButton
+                  href={`${
+                    import.meta.env.VITE_APP_PLUS_LP
+                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=comments_promo#excalidraw-redirect`}
+                >
+                  Sign up now
+                </LinkButton>
+              </AppContentActionGroup>
+            </AppContentSection>
+          </AppContent>
         </div>
       </Sidebar.Tab>
       <Sidebar.Tab tab="presentation" className="px-3">
         <div className="app-sidebar-promo-container">
-          <div
-            className="app-sidebar-promo-image"
-            style={{
-              ["--image-source" as any]: `url(/sidebar-presentation-promo-${
-                theme === THEME.DARK ? "dark" : "light"
-              }.jpg)`,
-              opacity: 0.7,
-            }}
-          />
-          <SidebarPromoCopy text="Create presentation with Excalidraw+" />
-          <LinkButton
-            href={`${
-              import.meta.env.VITE_APP_PLUS_LP
-            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=presentations_promo#excalidraw-redirect`}
+          <AppContent
+            as="div"
+            density="compact"
+            interaction="neutral"
+            label="Presentation"
           >
-            Sign up now
-          </LinkButton>
+            <AppContentSection>
+              <AppContentBody>
+                <div
+                  className="app-sidebar-promo-image"
+                  style={{
+                    ["--image-source" as any]: `url(/sidebar-presentation-promo-${
+                      theme === THEME.DARK ? "dark" : "light"
+                    }.jpg)`,
+                    opacity: 0.7,
+                  }}
+                />
+                <SidebarPromoCopy text="Create presentation with Excalidraw+" />
+              </AppContentBody>
+              <AppContentActionGroup label="Presentation actions">
+                <LinkButton
+                  href={`${
+                    import.meta.env.VITE_APP_PLUS_LP
+                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=presentations_promo#excalidraw-redirect`}
+                >
+                  Sign up now
+                </LinkButton>
+              </AppContentActionGroup>
+            </AppContentSection>
+          </AppContent>
         </div>
       </Sidebar.Tab>
     </DefaultSidebar>
