@@ -67,14 +67,31 @@
     border-radius: var(--border-radius-md);
     z-index: 6;
     white-space: pre;
+    min-width: min(28rem, calc(100% - (var(--ui-space-5) * 2)));
+    border: 1px solid var(--ui-border);
+    box-shadow: var(--ui-shadow-2);
+
+    > .app-content__state {
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
 
     &--warning {
-      background-color: var(--color-warning);
+      background-color: color-mix(
+        in srgb,
+        var(--color-warning) 24%,
+        var(--ui-surface-panel)
+      );
       color: var(--color-text-warning);
     }
 
     &--danger {
-      background-color: var(--color-danger-dark);
+      background-color: color-mix(
+        in srgb,
+        var(--color-danger) 22%,
+        var(--ui-surface-panel)
+      );
       color: var(--color-danger-text);
     }
   }

@@ -1,5 +1,10 @@
-import Trans from "@excalidraw/excalidraw/components/Trans";
 import { t } from "@excalidraw/excalidraw/i18n";
+import {
+  AppContent,
+  AppContentBody,
+  AppContentHeader,
+  AppContentSection,
+} from "@excalidraw/excalidraw/components/appContent/AppContent";
 import * as Sentry from "@sentry/browser";
 import React from "react";
 
@@ -8,6 +13,33 @@ interface TopErrorBoundaryState {
   sentryEventId: string;
   localStorage: string;
 }
+
+const RecoverySentence = ({
+  copy,
+  onAction,
+}: {
+  copy: string;
+  onAction: () => void;
+}) => {
+  const startTag = "<button>";
+  const endTag = "</button>";
+  const start = copy.indexOf(startTag);
+  const end = copy.indexOf(endTag, start + startTag.length);
+
+  if (start === -1 || end === -1) {
+    return copy;
+  }
+
+  return (
+    <>
+      {copy.slice(0, start)}
+      <button onClick={onAction}>
+        {copy.slice(start + startTag.length, end)}
+      </button>
+      {copy.slice(end + endTag.length)}
+    </>
+  );
+};
 
 export class TopErrorBoundary extends React.Component<
   any,
@@ -76,69 +108,72 @@ export class TopErrorBoundary extends React.Component<
     return (
       <div className="ErrorSplash excalidraw">
         <div className="ErrorSplash-messageContainer">
-          <div className="ErrorSplash-paragraph bigger align-center">
-            <Trans
-              i18nKey="errorSplash.headingMain"
-              button={(el) => (
-                <button onClick={() => window.location.reload()}>{el}</button>
-              )}
-            />
-          </div>
-          <div className="ErrorSplash-paragraph align-center">
-            <Trans
-              i18nKey="errorSplash.clearCanvasMessage"
-              button={(el) => (
-                <button
-                  onClick={() => {
-                    try {
-                      localStorage.clear();
-                      window.location.reload();
-                    } catch (error: any) {
-                      console.error(error);
-                    }
-                  }}
-                >
-                  {el}
-                </button>
-              )}
-            />
-            <br />
-            <div className="smaller">
-              <span role="img" aria-label="warning">
-                ⚠️
-              </span>
-              {t("errorSplash.clearCanvasCaveat")}
-              <span role="img" aria-hidden="true">
-                ⚠️
-              </span>
-            </div>
-          </div>
-          <div>
-            <div className="ErrorSplash-paragraph">
-              {t("errorSplash.trackedToSentry", {
-                eventId: this.state.sentryEventId,
-              })}
-            </div>
-            <div className="ErrorSplash-paragraph">
-              <Trans
-                i18nKey="errorSplash.openIssueMessage"
-                button={(el) => (
-                  <button onClick={() => this.createGithubIssue()}>{el}</button>
-                )}
+          <AppContent
+            as="main"
+            density="comfortable"
+            interaction="neutral"
+            label={t("errorDialog.title")}
+          >
+            <AppContentSection>
+              <AppContentHeader
+                title={
+                  <RecoverySentence
+                    copy={t("errorSplash.headingMain")}
+                    onAction={() => window.location.reload()}
+                  />
+                }
               />
-            </div>
-            <div className="ErrorSplash-paragraph">
-              <div className="ErrorSplash-details">
-                <label>{t("errorSplash.sceneContent")}</label>
-                <textarea
-                  rows={5}
-                  onPointerDown={this.selectTextArea}
-                  readOnly={true}
-                  value={this.state.localStorage}
-                />
-              </div>
-            </div>
-          </div>
+              <AppContentBody>
+                <div className="ErrorSplash-paragraph align-center">
+                  <RecoverySentence
+                    copy={t("errorSplash.clearCanvasMessage")}
+                    onAction={() => {
+                      try {
+                        localStorage.clear();
+                        window.location.reload();
+                      } catch (error: any) {
+                        console.error(error);
+                      }
+                    }}
+                  />
+                  <br />
+                  <div className="smaller">
+                    <span role="img" aria-label="warning">
+                      ⚠️
+                    </span>
+                    {t("errorSplash.clearCanvasCaveat")}
+                    <span role="img" aria-hidden="true">
+                      ⚠️
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <div className="ErrorSplash-paragraph">
+                    {t("errorSplash.trackedToSentry", {
+                      eventId: this.state.sentryEventId,
+                    })}
+                  </div>
+                  <div className="ErrorSplash-paragraph">
+                    <RecoverySentence
+                      copy={t("errorSplash.openIssueMessage")}
+                      onAction={() => this.createGithubIssue()}
+                    />
+                  </div>
+                  <div className="ErrorSplash-paragraph">
+                    <div className="ErrorSplash-details">
+                      <label>{t("errorSplash.sceneContent")}</label>
+                      <textarea
+                        rows={5}
+                        onPointerDown={this.selectTextArea}
+                        readOnly={true}
+                        value={this.state.localStorage}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </AppContentBody>
+            </AppContentSection>
+          </AppContent>
         </div>
       </div>
     );

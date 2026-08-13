@@ -4,6 +4,14 @@ import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
 import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import {
+  AppContent,
+  AppContentActionGroup,
+  AppContentBody,
+  AppContentFooter,
+  AppContentHeader,
+  AppContentSection,
+} from "@excalidraw/excalidraw/components/appContent/AppContent";
+import {
   copyIcon,
   LinkIcon,
   playerPlayIcon,
@@ -54,7 +62,7 @@ export type ShareDialogProps = {
   type: ShareDialogType;
 };
 
-const ActiveRoomDialog = ({
+export const ActiveRoomDialog = ({
   collabAPI,
   activeRoomLink,
   handleClose,
@@ -69,6 +77,15 @@ const ActiveRoomDialog = ({
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
+
+  useEffect(
+    () => () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+      }
+    },
+    [],
+  );
 
   const copyRoomLink = async () => {
     try {
@@ -103,115 +120,122 @@ const ActiveRoomDialog = ({
   };
 
   return (
-    <>
-      <h3 className="ShareDialog__active__header">
-        {t("labels.liveCollaboration").replace(/\./g, "")}
-      </h3>
-      <TextField
-        defaultValue={collabAPI.getUsername()}
-        placeholder="Your name"
-        label="Your name"
-        onChange={collabAPI.setUsername}
-        onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
+    <AppContentSection>
+      <AppContentHeader
+        title={t("labels.liveCollaboration").replace(/\./g, "")}
       />
-      <div className="ShareDialog__active__linkRow">
+      <AppContentBody>
         <TextField
-          ref={ref}
-          label="Link"
-          readonly
-          fullWidth
-          value={activeRoomLink}
+          defaultValue={collabAPI.getUsername()}
+          placeholder="Your name"
+          label="Your name"
+          onChange={collabAPI.setUsername}
+          onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
         />
-        {isShareSupported && (
+        <div className="ShareDialog__active__linkRow">
+          <TextField
+            ref={ref}
+            label="Link"
+            readonly
+            fullWidth
+            value={activeRoomLink}
+          />
+          {isShareSupported && (
+            <FilledButton
+              size="large"
+              variant="icon"
+              label="Share"
+              icon={getShareIcon()}
+              className="ShareDialog__active__share"
+              onClick={shareRoomLink}
+            />
+          )}
           <FilledButton
             size="large"
-            variant="icon"
-            label="Share"
-            icon={getShareIcon()}
-            className="ShareDialog__active__share"
-            onClick={shareRoomLink}
+            label={t("buttons.copyLink")}
+            icon={copyIcon}
+            status={copyStatus}
+            onClick={() => {
+              copyRoomLink();
+              onCopy();
+            }}
           />
-        )}
-        <FilledButton
-          size="large"
-          label={t("buttons.copyLink")}
-          icon={copyIcon}
-          status={copyStatus}
-          onClick={() => {
-            copyRoomLink();
-            onCopy();
-          }}
-        />
-      </div>
-      <QRCode value={activeRoomLink} />
-      <div className="ShareDialog__active__description">
-        <p>
-          <span
-            role="img"
-            aria-hidden="true"
-            className="ShareDialog__active__description__emoji"
-          >
-            🔒{" "}
-          </span>
-          {t("roomDialog.desc_privacy")}
-        </p>
-        <p>{t("roomDialog.desc_exitSession")}</p>
-      </div>
-
-      <div className="ShareDialog__active__actions">
-        <FilledButton
-          size="large"
-          variant="outlined"
-          color="danger"
-          label={t("roomDialog.button_stopSession")}
-          icon={playerStopFilledIcon}
-          onClick={() => {
-            trackEvent("share", "room closed");
-            collabAPI.stopCollaboration();
-            if (!collabAPI.isCollaborating()) {
-              handleClose();
-            }
-          }}
-        />
-      </div>
-    </>
+        </div>
+        <QRCode value={activeRoomLink} />
+        <div className="ShareDialog__active__description">
+          <p>
+            <span
+              role="img"
+              aria-hidden="true"
+              className="ShareDialog__active__description__emoji"
+            >
+              🔒{" "}
+            </span>
+            {t("roomDialog.desc_privacy")}
+          </p>
+          <p>{t("roomDialog.desc_exitSession")}</p>
+        </div>
+      </AppContentBody>
+      <AppContentFooter>
+        <AppContentActionGroup label={t("labels.actions")}>
+          <FilledButton
+            size="large"
+            variant="outlined"
+            color="danger"
+            label={t("roomDialog.button_stopSession")}
+            icon={playerStopFilledIcon}
+            onClick={() => {
+              trackEvent("share", "room closed");
+              collabAPI.stopCollaboration();
+              if (!collabAPI.isCollaborating()) {
+                handleClose();
+              }
+            }}
+          />
+        </AppContentActionGroup>
+      </AppContentFooter>
+    </AppContentSection>
   );
 };
 
-const ShareDialogPicker = (props: ShareDialogProps) => {
+export const ShareDialogPicker = (props: ShareDialogProps) => {
   const { t } = useI18n();
 
   const { collabAPI } = props;
 
   const startCollabJSX = collabAPI ? (
-    <>
-      <div className="ShareDialog__picker__header">
-        {t("labels.liveCollaboration").replace(/\./g, "")}
-      </div>
-
-      <div className="ShareDialog__picker__description">
-        <div style={{ marginBottom: "1em" }}>{t("roomDialog.desc_intro")}</div>
-        {t("roomDialog.desc_privacy")}
-      </div>
-
-      <div className="ShareDialog__picker__button">
-        <FilledButton
-          size="large"
-          label={t("roomDialog.button_startSession")}
-          icon={playerPlayIcon}
-          onClick={() => {
-            trackEvent("share", "room creation", `ui (${getFrame()})`);
-            collabAPI.startCollaboration(null);
-          }}
-        />
-      </div>
-
-      {props.type === "share" && (
-        <div className="ShareDialog__separator">
-          <span>{t("shareDialog.or")}</span>
+    <AppContentSection>
+      <AppContentHeader
+        title={
+          <div className="ShareDialog__picker__header">
+            {t("labels.liveCollaboration").replace(/\./g, "")}
+          </div>
+        }
+      />
+      <AppContentBody>
+        <div className="ShareDialog__picker__description">
+          <div style={{ marginBottom: "1em" }}>
+            {t("roomDialog.desc_intro")}
+          </div>
+          {t("roomDialog.desc_privacy")}
         </div>
-      )}
-    </>
+      </AppContentBody>
+      <AppContentFooter>
+        <AppContentActionGroup label={t("labels.actions")}>
+          <div className="ShareDialog__picker__button">
+            <FilledButton
+              size="large"
+              label={t("roomDialog.button_startSession")}
+              icon={playerPlayIcon}
+              onClick={() => {
+                trackEvent("share", "room creation", `ui (${getFrame()})`);
+                collabAPI.startCollaboration(null);
+              }}
+            />
+          </div>
+        </AppContentActionGroup>
+      </AppContentFooter>
+    </AppContentSection>
   ) : null;
 
   return (
@@ -219,26 +243,40 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
       {startCollabJSX}
 
       {props.type === "share" && (
-        <>
-          <div className="ShareDialog__picker__header">
-            {t("exportDialog.link_title")}
-          </div>
-          <div className="ShareDialog__picker__description">
-            {t("exportDialog.link_details")}
-          </div>
-
-          <div className="ShareDialog__picker__button">
-            <FilledButton
-              size="large"
-              label={t("exportDialog.link_button")}
-              icon={LinkIcon}
-              onClick={async () => {
-                await props.onExportToBackend();
-                props.handleClose();
-              }}
-            />
-          </div>
-        </>
+        <AppContentSection>
+          {startCollabJSX && (
+            <div className="ShareDialog__separator">
+              <span>{t("shareDialog.or")}</span>
+            </div>
+          )}
+          <AppContentHeader
+            title={
+              <div className="ShareDialog__picker__header">
+                {t("exportDialog.link_title")}
+              </div>
+            }
+          />
+          <AppContentBody>
+            <div className="ShareDialog__picker__description">
+              {t("exportDialog.link_details")}
+            </div>
+          </AppContentBody>
+          <AppContentFooter>
+            <AppContentActionGroup label={t("labels.actions")}>
+              <div className="ShareDialog__picker__button">
+                <FilledButton
+                  size="large"
+                  label={t("exportDialog.link_button")}
+                  icon={LinkIcon}
+                  onClick={async () => {
+                    await props.onExportToBackend();
+                    props.handleClose();
+                  }}
+                />
+              </div>
+            </AppContentActionGroup>
+          </AppContentFooter>
+        </AppContentSection>
       )}
     </>
   );
@@ -246,19 +284,22 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
 
 const ShareDialogInner = (props: ShareDialogProps) => {
   const activeRoomLink = useAtomValue(activeRoomLinkAtom);
+  const { t } = useI18n();
 
   return (
     <Dialog size="small" onCloseRequest={props.handleClose} title={false}>
       <div className="ShareDialog">
-        {props.collabAPI && activeRoomLink ? (
-          <ActiveRoomDialog
-            collabAPI={props.collabAPI}
-            activeRoomLink={activeRoomLink}
-            handleClose={props.handleClose}
-          />
-        ) : (
-          <ShareDialogPicker {...props} />
-        )}
+        <AppContent as="div" density="comfortable" label={t("labels.actions")}>
+          {props.collabAPI && activeRoomLink ? (
+            <ActiveRoomDialog
+              collabAPI={props.collabAPI}
+              activeRoomLink={activeRoomLink}
+              handleClose={props.handleClose}
+            />
+          ) : (
+            <ShareDialogPicker {...props} />
+          )}
+        </AppContent>
       </div>
     </Dialog>
   );

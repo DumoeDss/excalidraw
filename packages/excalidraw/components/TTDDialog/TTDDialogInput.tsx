@@ -90,7 +90,7 @@ export const TTDDialogInput = ({
           callbackRef.current?.();
         }
       };
-      textarea.focus();
+      textarea.focus({ preventScroll: true });
       textarea.addEventListener(EVENT.KEYDOWN, handleKeyDown);
       return () => {
         textarea.removeEventListener(EVENT.KEYDOWN, handleKeyDown);

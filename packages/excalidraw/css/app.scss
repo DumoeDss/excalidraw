@@ -21,13 +21,18 @@
   justify-content: center;
   pointer-events: none;
 
-  .Spinner {
-    font-size: 2.8em;
+  .LoadingMessage-state {
+    border: 0;
+    background: transparent;
+
+    > .app-content__state {
+      border: 0;
+      background: transparent;
+    }
   }
 
-  .LoadingMessage-text {
-    margin-top: 1em;
-    font-size: 0.8em;
+  .Spinner {
+    font-size: 2.8em;
   }
 }
 

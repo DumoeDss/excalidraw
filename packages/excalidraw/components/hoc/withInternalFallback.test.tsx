@@ -1,4 +1,5 @@
 import React from "react";
+import { act, fireEvent, waitFor } from "@testing-library/react";
 
 import { Excalidraw, MainMenu } from "../../index";
 import { render, queryAllByTestId } from "../../tests/test-utils";
@@ -98,5 +99,39 @@ describe("Test internal component fallback rendering", () => {
     expect(
       queryAllByTestId(excalContainers[1], "main-menu-trigger")?.length,
     ).toBe(1);
+  });
+
+  it("keeps host preference isolated after one editor unmounts", async () => {
+    const { container, rerender } = await render(
+      <div>
+        <div data-testid="editor-one" key="editor-one">
+          <Excalidraw>
+            <MainMenu>one</MainMenu>
+          </Excalidraw>
+        </div>
+        <div data-testid="editor-two" key="editor-two">
+          <Excalidraw>
+            <MainMenu>two</MainMenu>
+          </Excalidraw>
+        </div>
+      </div>,
+    );
+
+    await act(async () => {
+      rerender(
+        <div>
+          <div data-testid="editor-two" key="editor-two">
+            <Excalidraw>
+              <MainMenu>two</MainMenu>
+            </Excalidraw>
+          </div>
+        </div>,
+      );
+    });
+
+    const triggers = queryAllByTestId(container, "main-menu-trigger");
+    expect(triggers).toHaveLength(1);
+    fireEvent.click(triggers[0]);
+    await waitFor(() => expect(container).toHaveTextContent("two"));
   });
 });

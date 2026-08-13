@@ -15,6 +15,7 @@ import {
   DEFAULT_CATEGORIES,
 } from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
+import { AppContentState } from "@excalidraw/excalidraw/components/appContent/AppContent";
 import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/ShareableLinkDialog";
@@ -1068,13 +1069,19 @@ const ExcalidrawWrapper = () => {
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
-          <div className="alertalert--warning">
-            {t("alerts.collabOfflineWarning")}
+          <div className="alert alert--warning">
+            <AppContentState
+              kind="fallback"
+              title={t("alerts.collabOfflineWarning")}
+            />
           </div>
         )}
         {localStorageQuotaExceeded && (
           <div className="alert alert--danger">
-            {t("alerts.localStorageQuotaExceeded")}
+            <AppContentState
+              kind="error"
+              title={t("alerts.localStorageQuotaExceeded")}
+            />
           </div>
         )}
         {latestShareableLink && (

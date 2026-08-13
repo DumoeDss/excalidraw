@@ -107,7 +107,9 @@ describe("binding with linear elements", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(
+      queryByTestId(contextMenu!, "stats")!.querySelector("button")!,
+    );
     stats = UI.queryStats();
 
     UI.clickTool("rectangle");
@@ -171,7 +173,9 @@ describe("stats for a generic element", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(
+      queryByTestId(contextMenu!, "stats")!.querySelector("button")!,
+    );
     stats = UI.queryStats();
 
     UI.clickTool("rectangle");
@@ -345,7 +349,9 @@ describe("stats for a non-generic element", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(
+      queryByTestId(contextMenu!, "stats")!.querySelector("button")!,
+    );
     stats = UI.queryStats();
   });
 
@@ -501,7 +507,9 @@ describe("stats for multiple elements", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(
+      queryByTestId(contextMenu!, "stats")!.querySelector("button")!,
+    );
     stats = UI.queryStats();
   });
 
@@ -732,7 +740,9 @@ describe("frame resizing behavior", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(
+      queryByTestId(contextMenu!, "stats")!.querySelector("button")!,
+    );
     stats = UI.queryStats();
   });
 
