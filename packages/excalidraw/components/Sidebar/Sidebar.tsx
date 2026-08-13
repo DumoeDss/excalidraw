@@ -25,12 +25,10 @@ import {
   useExcalidrawAppState,
   useExcalidrawContainer,
   useExcalidrawSetAppState,
+  useResponsiveEditorShell,
 } from "../App";
 import { Island } from "../Island";
-import {
-  readLargeSurfaceSafeAreaInsets,
-  resolveLargeSurfacePolicy,
-} from "../largeSurface";
+import { resolveLargeSurfacePolicy } from "../largeSurface";
 
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarTabTrigger } from "./SidebarTabTrigger";
@@ -86,10 +84,11 @@ export const SidebarInner = forwardRef(
     const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom);
 
     const editorInterface = useEditorInterface();
+    const responsive = useResponsiveEditorShell();
     const appState = useExcalidrawAppState();
     const { container } = useExcalidrawContainer();
-    const direction = document.documentElement.dir === "rtl" ? "rtl" : "ltr";
-    const safeArea = readLargeSurfaceSafeAreaInsets(container);
+    const direction = responsive.direction;
+    const safeArea = responsive.safeArea.physical;
     const [requestedInlineSize, setRequestedInlineSize] = useState(
       SIDEBAR_DEFAULT_INLINE_SIZE,
     );
@@ -106,7 +105,7 @@ export const SidebarInner = forwardRef(
     const resizeAllowed =
       !!onDock &&
       docked != null &&
-      editorInterface.formFactor !== "phone" &&
+      responsive.adapter !== "phone" &&
       editorInterface.canFitSidebar;
     const policy = resolveLargeSurfacePolicy({
       kind: "sidebar",
@@ -115,9 +114,9 @@ export const SidebarInner = forwardRef(
       requestedInlineSize,
       container: { width: appState.width, height: appState.height },
       safeArea,
-      formFactor: editorInterface.formFactor,
+      formFactor: responsive.tier,
       direction,
-      coarsePointer: editorInterface.isTouchScreen,
+      coarsePointer: responsive.density === "touch",
     });
 
     const availableInlineSize = Math.max(
@@ -257,7 +256,7 @@ export const SidebarInner = forwardRef(
           <div
             className="sidebar__resize-handle"
             data-sidebar-resize-handle
-            data-coarse-pointer={editorInterface.isTouchScreen || undefined}
+            data-coarse-pointer={responsive.density === "touch" || undefined}
             role="separator"
             aria-orientation="vertical"
             aria-valuemin={Math.min(240, availableInlineSize)}

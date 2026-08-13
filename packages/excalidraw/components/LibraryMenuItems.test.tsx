@@ -30,7 +30,10 @@ vi.mock("./LibraryMenuSection", () => ({
   ),
 }));
 vi.mock("./App", () => ({
-  useEditorInterface: () => ({ formFactor: "phone" }),
+  useResponsiveEditorShell: () => ({
+    adapter: "phone",
+    density: "touch",
+  }),
 }));
 
 const baseProps = {

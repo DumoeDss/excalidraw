@@ -3,11 +3,10 @@ import { useLayoutEffect, useState } from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { useEditorInterface, useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer, useResponsiveEditorShell } from "../App";
 import {
   FloatingSurfaceFrame,
   FloatingSurfaceScrollViewport,
-  readEditorSafeAreaInsets,
   resolveFloatingSurfaceInlineShift,
   resolveFloatingSurfacePolicy,
   useFloatingSurfaceAvailableBlockSize,
@@ -24,22 +23,17 @@ const DropdownMenuSubContent = ({
   className?: string;
   onEscape?: () => void;
 }) => {
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const { container } = useExcalidrawContainer();
   const [frameElement, setFrameElement] = useState<HTMLDivElement | null>(null);
-  const direction =
-    container?.getAttribute("dir") === "rtl" ||
-    container?.closest<HTMLElement>("[dir=rtl]")
-      ? "rtl"
-      : "ltr";
   const policy = resolveFloatingSurfacePolicy({
     kind: "submenu",
     intent: "nested-submenu-inline",
-    formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
-    direction,
-    pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+    formFactor: responsive.adapter,
+    direction: responsive.direction,
+    pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
     availableBlockSize: container?.clientHeight ?? 0,
-    safeArea: readEditorSafeAreaInsets(container),
+    safeArea: responsive.safeArea.physical,
   });
   const availableBlockSize = useFloatingSurfaceAvailableBlockSize({
     boundary: container,
@@ -50,7 +44,7 @@ const DropdownMenuSubContent = ({
   const collisionPaddingRight = policy.collisionPadding.right;
 
   const classNames = clsx(`dropdown-menu dropdown-submenu ${className}`, {
-    "dropdown-menu--mobile": editorInterface.formFactor === "phone",
+    "dropdown-menu--mobile": responsive.adapter === "phone",
   }).trim();
 
   useLayoutEffect(() => {

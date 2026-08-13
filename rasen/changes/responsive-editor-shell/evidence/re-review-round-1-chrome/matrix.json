@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "change": "responsive-editor-shell",
+  "role": "original independent reviewer, dispatched report-only",
+  "round": 1,
+  "verdict": "CLEAN/PASS",
+  "findings": [
+    {
+      "id": "RES-R1-001",
+      "severity": "Major",
+      "status": "CLOSED"
+    },
+    {
+      "id": "RES-R1-002",
+      "severity": "Major",
+      "status": "CLOSED"
+    },
+    {
+      "id": "RES-R1-003",
+      "severity": "Major",
+      "status": "CLOSED"
+    },
+    {
+      "id": "RES-R1-004",
+      "severity": "Major",
+      "status": "CLOSED"
+    }
+  ],
+  "states": [
+    {
+      "id": "375x812-cold-phone-library",
+      "target": "76EEF034E13FE68C325436F12C0ED3A4",
+      "screenshot": "375x812-cold-phone-library.png",
+      "setup": "fresh target; mobile viewport before navigation; English language stored; target hard-reloaded; native paint allowed the sole ResizeObserver to deliver; no debug refresh/state helper; Library opened by trusted click",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "portrait",
+        "blockSize": "regular",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "ltr"
+      },
+      "root": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "clientHeight": 812,
+        "scrollHeight": 812
+      },
+      "renderedDOM": {
+        "mobileClass": true,
+        "desktopWrappers": 0,
+        "phoneLayouts": 1
+      },
+      "sidebar": {
+        "left": 82,
+        "right": 375,
+        "width": 293,
+        "borderLeftWidth": "1px",
+        "borderRightWidth": "0px"
+      },
+      "focus": {
+        "tag": "BUTTON",
+        "accessibleName": "Library"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "1024x768-instance-rtl-library-document-ltr",
+      "target": "0636F6C5122E0FA64D5FDA1A7601CA3E",
+      "screenshot": "1024x768-instance-rtl-library-doc-ltr.png",
+      "setup": "fresh target; Arabic editor language; document root set LTR; Library opened by trusted click",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "documentDirection": "ltr",
+      "instanceDirection": "rtl",
+      "root": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024
+      },
+      "sidebar": {
+        "left": 0,
+        "right": 293,
+        "width": 293,
+        "borderLeftWidth": "0px",
+        "borderRightWidth": "1px",
+        "physicalSide": "left",
+        "activeTabCount": 1
+      },
+      "focus": {
+        "tag": "BUTTON",
+        "accessibleName": "مكتبة"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "1440x900-instance-rtl-help-document-ltr",
+      "target": "DCB4929203EEA6F9E21AF3B31C150600",
+      "screenshot": "1440x900-instance-rtl-help-doc-ltr.png",
+      "setup": "fresh target; Arabic editor language; document root set LTR; Help opened by trusted click",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "documentDirection": "ltr",
+      "instanceDirection": "rtl",
+      "root": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "clientHeight": 900,
+        "scrollHeight": 986
+      },
+      "welcomeHelpHint": {
+        "left": 16,
+        "right": 173.203125,
+        "svgLeft": 4.738837242126465,
+        "svgRight": 84.6205358505249,
+        "minimumDescendantLeft": 4.738837242126465,
+        "maximumDescendantRight": 173.203125,
+        "boundedByEditorHorizontalScrollExtent": true
+      },
+      "focus": {
+        "tag": "A",
+        "accessibleText": "دليل الاستخدام"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "640x480-rtl-asymmetric-safe-help",
+      "target": "66B8DE9F0FCE49811E81F52D89DE27AB",
+      "screenshot": "640x480-rtl-asymmetric-safe-help.png",
+      "setup": "fresh target; Arabic phone editor under an LTR document; canonical safe variables set to 7/19/23/11; profile refreshed through real viewport changes; main menu and Help opened by trusted clicks",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl",
+        "signature": "[1,\"phone\",\"phone\",\"landscape\",\"short\",\"touch\",\"mobile\",\"rtl\",false,7,19,23,11,7,11,23,19]"
+      },
+      "safeArea": {
+        "physical": {
+          "top": 7,
+          "right": 19,
+          "bottom": 23,
+          "left": 11
+        },
+        "logical": {
+          "blockStart": 7,
+          "inlineEnd": 11,
+          "blockEnd": 23,
+          "inlineStart": 19
+        }
+      },
+      "root": {
+        "clientWidth": 640,
+        "scrollWidth": 640,
+        "clientHeight": 480,
+        "scrollHeight": 480
+      },
+      "helpSurface": {
+        "left": 0,
+        "right": 640,
+        "top": 0,
+        "bottom": 480,
+        "bounded": true
+      },
+      "focus": {
+        "tag": "A",
+        "accessibleText": "دليل الاستخدام"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    }
+  ],
+  "finalCleanHardReload": {
+    "target": "66B8DE9F0FCE49811E81F52D89DE27AB",
+    "screenshot": "final-clean-hard-reload.png",
+    "root": {
+      "tier": "phone",
+      "adapter": "phone",
+      "clientWidth": 640,
+      "scrollWidth": 640
+    },
+    "checkerMessages": 0,
+    "visibleErrorOverlays": 0,
+    "errorConsoleEntries": 0
+  },
+  "screenshots": {
+    "acceptedCount": 5,
+    "aggregateMethod": "SHA-256 over ordinal-sorted filename<TAB>file-sha256 records joined with LF",
+    "aggregateSha256": "f66862f5a3ffe94a135f3da7e32b8124cdd3361d8c1ad63ec35d0d21bdeb90b9",
+    "personallyInspected": true
+  },
+  "sourceFingerprint": {
+    "scopedBase": "500c5762306548a3293f4e39acfe59d05d9e0025",
+    "algorithm": "SHA-256 over ordinal-sorted UTF-8 path<TAB>git-hash-object records joined with LF and no terminal newline",
+    "manifest": "../fix-round-1/source-manifest.tsv",
+    "manifestCount": 30,
+    "aggregateSha256": "1df2728231959da528ba2c2ffcf818c952148c547d1494050a6fca9e83a0e503",
+    "fixerDeltaManifest": "../fix-round-1/fixer-delta-manifest.tsv",
+    "fixerDeltaManifestCount": 5,
+    "fixerDeltaAggregateSha256": "ca425a2c4b9aa142fac9a8b8a3e32b50d7c594896735ed6954a075da316b3c7c"
+  },
+  "targetLifecycle": {
+    "targets": [
+      "C0EE4FE796A6A7F5BAF53D74F2759EA3",
+      "76EEF034E13FE68C325436F12C0ED3A4",
+      "0636F6C5122E0FA64D5FDA1A7601CA3E",
+      "DCB4929203EEA6F9E21AF3B31C150600",
+      "4A2444AC80D452A6964FC729EFDB03C2",
+      "66B8DE9F0FCE49811E81F52D89DE27AB"
+    ],
+    "closedAndAbsent": true,
+    "proxy": {
+      "url": "http://localhost:3456",
+      "status": "ok",
+      "connected": true,
+      "sessions": 0,
+      "managedTabs": 0,
+      "chromePort": 9222,
+      "stopped": false
+    }
+  }
+}

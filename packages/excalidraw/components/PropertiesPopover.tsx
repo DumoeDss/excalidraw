@@ -4,12 +4,11 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useEditorInterface } from "./App";
 import { useStylesPanelMode } from "./App";
+import { useResponsiveEditorShell } from "./App";
 import {
   FloatingSurfaceFrame,
   FloatingSurfaceScrollViewport,
-  readEditorSafeAreaInsets,
   resolveFloatingSurfacePolicy,
 } from "./floatingSurface";
 import { resolvePropertyPlacement } from "./propertyPlacement";
@@ -55,19 +54,15 @@ export const PropertiesPopover = React.forwardRef<
     },
     ref,
   ) => {
-    const editorInterface = useEditorInterface();
+    const responsive = useResponsiveEditorShell();
     const stylesPanelMode = useStylesPanelMode();
-    const direction =
-      container?.closest<HTMLElement>(".excalidraw")?.getAttribute("dir") ===
-        "rtl" || document.documentElement.getAttribute("dir") === "rtl"
-        ? "rtl"
-        : "ltr";
+    const direction = responsive.direction;
     const placement = resolvePropertyPlacement({
-      formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
-      isLandscape: editorInterface.isLandscape,
+      formFactor: responsive.adapter,
+      isLandscape: responsive.orientation === "landscape",
       direction,
       surface:
-        editorInterface.formFactor === "phone"
+        responsive.presentation === "mobile"
           ? "phone"
           : stylesPanelMode === "full"
           ? "full"
@@ -77,14 +72,12 @@ export const PropertiesPopover = React.forwardRef<
     const policy = resolveFloatingSurfacePolicy({
       kind: surfaceKind,
       intent:
-        editorInterface.formFactor === "phone"
-          ? "phone-up"
-          : "property-canvas-inward",
-      formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
+        responsive.adapter === "phone" ? "phone-up" : "property-canvas-inward",
+      formFactor: responsive.adapter,
       direction,
-      pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+      pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
       collisionPadding: placement.collisionPadding,
-      safeArea: readEditorSafeAreaInsets(container),
+      safeArea: responsive.safeArea.physical,
       availableBlockSize: container?.clientHeight ?? 0,
     });
 
@@ -108,7 +101,7 @@ export const PropertiesPopover = React.forwardRef<
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
             // prevent auto-focus on touch devices to avoid keyboard popup
-            if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
+            if (preventAutoFocusOnTouch && responsive.density === "touch") {
               e.preventDefault();
             }
           }}

@@ -1,8 +1,8 @@
 .excalidraw {
-  --large-surface-safe-area-top: env(safe-area-inset-top, 0px);
-  --large-surface-safe-area-right: env(safe-area-inset-right, 0px);
-  --large-surface-safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --large-surface-safe-area-left: env(safe-area-inset-left, 0px);
+  --large-surface-safe-area-top: var(--sat, 0px);
+  --large-surface-safe-area-right: var(--sar, 0px);
+  --large-surface-safe-area-bottom: var(--sab, 0px);
+  --large-surface-safe-area-left: var(--sal, 0px);
 
   .large-surface {
     --large-surface-padding-inline: var(--ui-space-6);

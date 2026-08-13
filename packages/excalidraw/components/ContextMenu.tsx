@@ -6,10 +6,10 @@ import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { t } from "../i18n";
 
 import {
-  useEditorInterface,
   useExcalidrawAppState,
   useExcalidrawContainer,
   useExcalidrawElements,
+  useResponsiveEditorShell,
 } from "./App";
 import {
   FloatingSurfaceCheck,
@@ -18,7 +18,6 @@ import {
   FloatingSurfaceScrollViewport,
   FloatingSurfaceSeparator,
   FloatingSurfaceShortcut,
-  readEditorSafeAreaInsets,
   resolveFloatingSurfacePolicy,
   useFloatingSurfaceOwner,
 } from "./floatingSurface";
@@ -48,23 +47,18 @@ export const ContextMenu = React.memo(
   ({ actionManager, items, top, left, onClose }: ContextMenuProps) => {
     const appState = useExcalidrawAppState();
     const elements = useExcalidrawElements();
-    const editorInterface = useEditorInterface();
+    const responsive = useResponsiveEditorShell();
     const { container, id: editorId } = useExcalidrawContainer();
     const menuRef = useRef<HTMLUListElement>(null);
     const typeaheadRef = useRef({ value: "", timeout: 0 });
-    const direction =
-      container?.getAttribute("dir") === "rtl" ||
-      container?.closest<HTMLElement>("[dir=rtl]")
-        ? "rtl"
-        : "ltr";
     const policy = resolveFloatingSurfacePolicy({
       kind: "context-menu",
       intent: "pointer-anchor",
-      formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
-      direction,
-      pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+      formFactor: responsive.adapter,
+      direction: responsive.direction,
+      pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
       availableBlockSize: container?.clientHeight ?? appState.height,
-      safeArea: readEditorSafeAreaInsets(container),
+      safeArea: responsive.safeArea.physical,
     });
     const owner = useFloatingSurfaceOwner({
       scope: `${editorId ?? "editor"}:context-menu`,
@@ -192,8 +186,8 @@ export const ContextMenu = React.memo(
         autoFocus={false}
         trapTab={false}
         collisionPadding={8}
-        direction={direction}
-        safeArea={readEditorSafeAreaInsets(container)}
+        direction={responsive.direction}
+        safeArea={responsive.safeArea.physical}
       >
         <FloatingSurfaceFrame
           className="context-menu-frame"

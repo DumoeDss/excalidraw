@@ -7,15 +7,12 @@ import { KEYS, queryFocusableElements } from "@excalidraw/common";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
 import {
-  useEditorInterface,
   useExcalidrawAppState,
   useExcalidrawContainer,
+  useResponsiveEditorShell,
 } from "./App";
 import { LargeSurfaceFrame } from "./largeSurface";
-import {
-  readLargeSurfaceSafeAreaInsets,
-  resolveLargeSurfacePolicy,
-} from "./largeSurface/policy";
+import { resolveLargeSurfacePolicy } from "./largeSurface/policy";
 import {
   claimModal,
   isTopModalClaim,
@@ -47,7 +44,7 @@ export const Modal: React.FC<{
   });
   const { container } = useExcalidrawContainer();
   const appState = useExcalidrawAppState();
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const frameRef = useRef<HTMLDivElement>(null);
   const claimRef = useRef<symbol | null>(null);
   const onCloseRequestRef = useRef(props.onCloseRequest);
@@ -65,17 +62,15 @@ export const Modal: React.FC<{
         size: props.surfaceSize ?? "regular",
         requestedInlineSize: props.maxWidth,
         container: { width: appState.width, height: appState.height },
-        safeArea: readLargeSurfaceSafeAreaInsets(container),
-        formFactor: editorInterface.formFactor,
-        direction: document.documentElement.dir === "rtl" ? "rtl" : "ltr",
-        coarsePointer: editorInterface.isTouchScreen,
+        safeArea: responsive.safeArea.physical,
+        formFactor: responsive.tier,
+        direction: responsive.direction,
+        coarsePointer: responsive.density === "touch",
       }),
     [
       appState.height,
       appState.width,
-      container,
-      editorInterface.formFactor,
-      editorInterface.isTouchScreen,
+      responsive,
       props.maxWidth,
       props.surfaceSize,
     ],

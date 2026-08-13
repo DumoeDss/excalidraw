@@ -54,7 +54,6 @@ import {
   MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
-  supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
@@ -475,6 +474,12 @@ import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
+import {
+  readResponsiveEditorSafeArea,
+  resolveResponsiveEditorShell,
+  type ResponsiveEditorShellProfile,
+} from "./responsiveEditorShell/responsiveEditorShell";
+
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
@@ -522,7 +527,22 @@ import type { Action, ActionResult } from "../actions/types";
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
-const editorInterfaceContextInitialValue: EditorInterface = {
+type InternalEditorInterface = EditorInterface &
+  Readonly<{ responsive: ResponsiveEditorShellProfile }>;
+
+const initialResponsiveEditorShellProfile = resolveResponsiveEditorShell({
+  width: 1440,
+  height: 900,
+  formFactor: "desktop",
+  desktopUIMode: "full",
+  canFitSidebar: false,
+  direction: "ltr",
+  isTouchScreen: false,
+  hasCoarsePointer: false,
+  safeArea: { top: 0, right: 0, bottom: 0, left: 0 },
+});
+
+const editorInterfaceContextInitialValue: InternalEditorInterface = {
   formFactor: "desktop",
   desktopUIMode: "full",
   userAgent: createUserAgentDescriptor(
@@ -531,8 +551,9 @@ const editorInterfaceContextInitialValue: EditorInterface = {
   isTouchScreen: false,
   canFitSidebar: false,
   isLandscape: true,
+  responsive: initialResponsiveEditorShellProfile,
 };
-const EditorInterfaceContext = React.createContext<EditorInterface>(
+const EditorInterfaceContext = React.createContext<InternalEditorInterface>(
   editorInterfaceContextInitialValue,
 );
 EditorInterfaceContext.displayName = "EditorInterfaceContext";
@@ -586,8 +607,11 @@ ExcalidrawAPISetContext.displayName = "ExcalidrawAPISetContext";
 
 export const useApp = () => useContext(AppContext);
 export const useAppProps = () => useContext(AppPropsContext);
-export const useEditorInterface = () =>
-  useContext<EditorInterface>(EditorInterfaceContext);
+const useInternalEditorInterface = () => useContext(EditorInterfaceContext);
+export const useEditorInterface = (): EditorInterface =>
+  useInternalEditorInterface();
+export const useResponsiveEditorShell = () =>
+  useInternalEditorInterface().responsive;
 export const useStylesPanelMode = () =>
   deriveStylesPanelMode(useEditorInterface());
 export const useExcalidrawContainer = () =>
@@ -644,7 +668,10 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  editorInterface: EditorInterface = editorInterfaceContextInitialValue;
+  editorInterface: InternalEditorInterface = editorInterfaceContextInitialValue;
+  private lastValidEditorSize = { width: 1440, height: 900 };
+  private responsiveDirection: "ltr" | "rtl" = "ltr";
+  private coarsePointerQuery: MediaQueryList | null = null;
   private stylesPanelMode: StylesPanelMode = deriveStylesPanelMode(
     editorInterfaceContextInitialValue,
   );
@@ -849,6 +876,24 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
+    const requestedLanguage =
+      languages.find((lang) => lang.code === props.langCode) || defaultLang;
+    this.responsiveDirection = requestedLanguage.rtl ? "rtl" : "ltr";
+    const initialResponsive = resolveResponsiveEditorShell({
+      width: this.lastValidEditorSize.width,
+      height: this.lastValidEditorSize.height,
+      formFactor: "desktop",
+      desktopUIMode: this.editorInterface.desktopUIMode,
+      canFitSidebar: this.editorInterface.canFitSidebar,
+      direction: this.responsiveDirection,
+      isTouchScreen: this.editorInterface.isTouchScreen,
+      hasCoarsePointer: false,
+      safeArea: this.editorInterface.responsive.safeArea.physical,
+    });
+    this.editorInterface = {
+      ...this.editorInterface,
+      responsive: initialResponsive,
+    };
     const defaultAppState = getDefaultAppState();
     const {
       viewModeEnabled = false,
@@ -2799,6 +2844,18 @@ class App extends React.Component<AppProps, AppState> {
             "excalidraw--zen-mode": this.state.zenModeEnabled,
           },
         )}
+        dir={this.editorInterface.responsive.direction}
+        data-responsive-tier={this.editorInterface.responsive.tier}
+        data-responsive-adapter={this.editorInterface.responsive.adapter}
+        data-responsive-orientation={
+          this.editorInterface.responsive.orientation
+        }
+        data-responsive-block-size={this.editorInterface.responsive.blockSize}
+        data-responsive-density={this.editorInterface.responsive.density}
+        data-responsive-presentation={
+          this.editorInterface.responsive.presentation
+        }
+        data-responsive-signature={this.editorInterface.responsive.signature}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
             ? POINTER_EVENTS.disabled
@@ -4047,14 +4104,23 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  public refreshEditorInterface = () => {
+  public refreshEditorInterface = (
+    containerRect?: DOMRectReadOnly,
+    refreshSize = true,
+  ): boolean => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
-      return;
+      return false;
     }
 
+    const rect = refreshSize
+      ? containerRect ?? container.getBoundingClientRect()
+      : null;
+    if (rect && rect.width > 0 && rect.height > 0) {
+      this.lastValidEditorSize = { width: rect.width, height: rect.height };
+    }
     const { width: editorWidth, height: editorHeight } =
-      container.getBoundingClientRect();
+      this.lastValidEditorSize;
 
     const storedDesktopUIMode = loadDesktopUIModePreference();
     const userAgentDescriptor = createUserAgentDescriptor(
@@ -4065,16 +4131,59 @@ class App extends React.Component<AppProps, AppState> {
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
-    const nextEditorInterface = updateObject(this.editorInterface, {
-      desktopUIMode: storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
-      formFactor: this.getFormFactor(editorWidth, editorHeight),
-      userAgent: userAgentDescriptor,
+    const desktopUIMode =
+      storedDesktopUIMode ?? this.editorInterface.desktopUIMode;
+    const formFactor = this.getFormFactor(editorWidth, editorHeight);
+    const nextProfileCandidate = resolveResponsiveEditorShell({
+      width: editorWidth,
+      height: editorHeight,
+      formFactor,
+      desktopUIMode,
       canFitSidebar: editorWidth > sidebarBreakpoint,
-      isLandscape: editorWidth > editorHeight,
+      direction: this.responsiveDirection,
+      isTouchScreen: this.editorInterface.isTouchScreen,
+      hasCoarsePointer: this.coarsePointerQuery?.matches ?? false,
+      safeArea: readResponsiveEditorSafeArea(container),
     });
+    const responsive =
+      nextProfileCandidate.signature ===
+      this.editorInterface.responsive.signature
+        ? this.editorInterface.responsive
+        : nextProfileCandidate;
+    const currentEditorInterface = this.editorInterface;
+    const isLandscape = responsive.orientation === "landscape";
+    const nextEditorInterface =
+      currentEditorInterface.desktopUIMode === desktopUIMode &&
+      currentEditorInterface.formFactor === responsive.tier &&
+      currentEditorInterface.userAgent.isMobileDevice ===
+        userAgentDescriptor.isMobileDevice &&
+      currentEditorInterface.userAgent.platform ===
+        userAgentDescriptor.platform &&
+      currentEditorInterface.canFitSidebar === responsive.canFitSidebar &&
+      currentEditorInterface.isLandscape === isLandscape &&
+      currentEditorInterface.responsive === responsive
+        ? currentEditorInterface
+        : {
+            ...currentEditorInterface,
+            desktopUIMode,
+            formFactor: responsive.tier,
+            userAgent: userAgentDescriptor,
+            canFitSidebar: responsive.canFitSidebar,
+            isLandscape,
+            responsive,
+          };
 
     this.editorInterface = nextEditorInterface;
+    container.dir = responsive.direction;
+    container.dataset.responsiveTier = responsive.tier;
+    container.dataset.responsiveAdapter = responsive.adapter;
+    container.dataset.responsiveOrientation = responsive.orientation;
+    container.dataset.responsiveBlockSize = responsive.blockSize;
+    container.dataset.responsiveDensity = responsive.density;
+    container.dataset.responsivePresentation = responsive.presentation;
+    container.dataset.responsiveSignature = responsive.signature;
     this.reconcileStylesPanelMode(nextEditorInterface);
+    return nextEditorInterface !== currentEditorInterface;
   };
 
   private reconcileStylesPanelMode = (nextEditorInterface: EditorInterface) => {
@@ -4102,11 +4211,9 @@ class App extends React.Component<AppProps, AppState> {
 
   /** TO BE USED LATER */
   private setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-    const nextMode = setDesktopUIMode(mode);
-    this.editorInterface = updateObject(this.editorInterface, {
-      desktopUIMode: nextMode,
-    });
-    this.reconcileStylesPanelMode(this.editorInterface);
+    setDesktopUIMode(mode);
+    this.refreshEditorInterface(undefined, false);
+    this.setState({});
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {
@@ -4178,10 +4285,15 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
+    if (
+      typeof ResizeObserver !== "undefined" &&
+      this.excalidrawContainerRef.current
+    ) {
       this.resizeObserver = new ResizeObserver(() => {
-        this.refreshEditorInterface();
-        this.updateDOMRect();
+        const rect =
+          this.excalidrawContainerRef.current?.getBoundingClientRect();
+        const editorInterfaceChanged = this.refreshEditorInterface(rect);
+        this.updateDOMRect(undefined, editorInterfaceChanged);
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
@@ -4350,6 +4462,29 @@ class App extends React.Component<AppProps, AppState> {
         { passive: false },
       ),
     );
+
+    this.coarsePointerQuery = window.matchMedia?.("(pointer: coarse)") ?? null;
+    const handleResponsiveInputChange = () => {
+      this.refreshEditorInterface(undefined, false);
+      this.setState({});
+    };
+    this.coarsePointerQuery?.addEventListener?.(
+      "change",
+      handleResponsiveInputChange,
+    );
+    const visualViewport = window.visualViewport;
+    visualViewport?.addEventListener("resize", handleResponsiveInputChange);
+    this.onRemoveEventListenersEmitter.once(() => {
+      this.coarsePointerQuery?.removeEventListener?.(
+        "change",
+        handleResponsiveInputChange,
+      );
+      visualViewport?.removeEventListener(
+        "resize",
+        handleResponsiveInputChange,
+      );
+      this.coarsePointerQuery = null;
+    });
 
     if (!this.isInteractionEnabled()) {
       // NOTE by not attaching the wheel/touch/gesture listeners below (which
@@ -8965,6 +9100,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface = updateObject(this.editorInterface, {
         isTouchScreen: true,
       });
+      this.refreshEditorInterface(undefined, false);
     }
 
     if (isPanning) {
@@ -15053,7 +15189,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }, 300);
 
-  private updateDOMRect = (cb?: () => void) => {
+  private updateDOMRect = (cb?: () => void, editorInterfaceChanged = false) => {
     if (this.excalidrawContainerRef?.current) {
       const excalidrawContainer = this.excalidrawContainerRef.current;
       const {
@@ -15075,7 +15211,9 @@ class App extends React.Component<AppProps, AppState> {
         offsetLeft === currentOffsetLeft &&
         offsetTop === currentOffsetTop
       ) {
-        if (cb) {
+        if (editorInterfaceChanged) {
+          this.setState({}, cb);
+        } else if (cb) {
           cb();
         }
         return;
@@ -15123,6 +15261,8 @@ class App extends React.Component<AppProps, AppState> {
       languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
     await setLanguage(currentLang);
+    this.responsiveDirection = currentLang.rtl ? "rtl" : "ltr";
+    this.refreshEditorInterface(undefined, false);
     this.setAppState({});
   }
 }

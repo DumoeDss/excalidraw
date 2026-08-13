@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "verdict": "FAIL",
+  "findings": [
+    { "id": "RES-R1-001", "severity": "Major" },
+    { "id": "RES-R1-002", "severity": "Major" },
+    { "id": "RES-R1-003", "severity": "Major" },
+    { "id": "RES-R1-004", "severity": "Major" }
+  ],
+  "targetLifecycle": {
+    "targets": [
+      "953106115865073FC1FDCE3FF97D8C41",
+      "5B39EE8C92726010242CEB0B0C94029C",
+      "F68E569463907BC70A3D14C6245CDA74",
+      "16DD4E275CF684AE87D4D72FC3315EF0"
+    ],
+    "closedAndAbsent": true,
+    "proxy": {
+      "url": "http://localhost:3456",
+      "status": "ok",
+      "connected": true,
+      "managedTabs": 0,
+      "chromePort": 9222
+    }
+  },
+  "states": [
+    {
+      "id": "1440x900-light-ltr-library",
+      "target": "953106115865073FC1FDCE3FF97D8C41",
+      "screenshot": "1440x900-light-ltr-library.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "orientation": "landscape",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "full",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 1440, "scrollWidth": 1440 },
+      "surface": { "kind": "library", "x": 1147, "right": 1440, "width": 293 },
+      "interaction": { "selectedTool": "freedraw", "openSidebar": "library" }
+    },
+    {
+      "id": "1440x900-dark-rtl-help",
+      "target": "16DD4E275CF684AE87D4D72FC3315EF0",
+      "screenshot": "1440x900-dark-rtl-help.png",
+      "setup": "fresh target, editor-local RTL with document root left LTR",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "presentation": "full",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 1440, "scrollWidth": 1500 },
+      "surface": { "kind": "help", "x": 259.2, "right": 1180.8, "bounded": true },
+      "overflowSource": {
+        "class": "welcome-screen-decor-hint--help",
+        "left": -45,
+        "svgLeft": -60.36
+      },
+      "finding": "RES-R1-004"
+    },
+    {
+      "id": "1024x768-dark-rtl-library",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "1024x768-dark-rtl-library.png",
+      "setup": "fresh target, editor-local RTL with document root left LTR",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 1024, "scrollWidth": 1024 },
+      "surface": { "kind": "library", "x": 731, "right": 1024, "width": 293 },
+      "finding": "RES-R1-002"
+    },
+    {
+      "id": "768x1024-light-ltr-compact-properties",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "768x1024-light-ltr-compact-properties.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "orientation": "portrait",
+        "presentation": "compact",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 768, "scrollWidth": 768 },
+      "stylesPanelMarker": { "physicalDock": "right", "x": 696, "width": 56 },
+      "staleDesktop": 0
+    },
+    {
+      "id": "1180x700-light-ltr-large-content",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "1180x700-light-ltr-large-content.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "presentation": "compact",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 1180, "scrollWidth": 1180 },
+      "surface": { "kind": "mermaid", "x": 77, "right": 1103, "bounded": true },
+      "internalScroll": { "clientHeight": 567, "scrollHeight": 581, "reachable": true }
+    },
+    {
+      "id": "812x375-dark-rtl-phone-library",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "812x375-dark-rtl-phone-library.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 812, "scrollWidth": 812 },
+      "surface": { "kind": "library", "x": 519, "right": 812, "width": 293 },
+      "targetMinimum": { "width": 44, "height": 44 },
+      "canvasHit": { "x": 250, "y": 180, "tag": "CANVAS" },
+      "staleDesktop": 0
+    },
+    {
+      "id": "375x812-light-ltr-phone-library",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "375x812-light-ltr-phone-library.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "portrait",
+        "blockSize": "regular",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 375, "scrollWidth": 375 },
+      "surface": { "kind": "library", "x": 82, "right": 375, "width": 293 },
+      "targetMinimum": { "width": 44, "height": 44 },
+      "desktopWrappers": 0
+    },
+    {
+      "id": "640x480-dark-rtl-asymmetric-safe-help",
+      "target": "5B39EE8C92726010242CEB0B0C94029C",
+      "screenshot": "640x480-dark-rtl-asymmetric-safe-help.png",
+      "setup": "explicit instance profile refresh after hard reload",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl",
+        "signature": "[1,\"phone\",\"phone\",\"landscape\",\"short\",\"touch\",\"mobile\",\"rtl\",false,7,19,23,11,7,11,23,19]"
+      },
+      "safeArea": {
+        "physical": { "top": 7, "right": 19, "bottom": 23, "left": 11 },
+        "logical": { "blockStart": 7, "inlineEnd": 11, "blockEnd": 23, "inlineStart": 19 },
+        "floatingAlias": [7, 19, 23, 11],
+        "largeAlias": [7, 19, 23, 11]
+      },
+      "root": { "clientWidth": 640, "scrollWidth": 640 },
+      "surface": { "kind": "help", "x": 59.5, "right": 572.5, "bounded": true },
+      "internalScroll": { "clientHeight": 351, "scrollHeight": 3324, "reachable": true }
+    },
+    {
+      "id": "375x812-hard-reload-without-refresh",
+      "target": "F68E569463907BC70A3D14C6245CDA74",
+      "screenshot": "375x812-hard-reload-without-refresh.png",
+      "setup": "fresh target and hard reload with no debug refresh/state call",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "portrait",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 375, "scrollWidth": 510, "clientHeight": 812, "scrollHeight": 910 },
+      "renderedDOM": { "mobileClass": false, "desktopWrappers": 1, "phoneMenus": 0 },
+      "finding": "RES-R1-001"
+    }
+  ],
+  "finalReload": {
+    "profile": {
+      "tier": "desktop",
+      "adapter": "desktop",
+      "presentation": "full",
+      "direction": "ltr"
+    },
+    "root": { "clientWidth": 1440, "scrollWidth": 1440 },
+    "checkerMessages": 0,
+    "visibleErrorOverlays": 0,
+    "errorConsoleEntries": 0
+  },
+  "screenshots": {
+    "count": 9,
+    "aggregateMethod": "SHA-256 over ordinal-sorted filename<TAB>file-sha256 records joined with LF",
+    "aggregateSha256": "2e27e3b6eba18f59b778b0aadfa02a4e2462704ae591a0f01adf2da908c7500d",
+    "personallyInspected": true
+  },
+  "sourceFingerprint": {
+    "manifestCount": 28,
+    "hashObjectRecordsSha256": "837668a092c52b99dbe567a925a676064039b7f38557c87963cd90758fd4dc7f",
+    "rawCanonicalSha256": "4e9739a519a901ff2c82d80875ec7c626bcad62fa93a9c61a5964132a0117f62",
+    "implementerRecordedSha256": "f7b7eb9be98dab72a4579f358a6251881426cf4bc5fc9214c5509b8644272a54",
+    "status": "mismatch-algorithm-undocumented"
+  }
+}

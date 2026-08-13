@@ -189,4 +189,32 @@ describe("TopErrorBoundary", () => {
 
     consoleError.mockRestore();
   });
+
+  it("retains the 762px recovery card when desktop space permits", () => {
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 1440,
+    });
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const { container } = render(
+      <>
+        <style>{excalidrawStyles}</style>
+        <div className="test-viewport">
+          <TopErrorBoundary>
+            <BrokenLeaf />
+          </TopErrorBoundary>
+        </div>
+      </>,
+    );
+    consoleError.mockRestore();
+
+    const card = container.querySelector<HTMLElement>(
+      ".ErrorSplash-messageContainer",
+    )!;
+    const cardInlineSize = matchingRuleValue(card, "inline-size");
+    expect(cardInlineSize).toContain("47.5rem + 2px");
+    expect(47.5 * 16 + 2).toBe(762);
+  });
 });

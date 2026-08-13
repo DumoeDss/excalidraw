@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "targetLifecycle": {
+    "initialTarget": "E10F766E8B4669CD9FABD6C64F1EC8C5",
+    "replacementTarget": "6AEF29CFAD1DA6A7E78FA482B83D5EBD",
+    "closedAndAbsent": true,
+    "proxy": {
+      "url": "http://localhost:3456",
+      "status": "ok",
+      "connected": true,
+      "managedTabs": 0,
+      "chromePort": 9222
+    }
+  },
+  "states": [
+    {
+      "id": "1440x900-light-ltr-library",
+      "screenshot": "1440x900-light-ltr.png",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "orientation": "landscape",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "compact",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 1440, "scrollWidth": 1440 },
+      "surface": { "kind": "library", "x": 1148, "width": 288, "right": 1436 },
+      "interaction": {
+        "selectedTool": "freedraw",
+        "selectedLibrary": true,
+        "canvasProbe": "interactive canvas"
+      }
+    },
+    {
+      "id": "1440x900-dark-rtl-help",
+      "screenshot": "1440x900-dark-rtl.png",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "orientation": "landscape",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 1440, "scrollWidth": 1440 },
+      "surface": { "kind": "help", "width": 1024, "bounded": true },
+      "focus": { "name": "Documentation", "focusVisible": true }
+    },
+    {
+      "id": "1024x768-dark-rtl-library",
+      "screenshot": "1024x768-dark-rtl-library.png",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "orientation": "landscape",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 1024, "scrollWidth": 1024 },
+      "surface": { "kind": "library", "physicalDock": "right", "x": 732, "right": 1020 },
+      "toolbarTargetMinPx": 32
+    },
+    {
+      "id": "768x1024-light-ltr-compact",
+      "screenshot": "768x1024-light-ltr-compact-properties.png",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "orientation": "portrait",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "compact",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 768, "scrollWidth": 768 },
+      "stylesPanelMarker": { "physicalDock": "right", "x": 696, "width": 56 },
+      "canvasProbe": "interactive canvas"
+    },
+    {
+      "id": "1180x700-light-ltr-large",
+      "screenshot": "1180x700-light-ltr-large-content.png",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "orientation": "landscape",
+        "blockSize": "regular",
+        "density": "compact",
+        "presentation": "compact",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 1180, "scrollWidth": 1180 },
+      "surface": {
+        "kind": "mermaid",
+        "x": 20,
+        "y": 20,
+        "width": 1140,
+        "height": 660,
+        "bounded": true,
+        "internalScrollReachable": true
+      }
+    },
+    {
+      "id": "812x375-dark-rtl-phone-library",
+      "screenshot": "812x375-dark-rtl-phone-library-harness-latch.png",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl"
+      },
+      "root": { "clientWidth": 812, "scrollWidth": 812 },
+      "surface": { "kind": "library", "x": 520, "width": 288, "right": 808 },
+      "toolbarTargetMinPx": 44,
+      "canvasProbe": "interactive canvas beside chrome",
+      "inputEvidence": "documented test-harness latch; see focused App lifecycle test"
+    },
+    {
+      "id": "375x812-light-ltr-phone-library",
+      "screenshot": "375x812-light-ltr-phone-library.png",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "portrait",
+        "blockSize": "regular",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "ltr"
+      },
+      "root": { "clientWidth": 375, "scrollWidth": 375, "clientHeight": 812, "scrollHeight": 812 },
+      "surface": { "kind": "library", "x": 83, "width": 288, "right": 371 },
+      "toolbarTargetMinPx": 44,
+      "canvasProbe": "interactive canvas beside overlay"
+    },
+    {
+      "id": "640x480-dark-rtl-asymmetric-help",
+      "screenshot": "640x480-dark-rtl-asymmetric-safe-help.png",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl",
+        "signature": "[1,\"phone\",\"phone\",\"landscape\",\"short\",\"touch\",\"mobile\",\"rtl\",false,7,19,23,11,7,11,23,19]"
+      },
+      "safeArea": {
+        "physical": { "top": 7, "right": 19, "bottom": 23, "left": 11 },
+        "logical": { "blockStart": 7, "inlineEnd": 11, "blockEnd": 23, "inlineStart": 19 },
+        "floatingAlias": [7, 19, 23, 11],
+        "largeAlias": [7, 19, 23, 11]
+      },
+      "root": { "clientWidth": 640, "scrollWidth": 640 },
+      "surface": { "kind": "help", "x": 31, "y": 27, "width": 570, "height": 410, "bounded": true }
+    }
+  ],
+  "inputProbe": {
+    "status": "documented-harness-latch",
+    "detail": "A simplified DOM PointerEvent lacked the complete React/editor event shape, produced two probe-only exceptions, and did not latch isTouchScreen. It is not counted as product failure or successful pen evidence. App.lifecycle.test.tsx covers first pen/touch latching, immediate density refresh, and separate pen state. The final hard reload cleared these probe exceptions."
+  },
+  "finalReload": {
+    "profile": {
+      "tier": "phone",
+      "adapter": "phone",
+      "orientation": "portrait",
+      "blockSize": "regular",
+      "density": "touch",
+      "presentation": "mobile",
+      "direction": "ltr"
+    },
+    "root": { "clientWidth": 375, "scrollWidth": 375, "clientHeight": 812, "scrollHeight": 812 },
+    "checkerMessages": 0,
+    "visibleErrorOverlays": 0,
+    "errorConsoleEntries": 0
+  },
+  "screenshots": {
+    "count": 8,
+    "aggregateSha256": "df5e64c27de97d316b052bbbe805343f08e02792c6d0ab95357e4277d6335617",
+    "personallyInspected": true
+  }
+}

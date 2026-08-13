@@ -30,22 +30,12 @@
 
     border-left: 1px solid var(--sidebar-border-color);
 
-    :root[dir="rtl"] & {
-      left: var(--sidebar-safe-left, 0);
-      right: auto;
-    }
-
     &--docked {
       box-shadow: none;
     }
 
     &--overlay {
       box-shadow: var(--ui-shadow-3);
-    }
-
-    :root[dir="rtl"] & {
-      border-right: 1px solid var(--sidebar-border-color);
-      border-left: 0;
     }
 
     &__resize-handle {
@@ -83,6 +73,13 @@
         outline-offset: -2px;
       }
     }
+  }
+
+  &[dir="rtl"] .sidebar {
+    left: var(--sidebar-safe-left, 0);
+    right: auto;
+    border-right: 1px solid var(--sidebar-border-color);
+    border-left: 0;
   }
 
   // ---------------------------- sidebar header ------------------------------

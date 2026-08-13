@@ -9,8 +9,8 @@ import { t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
 import {
-  useEditorInterface,
   useExcalidrawContainer,
+  useResponsiveEditorShell,
   useStylesPanelMode,
 } from "./App";
 import {
@@ -20,7 +20,6 @@ import {
   FloatingSurfaceScrollViewport,
   FloatingSurfaceSection,
   FloatingSurfaceShortcut,
-  readEditorSafeAreaInsets,
   resolveFloatingSurfacePolicy,
   useFloatingSurfaceOwner,
 } from "./floatingSurface";
@@ -96,16 +95,11 @@ function Picker<T>({
   onClose: () => void;
 }) {
   const { container } = useExcalidrawContainer();
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const stylesPanelMode = useStylesPanelMode();
   const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
   const selectedOptionRef = useRef<HTMLButtonElement>(null);
-  const direction =
-    container?.getAttribute("dir") === "rtl" ||
-    container?.closest<HTMLElement>("[dir=rtl]") ||
-    document.documentElement.getAttribute("dir") === "rtl"
-      ? "rtl"
-      : "ltr";
+  const direction = responsive.direction;
   const allSections = [...visibleSections, ...hiddenSections];
   const allOptions = flattenOptions(allSections);
   const navigationRows = getNavigationRows([
@@ -227,11 +221,11 @@ function Picker<T>({
   }, []);
 
   const placement = resolvePropertyPlacement({
-    formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
-    isLandscape: editorInterface.isLandscape,
+    formFactor: responsive.adapter,
+    isLandscape: responsive.orientation === "landscape",
     direction,
     surface:
-      editorInterface.formFactor === "phone"
+      responsive.presentation === "mobile"
         ? "phone"
         : stylesPanelMode === "full"
         ? "full"
@@ -241,14 +235,12 @@ function Picker<T>({
   const policy = resolveFloatingSurfacePolicy({
     kind: "icon-picker",
     intent:
-      editorInterface.formFactor === "phone"
-        ? "phone-up"
-        : "property-canvas-inward",
-    formFactor: editorInterface.formFactor === "phone" ? "phone" : "desktop",
+      responsive.adapter === "phone" ? "phone-up" : "property-canvas-inward",
+    formFactor: responsive.adapter,
     direction,
-    pointerDensity: editorInterface.isTouchScreen ? "coarse" : "fine",
+    pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
     collisionPadding: placement.collisionPadding,
-    safeArea: readEditorSafeAreaInsets(container),
+    safeArea: responsive.safeArea.physical,
     availableBlockSize: container?.clientHeight ?? 0,
   });
 
