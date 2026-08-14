@@ -152,7 +152,7 @@
     }
   }
 
-  .App-bottom-bar > .Island.adaptive-toolbar-shell {
+  .Island.adaptive-toolbar-shell {
     pointer-events: none;
     // Keep the intrinsic measurement rail available to the toolbar planner
     // without letting it expand the editor's scrollable inline extent.
@@ -178,5 +178,9 @@
   &[data-toolbar-menu-open="true"] .mobile-shape-actions {
     visibility: hidden;
     pointer-events: none;
+
+    :where(button, a[href], input, select, textarea, [role="button"]) {
+      pointer-events: none;
+    }
   }
 }

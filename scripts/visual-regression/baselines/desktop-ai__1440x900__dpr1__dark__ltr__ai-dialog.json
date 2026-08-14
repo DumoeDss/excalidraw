@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "desktop-ai",
+  "filename": "desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog.png",
+  "width": 1440,
+  "height": 900,
+  "deviceScaleFactor": 1,
+  "crop": {
+    "selector": ".excalidraw",
+    "target": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "editor": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "browser": "Chrome",
+  "platform": "win32-x64-10.0.26200",
+  "fontVersion": "repository-fonts-v1",
+  "fixtureVersion": "visual-fixtures-v1",
+  "comparison": {
+    "channelTolerance": 4,
+    "antialiasTolerance": 12,
+    "maxMismatchRatio": 0.0005,
+    "maxMaskRatio": 0
+  },
+  "imageHash": "3d4d286c6f372a9f72e6f07be0f1eb80792c77bd99b1a6a93a2e20d8e389dc1d",
+  "budgetSource": null,
+  "approval": "intentional-change",
+  "approvedBy": "fixer",
+  "inspectedAt": "2026-08-14T14:08:47.995Z",
+  "sourceFingerprint": "70737b62e062eb3269a9d266c079576b79147caf9ba3275a13230f20f35509ad"
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-009-actions-2",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "desktop-ai",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog__fixer__fixer-009-actions-2__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog__fixer__fixer-009-actions-2__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog__fixer__fixer-009-actions-2__result.json",
+      "expectedHash": "f9f2e094133a21acbd04d04dec2a90468e5cb82efe75c92d72fb0572796c7cc6",
+      "currentHash": "1896a95712e8a8714dadd5db9c3fac30e4e7ef9df3744118b3f86a60fc4496f5",
+      "diffHash": "b42432275ab0ef3582802b47fc4856318238cba2d9c3d7e03bef6ae1fc2c0980",
+      "mismatchCount": 3006,
+      "mismatchRatio": 0.0023194444444444443,
+      "changedBounds": {
+        "x": 16,
+        "y": 801,
+        "width": 86,
+        "height": 35
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 0,
+            "acceptance": "browser"
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "mediaInput": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "restored": true,
+          "console": true,
+          "consoleErrors": 0
+        }
+      }
+    },
+    {
+      "scenarioId": "desktop-share",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-share__1440x900__dpr1__light__ltr__share-dialog.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-share__1440x900__dpr1__light__ltr__share-dialog__fixer__fixer-009-actions-2__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-share__1440x900__dpr1__light__ltr__share-dialog__fixer__fixer-009-actions-2__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-009-actions-2\\desktop-share__1440x900__dpr1__light__ltr__share-dialog__fixer__fixer-009-actions-2__result.json",
+      "expectedHash": "30404ef062f8bf5502209978133174f2f3c636a8ed880497e06354c894835b96",
+      "currentHash": "66bf1aa5cbc0f89daf4d203532308a3a90980eef1ccfea71ee7195cf006e54e1",
+      "diffHash": "4aa100ff17d0919b2cd415ca9c73706c2d15e34cdf4400c00eb639e7e054e572",
+      "mismatchCount": 4352,
+      "mismatchRatio": 0.003358024691358025,
+      "changedBounds": {
+        "x": 16,
+        "y": 419,
+        "width": 958,
+        "height": 417
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 0,
+            "acceptance": "browser"
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "mediaInput": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "restored": true,
+          "console": true,
+          "consoleErrors": 0
+        }
+      }
+    }
+  ],
+  "disposableTargets": ["B2C7497990B6A536B64A76CB38B514A9", "30C2831CE1FFD01AD86CE560C7E8090C"],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

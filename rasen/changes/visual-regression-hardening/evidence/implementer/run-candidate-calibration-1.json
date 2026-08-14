@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "mode": "update",
+  "role": "implementer",
+  "runId": "candidate-calibration-1",
+  "beforeBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "afterBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scenarios": [
+    {
+      "scenarioId": "desktop-welcome",
+      "status": "pass",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-welcome__1440x900__dpr1__light__ltr__welcome.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\candidate-calibration-1\\desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__candidate-calibration-1__current.png",
+      "diffPath": null,
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\candidate-calibration-1\\desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__candidate-calibration-1__result.json",
+      "expectedHash": null,
+      "currentHash": "e375a93829ff0f8813b09cce01ce2fb46e014ad497b24c23860c2ed4f6cf558a",
+      "diffHash": null,
+      "mismatchCount": null,
+      "mismatchRatio": null,
+      "changedBounds": null,
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": true,
+        "checkerOverlays": 0,
+        "consoleErrors": 0
+      }
+    }
+  ],
+  "disposableTargets": ["4B252D2DA9D633387F57F1B6657D77C5"],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

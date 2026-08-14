@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-007-recovery-1",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "top-level-recovery",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-007-recovery-1\\top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery__fixer__fixer-007-recovery-1__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-007-recovery-1\\top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery__fixer__fixer-007-recovery-1__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-007-recovery-1\\top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery__fixer__fixer-007-recovery-1__result.json",
+      "expectedHash": "8c8f09a5949c5b94f4dd4519d626176cabfe34b32e656589d1e64e3290d1b6cf",
+      "currentHash": "5a391efc6c5f40120182cb00960aa751383a196c0218505b3876e8d1f562e4e8",
+      "diffHash": "efd3b124c0fc4dca332c85a02a13602b8f134d54132b1962b93982fc70fb34d7",
+      "mismatchCount": 8118,
+      "mismatchRatio": 0.02642578125,
+      "changedBounds": {
+        "x": 16,
+        "y": 140,
+        "width": 365,
+        "height": 276
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 4,
+        "blankCanvasRoutingApplicable": false,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 0,
+            "acceptance": "browser"
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "mediaInput": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "restored": true,
+          "console": true,
+          "consoleErrors": 0
+        }
+      }
+    }
+  ],
+  "disposableTargets": ["A42735CB8F25B02146249EE4F51C1986"],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

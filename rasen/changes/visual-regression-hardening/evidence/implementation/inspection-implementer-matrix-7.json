@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "role": "implementer",
+  "runId": "implementer-matrix-7",
+  "inspectedAt": "2026-08-13T15:58:00.000Z",
+  "sourceFingerprint": "c78e6b921d570d448e881adb693bb12390368ad638d90609961bb5007588facb",
+  "entries": [
+    {
+      "scenarioId": "desktop-active-text",
+      "filename": "desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing.png",
+      "imageHash": "7b53629ae8798145ef3eb1175b08870d1207bfe3f065dabc363e440c97520e28",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The stabilized text-editing selection is visible near the canvas center with a single unbroken blue selection band.",
+        "The compact text property rail remains vertically bounded at the upper right and does not cover the selected text.",
+        "The light canvas, bottom toolbar, zoom controls, and corner actions remain distinct with no edge clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-ai",
+      "filename": "desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog.png",
+      "imageHash": "f9f2e094133a21acbd04d04dec2a90468e5cb82efe75c92d72fb0572796c7cc6",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark large surface is inset on all sides and its close control remains fully visible in the upper-right corner.",
+        "The active first tab, centered explanatory copy, and bottom prompt field form three clear visual levels.",
+        "The prompt field and circular submit action are fully contained without horizontal or bottom clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-collaboration",
+      "filename": "desktop-collaboration__1440x900__dpr1__dark__ltr__collaboration-local.png",
+      "imageHash": "10daed9dd586a2c3a66da3c7bebbcf7ee55c9bc49492970c92399af4f8521094",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark welcome hierarchy remains centered and readable without a transient dialog or checker overlay.",
+        "The collaborator avatar control and the three-count badge are visible beside the Share action in the top-right cluster.",
+        "The bottom toolbar and both lower-corner control groups remain separated and fully inside the viewport."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-main-menu",
+      "filename": "desktop-dark-main-menu__1440x900__dpr1__dark__rtl__main-menu-open.png",
+      "imageHash": "cc4c7ab8d619fa5022310cc268a523813e869083d868a5f17f29debd010d3aa6",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark RTL menu is anchored to the physical right beside its trigger and stays wholly within the editor.",
+        "Arabic labels, leading icons, trailing shortcuts, separators, and nested preference controls remain visibly structured.",
+        "The centered dark toolbar and mirrored corner controls do not overlap the open menu or the welcome content."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-sidebar-docked",
+      "filename": "desktop-dark-sidebar-docked__1440x900__dpr1__dark__rtl__sidebar-docked.png",
+      "imageHash": "b4efb3b388607325929ea23c90047a8c0a63bcbaf54e0c3230ba9f1dfae4991d",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The docked dark Library sidebar occupies a stable left column while the RTL canvas starts at its boundary.",
+        "Sidebar tabs, empty-state copy, and the full-width browse action remain readable and vertically separated.",
+        "The canvas toolbar and zoom controls are repositioned inside the remaining canvas without crossing into the sidebar."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-sidebar-overlay",
+      "filename": "desktop-dark-sidebar-overlay__1440x900__dpr1__dark__rtl__sidebar-overlay.png",
+      "imageHash": "3e4896d292c62982ebc1460ae05d58899a1dacfec3f5219754219f5a55f34f99",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The overlay Library sidebar floats above the physical left side without resizing the dark RTL canvas.",
+        "The pin, close, tab, empty-state, and browse controls remain visible within the bounded overlay surface.",
+        "The underlying toolbar stays centered in the full canvas and no overlay content spills beyond the viewport."
+      ]
+    },
+    {
+      "scenarioId": "desktop-library",
+      "filename": "desktop-library__1440x900__dpr1__light__ltr__library-content.png",
+      "imageHash": "5fbca0cec7b2d49c758ba41f9d5c75b1d0f98541d741e0f17ace3befef7a9ff9",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The light Library sidebar forms a full-height right column with a clear divider from the canvas.",
+        "Tabs, title row, empty-state explanation, and the purple browse action are aligned and unclipped.",
+        "The welcome content and bottom toolbar remain centered in the reduced canvas rather than hiding behind the sidebar."
+      ]
+    },
+    {
+      "scenarioId": "desktop-selected-rectangle",
+      "filename": "desktop-selected-rectangle__1440x900__dpr1__light__ltr__selected-rectangle.png",
+      "imageHash": "1a1f079d5b22168d08d75f79bd23bfb4c8dd6e27b7e7a9ad124f10bc3e0e90c7",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The purple rectangle is visibly selected with complete bounds, corner handles, and rotation handle.",
+        "The right property rail opens a bounded color surface with color grid, shades, and hex input all visible.",
+        "The selection, surface, toolbar, zoom controls, and help action occupy distinct regions without clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-share",
+      "filename": "desktop-share__1440x900__dpr1__light__ltr__share-dialog.png",
+      "imageHash": "30404ef062f8bf5502209978133174f2f3c636a8ed880497e06354c894835b96",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The collaboration dialog is centered above an evenly dimmed editor backdrop and has a fully visible close action.",
+        "Live collaboration and shareable-link sections have distinct headings, explanations, and purple primary actions.",
+        "The modal frame, separator treatment, and both actions are fully bounded with no backdrop controls visually intruding."
+      ]
+    },
+    {
+      "scenarioId": "desktop-toolbar-group",
+      "filename": "desktop-toolbar-group__1440x900__dpr1__light__ltr__toolbar-group-open.png",
+      "imageHash": "b38f543bd64b4f1d00b2423156f7e0d5ad4a80abebd62ae5bbc59cb6de04227f",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The shape group menu opens directly above the bottom toolbar and remains separated by a visible gap and shadow.",
+        "All five rows, including the final Line row, are fully visible with icons, labels, and shortcuts aligned.",
+        "The selected shape trigger, adjacent toolbar actions, and corner controls remain visible without menu overlap."
+      ]
+    },
+    {
+      "scenarioId": "desktop-welcome",
+      "filename": "desktop-welcome__1440x900__dpr1__light__ltr__welcome.png",
+      "imageHash": "e0eccd087fe6395c91c83806dba17166ff698c1dca4098a71c859d878bb79d9a",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "The welcome mark, storage explanation, and four primary onboarding actions form a centered light-canvas hierarchy.",
+        "The bottom toolbar is centered and the selection action carries a visible purple keyboard-focus outline.",
+        "Main menu, share/sidebar, zoom, history, and help controls remain inside their corners with no clipping or overlap."
+      ]
+    },
+    {
+      "scenarioId": "embed-dark-help",
+      "filename": "embed-dark-help__640x480__dpr1__dark__rtl__safe-area-help.png",
+      "imageHash": "e2b865532f3a21031932be853d10e0651953d74a29cf227e09416470fdd740c1",
+      "width": 640,
+      "height": 480,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark RTL Help surface respects the asymmetric inset and keeps its title and close action clear of the edges.",
+        "External help actions and the focused usage-guide control are arranged in a bounded top action group.",
+        "The shortcut list continues through an internal scroll region while the dialog frame stays inside the constrained viewport."
+      ]
+    },
+    {
+      "scenarioId": "multi-editor-isolation",
+      "filename": "multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor.png",
+      "imageHash": "8a91f86a3e99e5b2d3ef8045057a03e51c6b2365f1a79bd20b8153f9d074b42a",
+      "width": 1440,
+      "height": 900,
+      "classification": "intentional-change",
+      "observations": [
+        "A narrow dark editor and a wide light editor render simultaneously with a clean physical boundary between them.",
+        "Each editor retains its own main/sidebar controls, toolbar density, selection state, and theme-specific surface colors.",
+        "Neither editor's toolbar or corner controls cross into the neighboring instance or beyond the shared fixture root."
+      ]
+    },
+    {
+      "scenarioId": "narrow-loading",
+      "filename": "narrow-loading__375x812__dpr1__light__ltr__loading.png",
+      "imageHash": "fec24d6163592991f9ddf4def8552b1f3eeaac8a2b1a1be4790b8439fc5aef20",
+      "width": 375,
+      "height": 812,
+      "classification": "intentional-change",
+      "observations": [
+        "The real loading presentation is visible at canvas center with a spinner and the text Loading scene….",
+        "The ordinary welcome content is absent while the narrow editor's top and bottom persistent controls remain present.",
+        "The loading message, compact toolbar rows, and corner actions remain fully inside the portrait viewport without overlap."
+      ]
+    },
+    {
+      "scenarioId": "narrow-recoverable-error",
+      "filename": "narrow-recoverable-error__375x812__dpr1__dark__ltr__recoverable-error.png",
+      "imageHash": "03bacbbfc7d022704cba9f7958f3047912557f402120ab44ee24cfdb88410da4",
+      "width": 375,
+      "height": 812,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark recovery surface fills the narrow host while retaining a visible Error heading and close control.",
+        "The bordered alert card contains a distinct error label and a centered two-line recovery message.",
+        "The focused close treatment, alert card, and large-surface frame stay inside the portrait viewport with no horizontal clipping."
+      ]
+    },
+    {
+      "scenarioId": "phone-dark-landscape",
+      "filename": "phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow.png",
+      "imageHash": "cc0fcfdfbdf3f75852f41fa421ae2656e9bbaa8a3ee5d3bacc29fcb0a9efbfd6",
+      "width": 812,
+      "height": 375,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark RTL shape menu opens above the centered short-height toolbar without touching the viewport top.",
+        "All five menu rows are visible, and the highlighted final Line row spans the full usable menu width.",
+        "The bottom toolbar and both top corner controls remain completely reachable with no root-level horizontal overflow."
+      ]
+    },
+    {
+      "scenarioId": "phone-light-library",
+      "filename": "phone-light-library__375x812__dpr1__light__ltr__phone-library.png",
+      "imageHash": "2abdaadcd8c2f58d8d264e76b5643498ba91db75c9d417a95a815d92b94679ed",
+      "width": 375,
+      "height": 812,
+      "classification": "intentional-change",
+      "observations": [
+        "The light phone Library surface occupies a bounded overlay column while a narrow strip of canvas remains visible.",
+        "Tabs, title, overflow action, close control, empty-state copy, and browse action remain readable and touch-sized.",
+        "The bottom canvas controls are shielded behind the overlay and no Library content is clipped horizontally."
+      ]
+    },
+    {
+      "scenarioId": "tablet-dark-library",
+      "filename": "tablet-dark-library__1024x768__dpr1__dark__rtl__tablet-library-sidebar.png",
+      "imageHash": "29ccb65f4cda108a067b5a763b92bb3bf4b8a506415f9e55778a4eb4639cf8d8",
+      "width": 1024,
+      "height": 768,
+      "classification": "intentional-change",
+      "observations": [
+        "The dark RTL tablet keeps the desktop sidebar adapter as a full-height physical-left Library column.",
+        "Arabic empty-state copy and the browse action are centered within the sidebar and remain uncut.",
+        "The canvas mark, toolbar, and zoom controls fit within the remaining editor width without crossing the sidebar boundary."
+      ]
+    },
+    {
+      "scenarioId": "tablet-light-properties",
+      "filename": "tablet-light-properties__768x1024__dpr1__light__ltr__tablet-compact-properties.png",
+      "imageHash": "eb4c9d7f7342c9f9d907bd85b4024ec95386e4ca2f76e77a557e92f1906df012",
+      "width": 768,
+      "height": 1024,
+      "classification": "intentional-change",
+      "observations": [
+        "The selected purple rectangle remains fully visible behind a compact property rail on the right.",
+        "The color surface contains its complete color grid, shade row, and hex field within the tablet viewport.",
+        "The wide bottom toolbar, zoom/history controls, and help action stay aligned along the lower safe edge without clipping."
+      ]
+    },
+    {
+      "scenarioId": "top-level-recovery",
+      "filename": "top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery.png",
+      "imageHash": "8c8f09a5949c5b94f4dd4519d626176cabfe34b32e656589d1e64e3290d1b6cf",
+      "width": 640,
+      "height": 480,
+      "classification": "intentional-change",
+      "observations": [
+        "The application-owned recovery card is centered independently of any editor chrome on a plain light fixture root.",
+        "Recovery copy, the underlined details link, and the purple Open editor action form a clear reading and action order.",
+        "The Open editor action has a visible keyboard-focus outline and the complete card shadow remains inside the viewport."
+      ]
+    }
+  ]
+}

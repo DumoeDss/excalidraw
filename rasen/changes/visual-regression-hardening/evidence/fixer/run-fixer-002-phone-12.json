@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-002-phone-12",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "phone-dark-landscape",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-002-phone-12\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-002-phone-12__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-002-phone-12\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-002-phone-12__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-002-phone-12\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-002-phone-12__result.json",
+      "expectedHash": "cc0fcfdfbdf3f75852f41fa421ae2656e9bbaa8a3ee5d3bacc29fcb0a9efbfd6",
+      "currentHash": "4ac5a2c40556a7ff4325b323673df6ac5d86e74b3c5ecca7652b55c5bae88bee",
+      "diffHash": "19a72e0a427b10c5d20b224c7a10fca7aa33042558e3b28ae8073da6a409e452",
+      "mismatchCount": 4436,
+      "mismatchRatio": 0.014568144499178983,
+      "changedBounds": {
+        "x": 16,
+        "y": 71,
+        "width": 678,
+        "height": 247
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": {
+          "postSettleCls": 0,
+          "longTaskDuration": 0,
+          "interactionDuration": 50.200000047683716,
+          "resourceCount": 250,
+          "transferBytes": 68400,
+          "harnessDuration": 1258.2136000000028
+        },
+        "samples": [
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 54.299999952316284,
+            "resourceCount": 250,
+            "transferBytes": 68400,
+            "harnessDuration": 1266.8666999999987
+          },
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 53.40000003576279,
+            "resourceCount": 250,
+            "transferBytes": 68400,
+            "harnessDuration": 1271.9147999999986
+          },
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 45.80000001192093,
+            "resourceCount": 250,
+            "transferBytes": 68400,
+            "harnessDuration": 1262.3620999999985
+          }
+        ],
+        "medians": {
+          "postSettleCls": 0,
+          "longTaskDuration": 0,
+          "interactionDuration": 53.40000003576279,
+          "resourceCount": 250,
+          "transferBytes": 68400,
+          "harnessDuration": 1266.8666999999987
+        },
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 2,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1,
+            "acceptance": "mounted-editor"
+          },
+          "expected": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "actual": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "browserMatches": true,
+          "roots": [
+            {
+              "tier": "phone",
+              "adapter": "phone",
+              "density": "touch",
+              "signature": "[1,\"phone\",\"phone\",\"landscape\",\"short\",\"touch\",\"mobile\",\"rtl\",false,0,0,0,0,0,0,0,0]"
+            }
+          ],
+          "requiresMountedProjection": true,
+          "mountedProjectionMatches": true
+        },
+        "inputApplication": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "requested": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1,
+            "acceptance": "mounted-editor"
+          },
+          "expected": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "actual": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          }
+        },
+        "mountedInputReceipt": {
+          "contract": "full-mounted-editor",
+          "sourceFingerprint": "e164bfa62352cc21bbae038b193d991f9da955719e83c5f2fa25a3d494c1086e",
+          "command": "yarn test:app --run packages/excalidraw/tests/interactivity.test.tsx -t uses the complete mounted-editor pointer-aware activation authority",
+          "testFile": "packages/excalidraw/tests/interactivity.test.tsx",
+          "passed": true
+        },
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "mediaInput": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "restored": true,
+          "console": true,
+          "consoleErrors": 0
+        },
+        "inputRestoration": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restored": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restoredExactly": true
+        }
+      }
+    }
+  ],
+  "disposableTargets": [
+    "96D22E1CD0A5A569833A7B07D87F649D"
+  ],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

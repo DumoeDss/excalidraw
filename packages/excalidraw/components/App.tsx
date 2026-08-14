@@ -4345,9 +4345,11 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.mediaPlayerRefs.clear();
 
-    // we're recreating the api object reference so that the
-    // <ExcalidrawAPIContext.Provider/> picks up on it
-    this.api = { ...this.api, isDestroyed: true };
+    // Keep the public object identity while invalidating it. Consumers are
+    // explicitly allowed to cache the imperative API, so replacing only the
+    // App-owned reference would leave those cached objects looking live after
+    // this editor has unmounted.
+    this.api.isDestroyed = true;
 
     for (const key of Object.keys(this.api) as (keyof typeof this.api)[]) {
       if (

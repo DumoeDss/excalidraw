@@ -108,6 +108,17 @@ describe("event callbacks", () => {
     expect(calls).toEqual(["mount", "initialize"]);
   });
 
+  it("marks a cached imperative API as destroyed on unmount", () => {
+    const cachedAPI = excalidrawAPI;
+
+    unmountComponent();
+
+    expect(cachedAPI.isDestroyed).toBe(true);
+    expect(() => cachedAPI.getAppState()).toThrow(
+      /ExcalidrawAPI is no longer usable/,
+    );
+  });
+
   it("should trigger onChange on render", async () => {
     const onChange = vi.fn();
 

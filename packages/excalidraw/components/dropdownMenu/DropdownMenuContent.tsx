@@ -21,6 +21,8 @@ import type {
 const MenuContent = ({
   children,
   onClickOutside,
+  onEscapeKeyDown,
+  onCloseAutoFocus,
   className = "",
   onSelect,
   align = "end",
@@ -33,6 +35,8 @@ const MenuContent = ({
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
+  onEscapeKeyDown?: () => void;
+  onCloseAutoFocus?: (event: Event) => void;
   className?: string;
   /**
    * Called when any menu item is selected (clicked on).
@@ -84,6 +88,8 @@ const MenuContent = ({
           collisionPadding={policy.collisionPadding}
           sideOffset={8}
           onPointerDownOutside={() => onClickOutside?.()}
+          onEscapeKeyDown={() => onEscapeKeyDown?.()}
+          onCloseAutoFocus={onCloseAutoFocus}
         >
           <FloatingSurfaceFrame
             className={classNames}

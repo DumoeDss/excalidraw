@@ -116,7 +116,7 @@ describe("adaptive toolbar interaction surface", () => {
       ':where(button, input, select, textarea, a[href], [role="button"]) { pointer-events: var(--ui-pointerEvents);',
     );
     expect(toolbarStyles).toMatch(
-      /\.App-bottom-bar > \.Island\.adaptive-toolbar-shell \{[^}]*pointer-events: none;[^}]*overflow: clip;/,
+      /\.Island\.adaptive-toolbar-shell \{[^}]*pointer-events: none;[^}]*overflow: clip;/,
     );
     expect(toolbarStyles).not.toMatch(
       /\.layer-ui__bottom-center-stack \{[^}]*> \* \{[^}]*pointer-events:/,
@@ -126,6 +126,9 @@ describe("adaptive toolbar interaction surface", () => {
     );
     expect(toolbarStyles).toContain("&.adaptive-editor-toolbar__menu--phone");
     expect(toolbarStyles).toContain("z-index: 3;");
+    expect(toolbarStyles).toContain(
+      '&[data-toolbar-menu-open="true"] .mobile-shape-actions { visibility: hidden; pointer-events: none; :where(button, a[href], input, select, textarea, [role="button"]) { pointer-events: none;',
+    );
   });
 });
 

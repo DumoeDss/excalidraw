@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "mode": "update",
+  "role": "implementer",
+  "runId": "final-row-lifecycle-probe-1",
+  "sourceFingerprint": "455cf3e2e5b99953f8562cb07e32cd4e9d97ebbe740e17f609c60c7f06f98b44",
+  "implementationSources": [
+    "excalidraw-app/index.tsx",
+    "excalidraw-app/visualRegressionHost.tsx",
+    "package.json",
+    "packages/excalidraw/components/AdaptiveEditorToolbar.scss",
+    "packages/excalidraw/components/adaptiveToolbar.test.tsx",
+    "scripts/visual-regression/actions.ts",
+    "scripts/visual-regression/baseline.ts",
+    "scripts/visual-regression/browserScripts.ts",
+    "scripts/visual-regression/comparator.ts",
+    "scripts/visual-regression/fixtures.ts",
+    "scripts/visual-regression/lifecycle.ts",
+    "scripts/visual-regression/manifest.ts",
+    "scripts/visual-regression/naming.ts",
+    "scripts/visual-regression/paths.ts",
+    "scripts/visual-regression/performance.ts",
+    "scripts/visual-regression/png.ts",
+    "scripts/visual-regression/proxy.ts",
+    "scripts/visual-regression/replay.test.ts",
+    "scripts/visual-regression/replay.ts",
+    "scripts/visual-regression/runner.ts",
+    "scripts/visual-regression/scenarios.ts",
+    "scripts/visual-regression/semantics.ts",
+    "scripts/visual-regression/types.ts",
+    "scripts/visual-regression/visual.promote.test.ts",
+    "scripts/visual-regression/visual.unit.test.ts",
+    "scripts/visual-regression/visual.update.test.ts",
+    "scripts/visual-regression/visual.verify.test.ts",
+    "vitest.visual.config.mts"
+  ],
+  "beforeBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "afterBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scenarios": [
+    {
+      "scenarioId": "phone-dark-landscape",
+      "status": "pass",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\final-row-lifecycle-probe-1\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__implementer__final-row-lifecycle-probe-1__current.png",
+      "diffPath": null,
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\final-row-lifecycle-probe-1\\phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__implementer__final-row-lifecycle-probe-1__result.json",
+      "expectedHash": null,
+      "currentHash": "cc0fcfdfbdf3f75852f41fa421ae2656e9bbaa8a3ee5d3bacc29fcb0a9efbfd6",
+      "diffHash": null,
+      "mismatchCount": null,
+      "mismatchRatio": null,
+      "changedBounds": null,
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": {
+          "postSettleCls": 0,
+          "longTaskDuration": 0,
+          "interactionDuration": 49.69999998807907,
+          "resourceCount": 250,
+          "transferBytes": 67500,
+          "harnessDuration": 1263.7662
+        },
+        "samples": [
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 36.59999996423721,
+            "resourceCount": 250,
+            "transferBytes": 67500,
+            "harnessDuration": 1242.9364999999998
+          },
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 82.40000003576279,
+            "resourceCount": 250,
+            "transferBytes": 67500,
+            "harnessDuration": 1299.7240999999995
+          },
+          {
+            "postSettleCls": 0,
+            "longTaskDuration": 0,
+            "interactionDuration": 46.19999998807907,
+            "resourceCount": 250,
+            "transferBytes": 67500,
+            "harnessDuration": 1262.072699999997
+          }
+        ],
+        "medians": {
+          "postSettleCls": 0,
+          "longTaskDuration": 0,
+          "interactionDuration": 46.19999998807907,
+          "resourceCount": 250,
+          "transferBytes": 67500,
+          "harnessDuration": 1262.072699999997
+        },
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "targetActivated": true,
+        "actions": 3,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": false,
+        "checkerOverlays": 0,
+        "consoleErrors": 0
+      }
+    }
+  ],
+  "disposableTargets": ["4D959CBCAD27AF43A92B6A2BDA8DF4C8"],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

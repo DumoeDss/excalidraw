@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "embed-dark-help",
+  "filename": "embed-dark-help__640x480__dpr1__dark__rtl__safe-area-help.png",
+  "width": 640,
+  "height": 480,
+  "deviceScaleFactor": 1,
+  "crop": {
+    "selector": ".excalidraw",
+    "target": {
+      "x": 0,
+      "y": 0,
+      "width": 640,
+      "height": 480
+    },
+    "editor": {
+      "x": 0,
+      "y": 0,
+      "width": 640,
+      "height": 480
+    }
+  },
+  "browser": "Chrome",
+  "platform": "win32-x64-10.0.26200",
+  "fontVersion": "repository-fonts-v1",
+  "fixtureVersion": "visual-fixtures-v1",
+  "comparison": {
+    "channelTolerance": 4,
+    "antialiasTolerance": 12,
+    "maxMismatchRatio": 0.0005,
+    "maxMaskRatio": 0
+  },
+  "imageHash": "8a1c371380d8d6506c4df8d1dd536c333e12949f5e76e2090651f3fc39b29787",
+  "budgetSource": null,
+  "approval": "intentional-change",
+  "approvedBy": "fixer",
+  "inspectedAt": "2026-08-14T14:08:47.995Z",
+  "sourceFingerprint": "70737b62e062eb3269a9d266c079576b79147caf9ba3275a13230f20f35509ad"
+}
