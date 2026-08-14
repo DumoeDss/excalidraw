@@ -543,9 +543,25 @@ interface DebugCanvasProps {
 const DebugCanvas = React.forwardRef<HTMLCanvasElement, DebugCanvasProps>(
   ({ appState, scale }, ref) => {
     const { width, height } = appState;
+    const [, forceUpdate] = React.useReducer((value) => value + 1, 0);
+
+    React.useEffect(() => {
+      const update = () => forceUpdate();
+      window.__visualDebuggerForceUpdate = update;
+      return () => {
+        if (window.__visualDebuggerForceUpdate === update) {
+          delete window.__visualDebuggerForceUpdate;
+        }
+      };
+    }, []);
+
+    if (!isVisualDebuggerEnabled()) {
+      return null;
+    }
 
     return (
       <canvas
+        data-visual-debugger-canvas="true"
         style={{
           width,
           height,

@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-008-restoration-3",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "desktop-active-text",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-008-restoration-3\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-008-restoration-3__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-008-restoration-3\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-008-restoration-3__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-008-restoration-3\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-008-restoration-3__result.json",
+      "expectedHash": "7b53629ae8798145ef3eb1175b08870d1207bfe3f065dabc363e440c97520e28",
+      "currentHash": "42f24ee538049b55e0e21e0247ae2236e8cde3347cbe463c6950649e4fd5b8cb",
+      "diffHash": "dd887511583224ca2816103e0487d28600ee276dc889933016270a93e2dcf7c2",
+      "mismatchCount": 19654,
+      "mismatchRatio": 0.015165123456790124,
+      "changedBounds": {
+        "x": 12,
+        "y": 12,
+        "width": 1413,
+        "height": 856
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [
+        "text-editor: expected visible .excalidraw-wysiwyg",
+        "text-editor: expected current focus"
+      ],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 0,
+        "semanticAssertions": 5,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true,
+          "roots": [
+            {
+              "tier": "desktop",
+              "adapter": "desktop",
+              "density": "compact",
+              "signature": "[1,\"desktop\",\"desktop\",\"landscape\",\"regular\",\"compact\",\"compact\",\"ltr\",true,0,0,0,0,0,0,0,0]"
+            }
+          ],
+          "requiresMountedProjection": false,
+          "mountedProjectionMatches": true
+        },
+        "inputApplication": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          }
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerState": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "clockIdentity": true,
+          "clockState": true,
+          "scene": true,
+          "theme": true,
+          "appState": true,
+          "library": true,
+          "share": true,
+          "fixtureRoots": true,
+          "documentDirection": true,
+          "documentLanguage": true,
+          "restored": true
+        },
+        "inputRestoration": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "afterRestoreCommands": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 10
+          },
+          "postQuery": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restoredExactly": true
+        },
+        "consoleBaseline": {
+          "events": [],
+          "boundary": 0
+        },
+        "postRestoreConsoleEvents": [],
+        "postRestoreConsoleQuerySucceeded": true,
+        "restorationVerificationAttempted": true,
+        "targetCloseSucceeded": true,
+        "targetCloseObservation": {
+          "targetId": "DBDDC2DA2842BDA3C262BA812959DDAA",
+          "observation": {
+            "success": true
+          }
+        },
+        "targetEnumerationSucceeded": true,
+        "targetEnumerationObservation": {
+          "targetId": "DBDDC2DA2842BDA3C262BA812959DDAA",
+          "absent": true
+        }
+      }
+    }
+  ],
+  "disposableTargets": [
+    "DBDDC2DA2842BDA3C262BA812959DDAA"
+  ],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

@@ -30,6 +30,9 @@ export const isCurrentFloatingSurfaceOwner = (
   claim: FloatingSurfaceOwnerClaim,
 ) => claimsByScope.get(scope)?.get(identity) === claim;
 
+export const hasFloatingSurfaceOwner = (scope: string, identity: string) =>
+  claimsByScope.get(scope)?.has(identity) === true;
+
 export const releaseFloatingSurfaceOwnership = (
   scope: string,
   identity: string,

@@ -341,7 +341,7 @@ describe("adaptive toolbar live behavior", () => {
   });
 
   it.each(["desktop", "phone"] as const)(
-    "uses the pointer-aware activation authority on %s",
+    "uses the complete mounted-editor pointer-aware activation authority on %s",
     async (formFactor) => {
       const { container } = await render(
         <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
@@ -534,6 +534,37 @@ describe("adaptive toolbar live behavior", () => {
         expect(getComputedStyle(button).visibility).toBe("visible");
       });
     });
+  });
+
+  it("cleans phone toolbar shielding when the editor unmounts while open", async () => {
+    const view = await render(
+      <Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const root = view.container.querySelector<HTMLElement>(
+      ".excalidraw-container",
+    )!;
+    const actions = view.container.querySelector<HTMLElement>(
+      ".mobile-shape-actions",
+    )!;
+    fireEvent.click(
+      view.container.querySelector<HTMLButtonElement>(
+        '[data-testid="toolbar-shapes-group"]',
+      )!,
+    );
+    await waitFor(() => {
+      expect(root).toHaveAttribute("data-toolbar-menu-open", "true");
+      expect(actions).toHaveAttribute("aria-hidden", "true");
+      expect(actions.inert).toBe(true);
+    });
+
+    view.unmount();
+    expect(root).not.toHaveAttribute("data-toolbar-menu-open");
+    expect(actions).not.toHaveAttribute("aria-hidden");
+    expect(actions.inert).toBe(false);
+    expect(actions.style.opacity).toBe("");
   });
 });
 

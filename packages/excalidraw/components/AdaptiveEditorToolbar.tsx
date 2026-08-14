@@ -104,6 +104,7 @@ export const AdaptiveEditorToolbar = ({
   const overflowTriggerRef = useRef<HTMLButtonElement>(null);
   const menuTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const lastPointerTypeRef = useRef<PointerType | null>(null);
+  const restoreTriggerFocusRef = useRef(false);
   const toolbarInstanceId = useId();
   const { container } = useExcalidrawContainer();
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -146,38 +147,109 @@ export const AdaptiveEditorToolbar = ({
     useAdaptiveToolbarLayout(units);
 
   useEffect(() => {
-    const unsubscribe = app.onPointerDownEmitter.on(() => setOpenMenu(null));
+    const unsubscribe = app.onPointerDownEmitter.on(() => {
+      restoreTriggerFocusRef.current = false;
+      setOpenMenu(null);
+    });
     return () => unsubscribe?.();
   }, [app]);
 
   useEffect(() => {
+    if (!container || !openMenu) {
+      return;
+    }
     const mobileActions =
       container?.querySelector<HTMLElement>(".mobile-shape-actions") ?? null;
-    if (openMenu) {
-      container?.setAttribute("data-toolbar-menu-open", "true");
-      mobileActions?.setAttribute("aria-hidden", "true");
-      if (mobileActions) {
-        mobileActions.inert = true;
-        mobileActions.style.opacity = "0";
-      }
-    } else {
-      container?.removeAttribute("data-toolbar-menu-open");
-      mobileActions?.removeAttribute("aria-hidden");
-      if (mobileActions) {
-        mobileActions.inert = false;
-        mobileActions.style.removeProperty("opacity");
-      }
+    const mobileActionControls = mobileActions
+      ? [
+          ...mobileActions.querySelectorAll<HTMLElement>(
+            "button, a[href], input, select, textarea, [role='button']",
+          ),
+        ]
+      : [];
+    const ownerIdentity = `${toolbarInstanceId}-${openMenu}-menu`;
+    const previousRootOpen = container.getAttribute("data-toolbar-menu-open");
+    const previousRootOwner = container.getAttribute("data-toolbar-menu-owner");
+    const previousAriaHidden =
+      mobileActions?.getAttribute("aria-hidden") ?? null;
+    const previousInert = mobileActions?.inert ?? false;
+    const previousOpacity = mobileActions?.style.opacity ?? "";
+    const previousTransition = mobileActions?.style.transition ?? "";
+    const previousPointerEvents = mobileActionControls.map(
+      (control) => control.style.pointerEvents,
+    );
+
+    container.setAttribute("data-toolbar-menu-open", "true");
+    container.setAttribute("data-toolbar-menu-owner", ownerIdentity);
+    mobileActions?.setAttribute("aria-hidden", "true");
+    if (mobileActions) {
+      mobileActions.inert = true;
+      mobileActions.style.transition = "none";
+      mobileActions.style.opacity = "0";
     }
+    mobileActionControls.forEach((control) => {
+      control.style.pointerEvents = "none";
+    });
 
     return () => {
-      container?.removeAttribute("data-toolbar-menu-open");
-      mobileActions?.removeAttribute("aria-hidden");
-      if (mobileActions) {
-        mobileActions.inert = false;
-        mobileActions.style.removeProperty("opacity");
+      if (previousRootOpen == null) {
+        container.removeAttribute("data-toolbar-menu-open");
+      } else {
+        container.setAttribute("data-toolbar-menu-open", previousRootOpen);
       }
+      if (previousRootOwner == null) {
+        container.removeAttribute("data-toolbar-menu-owner");
+      } else {
+        container.setAttribute("data-toolbar-menu-owner", previousRootOwner);
+      }
+      if (previousAriaHidden == null) {
+        mobileActions?.removeAttribute("aria-hidden");
+      } else {
+        mobileActions?.setAttribute("aria-hidden", previousAriaHidden);
+      }
+      if (mobileActions) {
+        mobileActions.inert = previousInert;
+        if (previousOpacity) {
+          mobileActions.style.opacity = previousOpacity;
+        } else {
+          mobileActions.style.removeProperty("opacity");
+        }
+        if (previousTransition) {
+          mobileActions.style.transition = previousTransition;
+        } else {
+          mobileActions.style.removeProperty("transition");
+        }
+      }
+      mobileActionControls.forEach((control, index) => {
+        if (previousPointerEvents[index]) {
+          control.style.pointerEvents = previousPointerEvents[index];
+        } else {
+          control.style.removeProperty("pointer-events");
+        }
+      });
     };
-  }, [container, openMenu]);
+  }, [container, openMenu, toolbarInstanceId]);
+
+  const markOutsideClose = () => {
+    restoreTriggerFocusRef.current = false;
+  };
+  const markEscapeClose = () => {
+    restoreTriggerFocusRef.current = true;
+  };
+  const handleCloseAutoFocus = (event: Event) => {
+    if (!restoreTriggerFocusRef.current) {
+      event.preventDefault();
+    }
+  };
+  const restoreRequestedTriggerFocus = (focus: () => void) => {
+    if (!restoreTriggerFocusRef.current) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      focus();
+      restoreTriggerFocusRef.current = false;
+    });
+  };
 
   const activate = (
     item: ResolvedToolbarItem,
@@ -257,6 +329,7 @@ export const AdaptiveEditorToolbar = ({
             ? "toolbar-selection"
             : `toolbar-${unit.id}-group`
         }
+        ownerIdentity={`${toolbarInstanceId}-${unit.id}-menu`}
         isOpen={openMenu === unit.id}
         onOpenChange={(open) => setOpenMenu(open ? unit.id : null)}
         lastSelectedType={lastSelectedByGroup[unit.id] ?? options[0].type}
@@ -282,6 +355,10 @@ export const AdaptiveEditorToolbar = ({
           variant === "phone" && "adaptive-editor-toolbar__menu--phone",
         )}
         collisionBoundary={container}
+        onClickOutside={markOutsideClose}
+        onEscapeKeyDown={markEscapeClose}
+        onCloseAutoFocus={handleCloseAutoFocus}
+        shouldRestoreFocusOnClose={() => restoreTriggerFocusRef.current}
       />
     );
   };
@@ -344,9 +421,10 @@ export const AdaptiveEditorToolbar = ({
         onOpenChange={(open) => {
           setOpenMenu(open ? unit.id : null);
           if (open) {
+            restoreTriggerFocusRef.current = false;
             setAppState({ openMenu: null, openPopup: null });
           } else {
-            requestAnimationFrame(() =>
+            restoreRequestedTriggerFocus(() =>
               menuTriggerRefs.current.get(unit.id)?.focus(),
             );
           }
@@ -379,6 +457,9 @@ export const AdaptiveEditorToolbar = ({
         <DropdownMenu.Content
           id={menuId}
           onSelect={() => setOpenMenu(null)}
+          onClickOutside={markOutsideClose}
+          onEscapeKeyDown={markEscapeClose}
+          onCloseAutoFocus={handleCloseAutoFocus}
           className={clsx(
             "App-toolbar__extra-tools-dropdown adaptive-editor-toolbar__menu",
             variant === "phone" && "adaptive-editor-toolbar__menu--phone",
@@ -514,9 +595,10 @@ export const AdaptiveEditorToolbar = ({
             onOpenChange={(open) => {
               setOpenMenu(open ? "overflow" : null);
               if (open) {
+                restoreTriggerFocusRef.current = false;
                 setAppState({ openMenu: null, openPopup: null });
               } else {
-                requestAnimationFrame(() =>
+                restoreRequestedTriggerFocus(() =>
                   overflowTriggerRef.current?.focus(),
                 );
               }
@@ -543,6 +625,9 @@ export const AdaptiveEditorToolbar = ({
             <DropdownMenu.Content
               id={overflowMenuId}
               onSelect={() => setOpenMenu(null)}
+              onClickOutside={markOutsideClose}
+              onEscapeKeyDown={markEscapeClose}
+              onCloseAutoFocus={handleCloseAutoFocus}
               className={clsx(
                 "App-toolbar__extra-tools-dropdown adaptive-editor-toolbar__menu",
                 variant === "phone" && "adaptive-editor-toolbar__menu--phone",

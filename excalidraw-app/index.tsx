@@ -15,3 +15,9 @@ root.render(
     <ExcalidrawApp />
   </StrictMode>,
 );
+
+if (import.meta.env.DEV) {
+  void import("./visualRegressionHost").then(
+    ({ installVisualRegressionHost }) => installVisualRegressionHost(),
+  );
+}

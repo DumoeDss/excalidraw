@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "mode": "update",
+  "role": "fixer",
+  "runId": "fixer-integration-r1-debug-active-update-17",
+  "sourceFingerprint": "753052f636196c7811a69462f318a1e76a36665387e94a331414999bc4c4aa3d",
+  "implementationSources": [
+    "excalidraw-app/App.tsx",
+    "excalidraw-app/components/DebugCanvas.tsx",
+    "excalidraw-app/index.tsx",
+    "excalidraw-app/visualRegressionHost.tsx",
+    "package.json",
+    "packages/excalidraw/components/AdaptiveEditorToolbar.scss",
+    "packages/excalidraw/components/AdaptiveEditorToolbar.tsx",
+    "packages/excalidraw/components/App.tsx",
+    "packages/excalidraw/components/LibraryMenuSection.tsx",
+    "packages/excalidraw/components/LibraryUnit.test.tsx",
+    "packages/excalidraw/components/LibraryUnit.tsx",
+    "packages/excalidraw/components/ToolGroupDropdown.tsx",
+    "packages/excalidraw/components/adaptiveToolbar.test.tsx",
+    "packages/excalidraw/components/dropdownMenu/DropdownMenuContent.tsx",
+    "packages/excalidraw/components/floatingSurface/owner.ts",
+    "packages/excalidraw/tests/interactivity.test.tsx",
+    "packages/excalidraw/tests/packages/events.test.tsx",
+    "scripts/visual-regression/actions.ts",
+    "scripts/visual-regression/appOwner.ts",
+    "scripts/visual-regression/artifactWriter.ts",
+    "scripts/visual-regression/baseline.ts",
+    "scripts/visual-regression/browserScripts.ts",
+    "scripts/visual-regression/checkerDiagnostics.ts",
+    "scripts/visual-regression/comparator.ts",
+    "scripts/visual-regression/fixtures.ts",
+    "scripts/visual-regression/lifecycle.ts",
+    "scripts/visual-regression/manifest.ts",
+    "scripts/visual-regression/naming.ts",
+    "scripts/visual-regression/paths.ts",
+    "scripts/visual-regression/performance.ts",
+    "scripts/visual-regression/png.ts",
+    "scripts/visual-regression/proxy.ts",
+    "scripts/visual-regression/replay.test.ts",
+    "scripts/visual-regression/replay.ts",
+    "scripts/visual-regression/reviewerEntrypoint.ts",
+    "scripts/visual-regression/runner.ts",
+    "scripts/visual-regression/scenarios.ts",
+    "scripts/visual-regression/semantics.ts",
+    "scripts/visual-regression/types.ts",
+    "scripts/visual-regression/visual.promote.test.ts",
+    "scripts/visual-regression/visual.reviewer.verify.test.ts",
+    "scripts/visual-regression/visual.unit.test.ts",
+    "scripts/visual-regression/visual.update.test.ts",
+    "scripts/visual-regression/visual.verify.test.ts",
+    "tsconfig.json",
+    "vitest.visual.config.mts"
+  ],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "desktop-active-text",
+      "status": "pass",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-integration-r1-debug-active-update-17\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-integration-r1-debug-active-update-17__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-integration-r1-debug-active-update-17\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-integration-r1-debug-active-update-17__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-integration-r1-debug-active-update-17\\desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__fixer__fixer-integration-r1-debug-active-update-17__result.json",
+      "expectedHash": "7b53629ae8798145ef3eb1175b08870d1207bfe3f065dabc363e440c97520e28",
+      "currentHash": "a39b9e1046be672b0a45d6f2a923a5e4f6149f52f7c592bdb7f356d35c39d1f2",
+      "diffHash": "4e42fe34135ba0c8506367ad2019301c90ec3b6f79d00c126a78e5edd533bff7",
+      "mismatchCount": 11637,
+      "mismatchRatio": 0.008979166666666667,
+      "changedBounds": {
+        "x": 15,
+        "y": 16,
+        "width": 1410,
+        "height": 869
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 0,
+        "semanticAssertions": 5,
+        "blankCanvasRoutingApplicable": false,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true,
+          "roots": [
+            {
+              "tier": "desktop",
+              "adapter": "desktop",
+              "density": "compact",
+              "signature": "[1,\"desktop\",\"desktop\",\"landscape\",\"regular\",\"compact\",\"compact\",\"ltr\",true,0,0,0,0,0,0,0,0]"
+            }
+          ],
+          "requiresMountedProjection": false,
+          "mountedProjectionMatches": true
+        },
+        "inputApplication": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          }
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "checkerBadgeCount": 0,
+        "checkerWindowCount": 0,
+        "checkerBadgeTexts": [],
+        "checkerWindowTexts": [],
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerState": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "clockIdentity": true,
+          "clockState": true,
+          "scene": true,
+          "theme": true,
+          "appState": true,
+          "library": true,
+          "share": true,
+          "fixtureRoots": true,
+          "documentDirection": true,
+          "documentLanguage": true,
+          "focusDetails": {
+            "previousTag": "DIV",
+            "previousId": "",
+            "previousConnected": true,
+            "activeTag": "DIV",
+            "activeId": ""
+          },
+          "appStateDifferences": [],
+          "appStateDetails": {},
+          "restored": true
+        },
+        "inputRestoration": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "afterRestoreCommands": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 10
+          },
+          "postQuery": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restoredExactly": true
+        },
+        "consoleBaseline": {
+          "events": [],
+          "boundary": 0
+        },
+        "postRestoreConsoleEvents": [],
+        "postRestoreConsoleQuerySucceeded": true,
+        "restorationVerificationAttempted": true,
+        "targetCloseSucceeded": true,
+        "targetCloseObservation": {
+          "targetId": "316BB782C538A8A27AC2F2E056B17157",
+          "observation": {
+            "success": true
+          }
+        },
+        "targetEnumerationSucceeded": true,
+        "targetEnumerationObservation": {
+          "targetId": "316BB782C538A8A27AC2F2E056B17157",
+          "absent": true
+        }
+      }
+    }
+  ],
+  "disposableTargets": [
+    "316BB782C538A8A27AC2F2E056B17157"
+  ],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

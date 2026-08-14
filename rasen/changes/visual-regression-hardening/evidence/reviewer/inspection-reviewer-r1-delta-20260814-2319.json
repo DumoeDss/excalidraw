@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "authorRole": "reviewer",
+  "runId": "reviewer-r1-delta-20260814-2319",
+  "inspectedAt": "2026-08-14T15:31:59.0234404Z",
+  "inspectionMethod": "Each retained PNG was opened individually at original resolution with the reviewer's image viewer.",
+  "sourceFingerprint": "70737b62e062eb3269a9d266c079576b79147caf9ba3275a13230f20f35509ad",
+  "canonicalHashBefore": "311666a303148a5f3ccb1327c3fb56f4fc3f1ddf0aaf8b7af927fa12772d5830",
+  "canonicalHashAfter": "311666a303148a5f3ccb1327c3fb56f4fc3f1ddf0aaf8b7af927fa12772d5830",
+  "primaryScenarioCount": 20,
+  "primaryAccepted": 19,
+  "primaryRejected": 1,
+  "entries": [
+    {
+      "scenarioId": "desktop-active-text",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "e43521433119f95b4f0df2eceb2bd6a47020998219a5193a44e4fc6b121272d1",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The deterministic editing text is visibly selected in blue near the canvas center.",
+        "The text-specific property rail is present on the physical right without covering the selected text.",
+        "The bottom toolbar and corner controls are fully inside the viewport with no checker badge or clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-ai",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "3d4d286c6f372a9f72e6f07be0f1eb80792c77bd99b1a6a93a2e20d8e389dc1d",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark text-to-diagram surface is visibly open and fills a bounded inset region.",
+        "The selected text-to-diagram tab, descriptive copy, and bottom prompt input are readable.",
+        "The close control and submit control remain visible with no checker badge or edge clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-collaboration",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-collaboration__1440x900__dpr1__dark__ltr__collaboration-local__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "43abced5c533b8788a6a9fadbd4b4d827e802cf5f8f1ef7928793c6a07032d91",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The local collaborator avatar marked A is visible beside the Share control.",
+        "A green collaboration count badge marked 3 is visible on the Share control.",
+        "The dark welcome content and bottom toolbar remain centered and unobscured."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-main-menu",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-dark-main-menu__1440x900__dpr1__dark__rtl__main-menu-open__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "be1e1a60ae8339b5a94cfd9b84fefecf829cfb0b378c657b2a67ccfefaa47601",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark main menu is anchored to the physical right and all rows remain inside the viewport.",
+        "Arabic RTL labels and the theme/language sections are readable in the expected logical direction.",
+        "The centered editor toolbar and welcome canvas remain visible without overlap from the menu."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-sidebar-docked",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-dark-sidebar-docked__1440x900__dpr1__dark__rtl__sidebar-docked__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "157cc3ca647b59818a3e7e97639d759a0a65ea400b46e646094657b8cc420572",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The RTL Library sidebar is docked on the physical left and reserves a stable column.",
+        "The fixed purple Library item is visible below the application-content headings.",
+        "The remaining dark editor canvas and bottom toolbar are bounded without horizontal spill."
+      ]
+    },
+    {
+      "scenarioId": "desktop-dark-sidebar-overlay",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-dark-sidebar-overlay__1440x900__dpr1__dark__rtl__sidebar-overlay__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "7d76c9198974a92e99c9a71f47a55ab309f6e24a3466ab8a1fb37817c65fb3eb",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark RTL Library surface overlays the physical left side rather than resizing the full editor.",
+        "The fixed purple Library item and browse action are visible within the overlay.",
+        "Pin and close controls are visible while the underlying editor remains bounded and checker-free."
+      ]
+    },
+    {
+      "scenarioId": "desktop-library",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-library__1440x900__dpr1__light__ltr__library-content__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "c7c3c787b2a0b1a78386da88f609b69d3db46abb6f3c7654ecdfe48be1ef4328",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The light Library sidebar is open on the physical right with its search and tab controls visible.",
+        "The fixed purple Library item is rendered under Excalidraw Library instead of an empty-only state.",
+        "The Browse libraries action is fully visible at the bottom and the editor canvas remains unclipped."
+      ]
+    },
+    {
+      "scenarioId": "desktop-selected-rectangle",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-selected-rectangle__1440x900__dpr1__light__ltr__selected-rectangle__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "3aa963a21627d5bf7279fd3d124023121947136ce6e39bded50554e1ca751bc9",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "A large purple rectangle is visibly selected with all resize handles present.",
+        "The stroke color surface is open beside the right property rail and all swatches are visible.",
+        "The canvas object, property surface, and bottom toolbar do not overlap or clip one another."
+      ]
+    },
+    {
+      "scenarioId": "desktop-share",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-share__1440x900__dpr1__light__ltr__share-dialog__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "165a2451370c8d0e8bd0a19183b8e4136a224fd0b0579eb4ec2243898ab590e4",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The collaboration dialog is centered and the background editor is visibly isolated.",
+        "Both Start session and Export to Link actions are readable and fully contained.",
+        "The close control and dialog sections remain visible with no checker overlay or clipping."
+      ]
+    },
+    {
+      "scenarioId": "desktop-toolbar-group",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-toolbar-group__1440x900__dpr1__light__ltr__toolbar-group-open__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "b288052a9155bd8549ab4271386fd1a34dc70e76f3d6541a3132457ff8b3c631",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The five-row shape menu is open directly above the centered toolbar.",
+        "Rectangle is visibly selected and the final Line row is fully present.",
+        "The complete menu, toolbar, and corner controls stay inside the desktop viewport."
+      ]
+    },
+    {
+      "scenarioId": "desktop-welcome",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/desktop-welcome__1440x900__dpr1__light__ltr__welcome__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "e0eccd087fe6395c91c83806dba17166ff698c1dca4098a71c859d878bb79d9a",
+      "width": 1440,
+      "height": 900,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The welcome logo and browser-storage guidance are centered and readable.",
+        "Open, Help, collaboration, and sign-up actions are visible without collision.",
+        "The bottom toolbar and all four corner control groups remain within the canvas."
+      ]
+    },
+    {
+      "scenarioId": "embed-dark-help",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/embed-dark-help__640x480__dpr1__dark__rtl__safe-area-help__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "8a1c371380d8d6506c4df8d1dd536c333e12949f5e76e2090651f3fc39b29787",
+      "width": 640,
+      "height": 480,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark RTL Help surface respects visible asymmetric outer insets.",
+        "The heading, close control, external actions, and keyboard-shortcut rows are readable.",
+        "The content uses bounded internal scrolling rather than spilling beyond the embed viewport."
+      ]
+    },
+    {
+      "scenarioId": "multi-editor-isolation",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "b9c7a1ea70ab10425b6e16a7825ac018954672fd60af1f31e420fcc5ca790f4e",
+      "width": 1440,
+      "height": 900,
+      "classification": "rejected-harness-regression",
+      "observations": [
+        "The left light editor canvas is visibly blank even though lifecycle receipts claim visual-rectangle-01 exists.",
+        "The right dark editor, both owner markers, and the lifecycle-control rail remain visible and bounded.",
+        "Comparison rejects 69,098 pixels in a 325 by 213 region where the canonical left rectangle should appear."
+      ]
+    },
+    {
+      "scenarioId": "narrow-loading",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/narrow-loading__375x812__dpr1__light__ltr__loading__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "9ce8d4d2da8e11d80e87ae70caed0c7c8766bc78ae4645b4866ac2d858e774b1",
+      "width": 375,
+      "height": 812,
+      "classification": "accepted-bounded-raster-variance",
+      "observations": [
+        "The loading spinner and Loading scene text are centered and clearly visible.",
+        "The phone action rows are fully contained at the bottom with no horizontal overflow.",
+        "Only 81 spinner-edge pixels differ, ratio 0.00026601, below the unchanged 0.0005 scenario budget."
+      ]
+    },
+    {
+      "scenarioId": "narrow-recoverable-error",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/narrow-recoverable-error__375x812__dpr1__dark__ltr__recoverable-error__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "03bacbbfc7d022704cba9f7958f3047912557f402120ab44ee24cfdb88410da4",
+      "width": 375,
+      "height": 812,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark recoverable-error surface is bounded inside the narrow host.",
+        "The Error heading, local-content message, and focus-highlighted close control are visible.",
+        "The central error alert has readable contrast and no content extends outside the viewport."
+      ]
+    },
+    {
+      "scenarioId": "phone-dark-landscape",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "dc5f5e4866fc4cf875936ee8ea5ecfc01233412bec72ead032bd4ed83535bb06",
+      "width": 812,
+      "height": 375,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The five-row dark shape menu is fully visible above the short-landscape toolbar.",
+        "The complete final Line row is highlighted and not clipped at either inline edge.",
+        "The foreground menu, toolbar, and top corner controls remain bounded with no checker badge."
+      ]
+    },
+    {
+      "scenarioId": "phone-light-library",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "1b5b18089b6477d20f1ad8d0dc54a324efe2f0ac32ed036367564fde27fafd64",
+      "width": 375,
+      "height": 812,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The phone Library overlay is bounded from the physical left inset to the right edge.",
+        "The fixed purple Library item is visible under Excalidraw Library.",
+        "Search, close, tabs, and Browse libraries controls are all visible and reachable."
+      ]
+    },
+    {
+      "scenarioId": "tablet-dark-library",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/tablet-dark-library__1024x768__dpr1__dark__rtl__tablet-library-sidebar__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "fbd631655f20dc318227a6c8a6c4b12c06b1f7c243781f6097fc8bfecf08b28d",
+      "width": 1024,
+      "height": 768,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The dark RTL Library sidebar occupies a bounded physical-left tablet column.",
+        "The fixed purple Library item is visible beneath the Arabic application-content labels.",
+        "The remaining editor and bottom toolbar stay within the viewport without root overflow."
+      ]
+    },
+    {
+      "scenarioId": "tablet-light-properties",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/tablet-light-properties__768x1024__dpr1__light__ltr__tablet-compact-properties__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "fe193cbf37e6117678cbfe1eeefdaf7d9549996ffc44ffcdeb2b5f6b656a749a",
+      "width": 768,
+      "height": 1024,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The selected purple rectangle and its handles remain visible in the tablet canvas.",
+        "The color surface is fully contained beside the compact right property rail.",
+        "The tablet bottom toolbar and zoom controls are bounded with no horizontal fallback."
+      ]
+    },
+    {
+      "scenarioId": "top-level-recovery",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/top-level-recovery__640x480__dpr1__light__ltr__top-level-recovery__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "33a44ccee9647eaf078e16fadc6b7002ee3f3a5073d20bf2aff90c47c192dd78",
+      "width": 640,
+      "height": 480,
+      "classification": "accepted-intentional-state",
+      "observations": [
+        "The two-line recovery heading is strongly visible in dark text on the white card.",
+        "The recovery copy, Review details link, and Open editor action are readable and bounded.",
+        "The Open editor control has a visible focus treatment and the card is centered without clipping."
+      ]
+    }
+  ],
+  "companionArtifacts": [
+    {
+      "scenarioId": "phone-dark-landscape",
+      "purpose": "toolbar-restored",
+      "file": "rasen/changes/visual-regression-hardening/evidence/reviewer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__reviewer__reviewer-r1-delta-20260814-2319__evidence.png",
+      "sha256": "979ca8dca567273388902eb5c3907f7092558c780e537aa18a04e4e986488f77",
+      "width": 812,
+      "height": 375,
+      "classification": "accepted-restoration-adjacency",
+      "observations": [
+        "The foreground shape menu is absent after the close sequence.",
+        "The upper adjacent action row is visible again with undo, redo, and overflow actions.",
+        "The Line tool has a visible focus ring and both toolbar rows remain inside the short viewport."
+      ]
+    }
+  ]
+}

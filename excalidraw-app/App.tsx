@@ -145,7 +145,6 @@ import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
 import DebugCanvas, {
   debugRenderer,
-  isVisualDebuggerEnabled,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { useSimulatedCollaborators } from "./debugCollaborators";
@@ -1301,7 +1300,7 @@ const ExcalidrawWrapper = () => {
             },
           ]}
         />
-        {isVisualDebuggerEnabled() && excalidrawAPI && (
+        {isDevEnv() && excalidrawAPI && (
           <DebugCanvas
             appState={excalidrawAPI.getAppState()}
             scale={window.devicePixelRatio}

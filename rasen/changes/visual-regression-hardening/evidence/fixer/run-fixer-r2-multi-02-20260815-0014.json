@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-r2-multi-02-20260815-0014",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "311666a303148a5f3ccb1327c3fb56f4fc3f1ddf0aaf8b7af927fa12772d5830",
+  "afterBaselineHash": "311666a303148a5f3ccb1327c3fb56f4fc3f1ddf0aaf8b7af927fa12772d5830",
+  "scenarios": [
+    {
+      "scenarioId": "multi-editor-isolation",
+      "status": "pass",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-r2-multi-02-20260815-0014\\multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor__fixer__fixer-r2-multi-02-20260815-0014__current.png",
+      "diffPath": null,
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-r2-multi-02-20260815-0014\\multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor__fixer__fixer-r2-multi-02-20260815-0014__result.json",
+      "expectedHash": "78a291f372a8315bdadef1a89f767b14a578373e31fa9b006fbc3cd56152040f",
+      "currentHash": "2f8acc38fe7652b90895d85b8ff9225e6d09c6a393ace917039c2fb7e9a2d85a",
+      "diffHash": null,
+      "mismatchCount": 0,
+      "mismatchRatio": 0,
+      "changedBounds": null,
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 2,
+        "semanticAssertions": 2,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "browserMatches": true,
+          "roots": [
+            {
+              "tier": "desktop",
+              "adapter": "desktop",
+              "density": "compact",
+              "signature": "[1,\"desktop\",\"desktop\",\"landscape\",\"regular\",\"compact\",\"compact\",\"ltr\",true,0,0,0,0,0,0,0,0]"
+            },
+            {
+              "tier": "desktop",
+              "adapter": "desktop",
+              "density": "compact",
+              "signature": "[1,\"desktop\",\"desktop\",\"landscape\",\"regular\",\"compact\",\"compact\",\"ltr\",false,0,0,0,0,0,0,0,0]"
+            },
+            {
+              "tier": "tablet",
+              "adapter": "desktop",
+              "density": "compact",
+              "signature": "[1,\"tablet\",\"desktop\",\"portrait\",\"regular\",\"compact\",\"compact\",\"rtl\",false,0,0,0,0,0,0,0,0]"
+            }
+          ],
+          "requiresMountedProjection": false,
+          "mountedProjectionMatches": true
+        },
+        "inputApplication": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "requested": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": "preserve",
+            "acceptance": "browser"
+          },
+          "expected": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "actual": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          }
+        },
+        "mountedInputReceipt": null,
+        "checkerOverlays": 0,
+        "checkerBadgeCount": 0,
+        "checkerWindowCount": 0,
+        "checkerBadgeTexts": [],
+        "checkerWindowTexts": [],
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerState": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "clockIdentity": true,
+          "clockState": true,
+          "scene": true,
+          "theme": true,
+          "appState": true,
+          "library": true,
+          "share": true,
+          "fixtureRoots": true,
+          "documentDirection": true,
+          "documentLanguage": true,
+          "focusDetails": {
+            "previousTag": "DIV",
+            "previousId": "",
+            "previousConnected": true,
+            "activeTag": "DIV",
+            "activeId": ""
+          },
+          "appStateDifferences": [],
+          "appStateDetails": {},
+          "restored": true
+        },
+        "inputRestoration": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "afterRestoreCommands": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 10
+          },
+          "postQuery": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restoredExactly": true
+        },
+        "consoleBaseline": {
+          "events": [],
+          "boundary": 0
+        },
+        "postRestoreConsoleEvents": [],
+        "postRestoreConsoleQuerySucceeded": true,
+        "restorationVerificationAttempted": true,
+        "targetCloseSucceeded": true,
+        "targetCloseObservation": {
+          "targetId": "7CA3C951B5807005CF62A0F94F716518",
+          "observation": {
+            "success": true
+          }
+        },
+        "targetEnumerationSucceeded": true,
+        "targetEnumerationObservation": {
+          "targetId": "7CA3C951B5807005CF62A0F94F716518",
+          "absent": true
+        }
+      }
+    }
+  ],
+  "disposableTargets": [
+    "7CA3C951B5807005CF62A0F94F716518"
+  ],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

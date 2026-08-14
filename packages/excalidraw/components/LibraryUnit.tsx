@@ -16,6 +16,7 @@ export const LibraryUnit = memo(
   ({
     id,
     elements,
+    name,
     isPending,
     onClick,
     selected,
@@ -25,6 +26,7 @@ export const LibraryUnit = memo(
   }: {
     id: LibraryItem["id"] | /** for pending item */ null;
     elements?: LibraryItem["elements"];
+    name?: LibraryItem["name"];
     isPending?: boolean;
     onClick: (id: LibraryItem["id"] | null) => void;
     selected: boolean;
@@ -49,6 +51,8 @@ export const LibraryUnit = memo(
           "library-unit--selected": selected,
           "library-unit--skeleton": !svg,
         })}
+        data-library-item-id={id || undefined}
+        aria-label={name || undefined}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

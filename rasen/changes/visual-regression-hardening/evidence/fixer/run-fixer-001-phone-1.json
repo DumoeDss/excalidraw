@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "fixer",
+  "runId": "fixer-001-phone-1",
+  "sourceFingerprint": null,
+  "implementationSources": [],
+  "beforeBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "afterBaselineHash": "8fcb425de07249e7f93eae0c23cda149b39333fc939882d97a51ef8f852c9188",
+  "scenarios": [
+    {
+      "scenarioId": "phone-light-library",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\phone-light-library__375x812__dpr1__light__ltr__phone-library.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-001-phone-1\\phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-001-phone-1__current.png",
+      "diffPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-001-phone-1\\phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-001-phone-1__diff.png",
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\fixer\\fixer-001-phone-1\\phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-001-phone-1__result.json",
+      "expectedHash": "2abdaadcd8c2f58d8d264e76b5643498ba91db75c9d417a95a815d92b94679ed",
+      "currentHash": "82108902401f055cc7aede53efa749a8084ef800af4dd25721bb05d718241626",
+      "diffHash": "1ea20a2c39bbc7e2dd0486033a03ac19ac5e0120f906f1b11b0b4a6a61c0d1e5",
+      "mismatchCount": 33540,
+      "mismatchRatio": 0.11014778325123152,
+      "changedBounds": {
+        "x": 16,
+        "y": 18,
+        "width": 347,
+        "height": 778
+      },
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": [],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "restorationVerified": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 7,
+        "blankCanvasRouting": true,
+        "blankCanvasRoutingApplicable": true,
+        "inputAcceptance": {
+          "requested": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1,
+            "acceptance": "mounted-editor"
+          },
+          "expected": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "actual": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "browserMatches": true,
+          "roots": [
+            {
+              "tier": "phone",
+              "adapter": "phone",
+              "density": "touch",
+              "signature": "[1,\"phone\",\"phone\",\"portrait\",\"regular\",\"touch\",\"mobile\",\"ltr\",false,0,0,0,0,0,0,0,0]"
+            }
+          ],
+          "requiresMountedProjection": true,
+          "mountedProjectionMatches": true
+        },
+        "inputApplication": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "requested": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1,
+            "acceptance": "mounted-editor"
+          },
+          "expected": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          },
+          "actual": {
+            "pointer": "coarse",
+            "hover": false,
+            "touchPoints": 1
+          }
+        },
+        "mountedInputReceipt": {
+          "contract": "full-mounted-editor",
+          "sourceFingerprint": "677d53835b69919daaff67a0f4ea23ae1780d10e9666f194fc81d9feff13bde4",
+          "command": "yarn test:app --run packages/excalidraw/tests/interactivity.test.tsx -t uses the complete mounted-editor pointer-aware activation authority",
+          "testFile": "packages/excalidraw/tests/interactivity.test.tsx",
+          "passed": true
+        },
+        "checkerOverlays": 0,
+        "consoleErrors": 0,
+        "restorationObservations": {
+          "debuggerLive": true,
+          "debuggerStorage": true,
+          "debuggerCanvas": true,
+          "storage": true,
+          "locale": true,
+          "mediaInput": true,
+          "safeArea": true,
+          "styles": true,
+          "focus": true,
+          "focusMarker": true,
+          "transientMarkers": true,
+          "restored": true,
+          "console": true,
+          "consoleErrors": 0
+        },
+        "inputRestoration": {
+          "prior": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restored": {
+            "pointer": "fine",
+            "hover": true,
+            "touchPoints": 10
+          },
+          "restoredExactly": true
+        }
+      }
+    }
+  ],
+  "disposableTargets": [
+    "03A566BD11F8EB19780EBC81902ED8A2"
+  ],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

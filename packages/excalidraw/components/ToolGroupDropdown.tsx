@@ -27,6 +27,7 @@ type ToolGroupDropdownProps = {
   options: readonly ToolGroupOption[];
   title: string;
   "data-testid"?: string;
+  ownerIdentity?: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   /** remembers the last picked tool so the trigger reflects it */
@@ -42,6 +43,10 @@ type ToolGroupDropdownProps = {
   activateOnOpen?: boolean;
   menuClassName?: string;
   collisionBoundary?: Element | null;
+  onClickOutside?: () => void;
+  onEscapeKeyDown?: () => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  shouldRestoreFocusOnClose?: () => boolean;
 };
 
 /**
@@ -55,6 +60,7 @@ export const ToolGroupDropdown = ({
   options,
   title,
   "data-testid": dataTestId,
+  ownerIdentity,
   isOpen,
   onOpenChange,
   lastSelectedType,
@@ -63,8 +69,13 @@ export const ToolGroupDropdown = ({
   activateOnOpen = true,
   menuClassName,
   collisionBoundary,
+  onClickOutside,
+  onEscapeKeyDown,
+  onCloseAutoFocus,
+  shouldRestoreFocusOnClose,
 }: ToolGroupDropdownProps) => {
-  const menuId = useId();
+  const generatedMenuId = useId();
+  const menuId = ownerIdentity ?? generatedMenuId;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const lastPointerTypeRef = useRef<PointerType | null>(null);
   const activeOption = options.find((option) => option.type === activeToolType);
@@ -103,7 +114,7 @@ export const ToolGroupDropdown = ({
         onOpenChange(open);
         if (open && activateOnOpen) {
           activateTool(displayedOption.type, lastPointerTypeRef.current);
-        } else if (!open) {
+        } else if (!open && (shouldRestoreFocusOnClose?.() ?? true)) {
           requestAnimationFrame(() => triggerRef.current?.focus());
         }
       }}
@@ -154,6 +165,9 @@ export const ToolGroupDropdown = ({
       <DropdownMenu.Content
         id={menuId}
         onSelect={() => onOpenChange(false)}
+        onClickOutside={onClickOutside}
+        onEscapeKeyDown={onEscapeKeyDown}
+        onCloseAutoFocus={onCloseAutoFocus}
         className={clsx(
           "tool-group-dropdown__menu adaptive-editor-toolbar__menu",
           menuClassName,
