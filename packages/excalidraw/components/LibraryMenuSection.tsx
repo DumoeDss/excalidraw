@@ -67,6 +67,7 @@ export const LibraryMenuSection = memo(
               onClick={onClick}
               svgCache={svgCache}
               id={item?.id}
+              name={item.id === null ? undefined : item.name}
               selected={isItemSelected(item.id)}
               onToggle={onItemSelectToggle}
               onDrag={onItemDrag}

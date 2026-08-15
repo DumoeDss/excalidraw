@@ -52,17 +52,19 @@ export const ChatInterface = ({
   renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
   renderWarning?: TTTDDialog.renderWarning;
 }) => {
+  const messagesRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useLayoutEffect(() => {
-    messagesEndRef.current?.scrollIntoView();
+    const messagesContainer = messagesRef.current;
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
   }, [messages]);
 
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
+    textareaRef.current?.focus({ preventScroll: true });
   }, [chatId]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -109,7 +111,7 @@ export const ChatInterface = ({
 
   return (
     <div className="chat-interface">
-      <div className="chat-interface__messages">
+      <div className="chat-interface__messages" ref={messagesRef}>
         {messages.length === 0 ? (
           <div className="chat-interface__welcome-screen">
             {renderWelcomeScreen ? (
@@ -153,7 +155,6 @@ export const ChatInterface = ({
           >
             <textarea
               ref={textareaRef}
-              autoFocus
               className="chat-interface__input"
               value={currentPrompt}
               onChange={handleInputChange}

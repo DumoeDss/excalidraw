@@ -20,40 +20,29 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "items": [
       "separator",
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <g
-            strokeWidth={"1.25000"}
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M9.15 14.85l8.85 -10.85"
-            />
-            <path
-              d="M6 4l8.85 10.85"
-            />
-          </g>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M9.15 14.85l8.85 -10.85"
+          />
+          <path
+            d="M6 4l8.85 10.85"
+          />
+        </Icon>,
         "keyTest": [Function],
         "label": "labels.cut",
         "name": "cut",
@@ -780,32 +769,23 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <React.Fragment>
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
-            />
-            <path
-              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
-            />
-          </React.Fragment>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+          />
+          <path
+            d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+          />
+        </Icon>,
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -4707,40 +4687,29 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "items": [
       "separator",
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <g
-            strokeWidth={"1.25000"}
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M9.15 14.85l8.85 -10.85"
-            />
-            <path
-              d="M6 4l8.85 10.85"
-            />
-          </g>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M9.15 14.85l8.85 -10.85"
+          />
+          <path
+            d="M6 4l8.85 10.85"
+          />
+        </Icon>,
         "keyTest": [Function],
         "label": "labels.cut",
         "name": "cut",
@@ -5467,32 +5436,23 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <React.Fragment>
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
-            />
-            <path
-              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
-            />
-          </React.Fragment>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+          />
+          <path
+            d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+          />
+        </Icon>,
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -5927,40 +5887,29 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "items": [
       "separator",
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <g
-            strokeWidth={"1.25000"}
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M9.15 14.85l8.85 -10.85"
-            />
-            <path
-              d="M6 4l8.85 10.85"
-            />
-          </g>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M9.15 14.85l8.85 -10.85"
+          />
+          <path
+            d="M6 4l8.85 10.85"
+          />
+        </Icon>,
         "keyTest": [Function],
         "label": "labels.cut",
         "name": "cut",
@@ -6687,32 +6636,23 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <React.Fragment>
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
-            />
-            <path
-              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
-            />
-          </React.Fragment>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+          />
+          <path
+            d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+          />
+        </Icon>,
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -7890,40 +7830,29 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "items": [
       "separator",
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <g
-            strokeWidth={"1.25000"}
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M9.15 14.85l8.85 -10.85"
-            />
-            <path
-              d="M6 4l8.85 10.85"
-            />
-          </g>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M9.15 14.85l8.85 -10.85"
+          />
+          <path
+            d="M6 4l8.85 10.85"
+          />
+        </Icon>,
         "keyTest": [Function],
         "label": "labels.cut",
         "name": "cut",
@@ -8650,32 +8579,23 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <React.Fragment>
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
-            />
-            <path
-              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
-            />
-          </React.Fragment>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+          />
+          <path
+            d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+          />
+        </Icon>,
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -8884,40 +8804,29 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "items": [
       "separator",
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <g
-            strokeWidth={"1.25000"}
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
-            />
-            <path
-              d="M9.15 14.85l8.85 -10.85"
-            />
-            <path
-              d="M6 4l8.85 10.85"
-            />
-          </g>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+          />
+          <path
+            d="M9.15 14.85l8.85 -10.85"
+          />
+          <path
+            d="M6 4l8.85 10.85"
+          />
+        </Icon>,
         "keyTest": [Function],
         "label": "labels.cut",
         "name": "cut",
@@ -9644,32 +9553,23 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "icon": <svg
-          aria-hidden="true"
-          className=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
+        "icon": <Icon
+          size="md"
+          viewBox={24}
+          weight="medium"
         >
-          <React.Fragment>
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <path
-              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
-            />
-            <path
-              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
-            />
-          </React.Fragment>
-        </svg>,
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <path
+            d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+          />
+          <path
+            d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+          />
+        </Icon>,
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],

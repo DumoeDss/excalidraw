@@ -8,6 +8,7 @@ import { useUIAppState } from "../context/ui-appState";
 export const useCreatePortalContainer = (opts?: {
   className?: string;
   parentSelector?: string;
+  editorPortal?: boolean;
 }) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
@@ -19,7 +20,10 @@ export const useCreatePortalContainer = (opts?: {
   useLayoutEffect(() => {
     if (div) {
       div.className = "";
-      div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
+      div.classList.add(
+        "excalidraw",
+        ...(opts?.className?.split(/\s+/).filter(Boolean) || []),
+      );
       div.classList.toggle(
         "excalidraw--mobile",
         editorInterface.formFactor === "phone",
@@ -29,7 +33,9 @@ export const useCreatePortalContainer = (opts?: {
   }, [div, theme, editorInterface.formFactor, opts?.className]);
 
   useLayoutEffect(() => {
-    const container = opts?.parentSelector
+    const container = opts?.editorPortal
+      ? excalidrawContainer
+      : opts?.parentSelector
       ? excalidrawContainer?.querySelector(opts.parentSelector)
       : document.body;
 
@@ -38,7 +44,10 @@ export const useCreatePortalContainer = (opts?: {
     }
 
     const div = document.createElement("div");
-
+    div.classList.add(
+      "excalidraw",
+      ...(opts?.className?.split(/\s+/).filter(Boolean) || []),
+    );
     container.appendChild(div);
 
     setDiv(div);
@@ -46,7 +55,12 @@ export const useCreatePortalContainer = (opts?: {
     return () => {
       container.removeChild(div);
     };
-  }, [excalidrawContainer, opts?.parentSelector]);
+  }, [
+    excalidrawContainer,
+    opts?.className,
+    opts?.editorPortal,
+    opts?.parentSelector,
+  ]);
 
   return div;
 };

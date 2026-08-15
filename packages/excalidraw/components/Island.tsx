@@ -16,6 +16,16 @@ type IslandProps = {
   /** identifies the surface so `getViewportOffsets` can reserve space for
    * it while hidden (see {@link ViewportUIName}) */
   "data-viewport-ui-name"?: ViewportUIName;
+  "data-large-surface"?: boolean;
+  "data-large-surface-kind"?: "dialog" | "sheet" | "sidebar";
+  "data-large-surface-presentation"?:
+    | "centered"
+    | "fullscreen"
+    | "sheet"
+    | "docked"
+    | "overlay";
+  "data-large-surface-density"?: "compact" | "touch";
+  "data-large-surface-elevation"?: "flat" | "raised" | "modal";
 };
 
 export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
@@ -27,6 +37,11 @@ export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
       style,
       "data-viewport-ui": viewportUI,
       "data-viewport-ui-name": viewportUIName,
+      "data-large-surface": largeSurface,
+      "data-large-surface-kind": largeSurfaceKind,
+      "data-large-surface-presentation": largeSurfacePresentation,
+      "data-large-surface-density": largeSurfaceDensity,
+      "data-large-surface-elevation": largeSurfaceElevation,
     },
     ref,
   ) => (
@@ -35,6 +50,11 @@ export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
       style={{ "--padding": padding, ...style }}
       data-viewport-ui={viewportUI}
       data-viewport-ui-name={viewportUIName}
+      data-large-surface={largeSurface || undefined}
+      data-large-surface-kind={largeSurfaceKind}
+      data-large-surface-presentation={largeSurfacePresentation}
+      data-large-surface-density={largeSurfaceDensity}
+      data-large-surface-elevation={largeSurfaceElevation}
       ref={ref}
     >
       {children}

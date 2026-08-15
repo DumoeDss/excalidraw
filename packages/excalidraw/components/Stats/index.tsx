@@ -19,6 +19,12 @@ import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
 import { CloseIcon } from "../icons";
+import {
+  AppContent,
+  AppContentBody,
+  AppContentHeader,
+  AppContentSection,
+} from "../appContent/AppContent";
 
 import Angle from "./Angle";
 import CanvasGrid from "./CanvasGrid";
@@ -185,247 +191,276 @@ export const StatsInner = memo(
     return (
       <div className="exc-stats">
         <Island padding={3}>
-          <div className="title">
-            <h2>{t("stats.title")}</h2>
-            <div className="close" onClick={onClose}>
-              {CloseIcon}
-            </div>
-          </div>
-
-          <Collapsible
-            label={<h3>{t("stats.generalStats")}</h3>}
-            open={!!(appState.stats.panels & STATS_PANELS.generalStats)}
-            openTrigger={() =>
-              setAppState((state) => {
-                return {
-                  stats: {
-                    open: true,
-                    panels: state.stats.panels ^ STATS_PANELS.generalStats,
-                  },
-                };
-              })
-            }
-          >
-            <StatsRows>
-              <StatsRow heading>{t("stats.scene")}</StatsRow>
-              <StatsRow columns={2}>
-                <div>{t("stats.shapes")}</div>
-                <div>{elements.length}</div>
-              </StatsRow>
-              <StatsRow columns={2}>
-                <div>{t("stats.width")}</div>
-                <div>{sceneDimension.width}</div>
-              </StatsRow>
-              <StatsRow columns={2}>
-                <div>{t("stats.height")}</div>
-                <div>{sceneDimension.height}</div>
-              </StatsRow>
-              {gridModeEnabled && (
-                <>
-                  <StatsRow heading>Canvas</StatsRow>
-                  <StatsRow>
-                    <CanvasGrid
-                      property="gridStep"
-                      scene={scene}
-                      appState={appState}
-                      setAppState={setAppState}
-                    />
-                  </StatsRow>
-                </>
-              )}
-            </StatsRows>
-
-            {renderCustomStats?.(elements, appState)}
-          </Collapsible>
-
-          {!_frameAndChildrenSelectedTogether && selectedElements.length > 0 && (
-            <div
-              id="elementStats"
-              style={{
-                marginTop: 12,
-              }}
-            >
-              <Collapsible
-                label={<h3>{t("stats.elementProperties")}</h3>}
-                open={
-                  !!(appState.stats.panels & STATS_PANELS.elementProperties)
-                }
-                openTrigger={() =>
-                  setAppState((state) => {
-                    return {
-                      stats: {
-                        open: true,
-                        panels:
-                          state.stats.panels ^ STATS_PANELS.elementProperties,
-                      },
-                    };
-                  })
-                }
-              >
-                <StatsRows>
-                  {singleElement && (
-                    <>
-                      {cropMode && (
-                        <StatsRow heading>
-                          {t("labels.unCroppedDimension")}
+          <AppContent as="div" density="compact" label={t("stats.title")}>
+            <AppContentSection>
+              <div className="title">
+                <AppContentHeader
+                  title={<h2>{t("stats.title")}</h2>}
+                  actions={
+                    <button
+                      aria-label={t("buttons.close")}
+                      className="close"
+                      onClick={onClose}
+                      type="button"
+                    >
+                      {CloseIcon}
+                    </button>
+                  }
+                />
+              </div>
+              <AppContentBody>
+                <Collapsible
+                  label={<h3>{t("stats.generalStats")}</h3>}
+                  open={!!(appState.stats.panels & STATS_PANELS.generalStats)}
+                  openTrigger={() =>
+                    setAppState((state) => {
+                      return {
+                        stats: {
+                          open: true,
+                          panels:
+                            state.stats.panels ^ STATS_PANELS.generalStats,
+                        },
+                      };
+                    })
+                  }
+                >
+                  <StatsRows>
+                    <StatsRow heading>{t("stats.scene")}</StatsRow>
+                    <StatsRow columns={2}>
+                      <div>{t("stats.shapes")}</div>
+                      <div>{elements.length}</div>
+                    </StatsRow>
+                    <StatsRow columns={2}>
+                      <div>{t("stats.width")}</div>
+                      <div>{sceneDimension.width}</div>
+                    </StatsRow>
+                    <StatsRow columns={2}>
+                      <div>{t("stats.height")}</div>
+                      <div>{sceneDimension.height}</div>
+                    </StatsRow>
+                    {gridModeEnabled && (
+                      <>
+                        <StatsRow heading>Canvas</StatsRow>
+                        <StatsRow>
+                          <CanvasGrid
+                            property="gridStep"
+                            scene={scene}
+                            appState={appState}
+                            setAppState={setAppState}
+                          />
                         </StatsRow>
-                      )}
+                      </>
+                    )}
+                  </StatsRows>
 
-                      {appState.croppingElementId &&
-                        isImageElement(singleElement) &&
-                        unCroppedDimension && (
-                          <StatsRow columns={2}>
-                            <div>{t("stats.width")}</div>
-                            <div>{round(unCroppedDimension.width, 2)}</div>
-                          </StatsRow>
-                        )}
+                  {renderCustomStats?.(elements, appState)}
+                </Collapsible>
 
-                      {appState.croppingElementId &&
-                        isImageElement(singleElement) &&
-                        unCroppedDimension && (
-                          <StatsRow columns={2}>
-                            <div>{t("stats.height")}</div>
-                            <div>{round(unCroppedDimension.height, 2)}</div>
-                          </StatsRow>
-                        )}
-
-                      <StatsRow
-                        heading
-                        data-testid="stats-element-type"
-                        style={{ margin: "0.3125rem 0" }}
+                {!_frameAndChildrenSelectedTogether &&
+                  selectedElements.length > 0 && (
+                    <div
+                      id="elementStats"
+                      style={{
+                        marginTop: 12,
+                      }}
+                    >
+                      <Collapsible
+                        label={<h3>{t("stats.elementProperties")}</h3>}
+                        open={
+                          !!(
+                            appState.stats.panels &
+                            STATS_PANELS.elementProperties
+                          )
+                        }
+                        openTrigger={() =>
+                          setAppState((state) => {
+                            return {
+                              stats: {
+                                open: true,
+                                panels:
+                                  state.stats.panels ^
+                                  STATS_PANELS.elementProperties,
+                              },
+                            };
+                          })
+                        }
                       >
-                        {appState.croppingElementId
-                          ? t("labels.imageCropping")
-                          : t(`element.${singleElement.type}`)}
-                      </StatsRow>
+                        <StatsRows>
+                          {singleElement && (
+                            <>
+                              {cropMode && (
+                                <StatsRow heading>
+                                  {t("labels.unCroppedDimension")}
+                                </StatsRow>
+                              )}
 
-                      <StatsRow>
-                        <Position
-                          element={singleElement}
-                          property="x"
-                          elementsMap={elementsMap}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <Position
-                          element={singleElement}
-                          property="y"
-                          elementsMap={elementsMap}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <Dimension
-                          property="width"
-                          element={singleElement}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <Dimension
-                          property="height"
-                          element={singleElement}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <Angle
-                          property="angle"
-                          element={singleElement}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <FontSize
-                          property="fontSize"
-                          element={singleElement}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                    </>
+                              {appState.croppingElementId &&
+                                isImageElement(singleElement) &&
+                                unCroppedDimension && (
+                                  <StatsRow columns={2}>
+                                    <div>{t("stats.width")}</div>
+                                    <div>
+                                      {round(unCroppedDimension.width, 2)}
+                                    </div>
+                                  </StatsRow>
+                                )}
+
+                              {appState.croppingElementId &&
+                                isImageElement(singleElement) &&
+                                unCroppedDimension && (
+                                  <StatsRow columns={2}>
+                                    <div>{t("stats.height")}</div>
+                                    <div>
+                                      {round(unCroppedDimension.height, 2)}
+                                    </div>
+                                  </StatsRow>
+                                )}
+
+                              <StatsRow
+                                heading
+                                data-testid="stats-element-type"
+                                style={{ margin: "0.3125rem 0" }}
+                              >
+                                {appState.croppingElementId
+                                  ? t("labels.imageCropping")
+                                  : t(`element.${singleElement.type}`)}
+                              </StatsRow>
+
+                              <StatsRow>
+                                <Position
+                                  element={singleElement}
+                                  property="x"
+                                  elementsMap={elementsMap}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <Position
+                                  element={singleElement}
+                                  property="y"
+                                  elementsMap={elementsMap}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <Dimension
+                                  property="width"
+                                  element={singleElement}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <Dimension
+                                  property="height"
+                                  element={singleElement}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <Angle
+                                  property="angle"
+                                  element={singleElement}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <FontSize
+                                  property="fontSize"
+                                  element={singleElement}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                            </>
+                          )}
+
+                          {multipleElements && (
+                            <>
+                              {elementsAreInSameGroup(multipleElements) && (
+                                <StatsRow heading>
+                                  {t("element.group")}
+                                </StatsRow>
+                              )}
+
+                              <StatsRow
+                                columns={2}
+                                style={{ margin: "0.3125rem 0" }}
+                              >
+                                <div>{t("stats.shapes")}</div>
+                                <div>{selectedElements.length}</div>
+                              </StatsRow>
+
+                              <StatsRow>
+                                <MultiPosition
+                                  property="x"
+                                  elements={multipleElements}
+                                  elementsMap={elementsMap}
+                                  atomicUnits={atomicUnits}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <MultiPosition
+                                  property="y"
+                                  elements={multipleElements}
+                                  elementsMap={elementsMap}
+                                  atomicUnits={atomicUnits}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <MultiDimension
+                                  property="width"
+                                  elements={multipleElements}
+                                  elementsMap={elementsMap}
+                                  atomicUnits={atomicUnits}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <MultiDimension
+                                  property="height"
+                                  elements={multipleElements}
+                                  elementsMap={elementsMap}
+                                  atomicUnits={atomicUnits}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <MultiAngle
+                                  property="angle"
+                                  elements={multipleElements}
+                                  scene={scene}
+                                  appState={appState}
+                                />
+                              </StatsRow>
+                              <StatsRow>
+                                <MultiFontSize
+                                  property="fontSize"
+                                  elements={multipleElements}
+                                  scene={scene}
+                                  appState={appState}
+                                  elementsMap={elementsMap}
+                                />
+                              </StatsRow>
+                            </>
+                          )}
+                        </StatsRows>
+                      </Collapsible>
+                    </div>
                   )}
-
-                  {multipleElements && (
-                    <>
-                      {elementsAreInSameGroup(multipleElements) && (
-                        <StatsRow heading>{t("element.group")}</StatsRow>
-                      )}
-
-                      <StatsRow columns={2} style={{ margin: "0.3125rem 0" }}>
-                        <div>{t("stats.shapes")}</div>
-                        <div>{selectedElements.length}</div>
-                      </StatsRow>
-
-                      <StatsRow>
-                        <MultiPosition
-                          property="x"
-                          elements={multipleElements}
-                          elementsMap={elementsMap}
-                          atomicUnits={atomicUnits}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <MultiPosition
-                          property="y"
-                          elements={multipleElements}
-                          elementsMap={elementsMap}
-                          atomicUnits={atomicUnits}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <MultiDimension
-                          property="width"
-                          elements={multipleElements}
-                          elementsMap={elementsMap}
-                          atomicUnits={atomicUnits}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <MultiDimension
-                          property="height"
-                          elements={multipleElements}
-                          elementsMap={elementsMap}
-                          atomicUnits={atomicUnits}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <MultiAngle
-                          property="angle"
-                          elements={multipleElements}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      </StatsRow>
-                      <StatsRow>
-                        <MultiFontSize
-                          property="fontSize"
-                          elements={multipleElements}
-                          scene={scene}
-                          appState={appState}
-                          elementsMap={elementsMap}
-                        />
-                      </StatsRow>
-                    </>
-                  )}
-                </StatsRows>
-              </Collapsible>
-            </div>
-          )}
+              </AppContentBody>
+            </AppContentSection>
+          </AppContent>
         </Island>
       </div>
     );

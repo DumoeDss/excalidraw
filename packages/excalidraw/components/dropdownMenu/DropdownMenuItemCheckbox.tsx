@@ -7,8 +7,15 @@ import type { DropdownMenuItemProps } from "./DropdownMenuItem";
 const DropdownMenuItemCheckbox = (
   props: Omit<DropdownMenuItemProps, "icon"> & { checked: boolean },
 ) => {
+  const { checked, ...rest } = props;
   return (
-    <DropdownMenuItem {...props} icon={props.checked ? checkIcon : emptyIcon} />
+    <DropdownMenuItem
+      {...rest}
+      icon={checked ? checkIcon : emptyIcon}
+      selected={checked || rest.selected}
+      role="menuitemcheckbox"
+      aria-checked={checked}
+    />
   );
 };
 

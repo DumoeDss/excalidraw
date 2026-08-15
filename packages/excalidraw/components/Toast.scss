@@ -4,17 +4,18 @@
     $closeButtonPadding: 0.4rem;
 
     animation: Toast-fade-in 0.5s;
+    position: relative;
     min-width: 220px;
-    max-width: min(360px, calc(100vw - 32px));
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--default-border-color);
-    background-color: var(--island-bg-color);
+    max-width: min(360px, calc(100% - 32px));
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background-color: var(--ui-surface-panel);
     color: var(--text-primary-color);
     padding: 0.5rem 0.75rem;
-    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+    box-shadow: var(--ui-shadow-3);
     box-sizing: border-box;
     cursor: default;
-    pointer-events: none;
+    pointer-events: auto;
 
     .Toast__message {
       font-family: var(--ui-font);
@@ -52,6 +53,26 @@
         height: $closeButtonSize;
       }
     }
+  }
+
+  .ToastRegion {
+    position: absolute;
+    z-index: var(--zIndex-toast);
+    left: calc(var(--large-surface-safe-area-left) + var(--ui-space-4));
+    right: calc(var(--large-surface-safe-area-right) + var(--ui-space-4));
+    bottom: calc(
+      max(
+          var(--large-surface-safe-area-bottom),
+          var(--toast-bottom-reservation, 0px),
+          var(--viewport-status-label-offset)
+        ) + var(--ui-space-2)
+    );
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ui-space-2);
+    pointer-events: none;
   }
 
   @keyframes Toast-fade-in {

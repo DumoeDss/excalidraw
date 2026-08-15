@@ -4,20 +4,33 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useEditorInterface } from "./App";
-import { Island } from "./Island";
+import { useStylesPanelMode } from "./App";
+import { useResponsiveEditorShell } from "./App";
+import {
+  FloatingSurfaceFrame,
+  FloatingSurfaceScrollViewport,
+  resolveFloatingSurfacePolicy,
+} from "./floatingSurface";
+import { resolvePropertyPlacement } from "./propertyPlacement";
+
+import type { FloatingSurfaceKind } from "./floatingSurface";
 
 interface PropertiesPopoverProps {
   className?: string;
   container: HTMLDivElement | null;
   children: ReactNode;
-  style?: object;
+  style?: React.CSSProperties;
   onClose: () => void;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   onPointerLeave?: React.PointerEventHandler<HTMLDivElement>;
   onFocusOutside?: Popover.PopoverContentProps["onFocusOutside"];
   onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
   preventAutoFocusOnTouch?: boolean;
+  returnFocusRef?: React.RefObject<HTMLElement | null>;
+  surfaceKind?: Extract<
+    FloatingSurfaceKind,
+    "property-popover" | "color-picker" | "font-picker"
+  >;
 }
 
 export const PropertiesPopover = React.forwardRef<
@@ -36,28 +49,51 @@ export const PropertiesPopover = React.forwardRef<
       onPointerLeave,
       onPointerDownOutside,
       preventAutoFocusOnTouch = false,
+      returnFocusRef,
+      surfaceKind = "property-popover",
     },
     ref,
   ) => {
-    const editorInterface = useEditorInterface();
-    const isMobilePortrait =
-      editorInterface.formFactor === "phone" && !editorInterface.isLandscape;
+    const responsive = useResponsiveEditorShell();
+    const stylesPanelMode = useStylesPanelMode();
+    const direction = responsive.direction;
+    const placement = resolvePropertyPlacement({
+      formFactor: responsive.adapter,
+      isLandscape: responsive.orientation === "landscape",
+      direction,
+      surface:
+        responsive.presentation === "mobile"
+          ? "phone"
+          : stylesPanelMode === "full"
+          ? "full"
+          : "compact",
+      collisionBoundary: container,
+    });
+    const policy = resolveFloatingSurfacePolicy({
+      kind: surfaceKind,
+      intent:
+        responsive.adapter === "phone" ? "phone-up" : "property-canvas-inward",
+      formFactor: responsive.adapter,
+      direction,
+      pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
+      collisionPadding: placement.collisionPadding,
+      safeArea: responsive.safeArea.physical,
+      availableBlockSize: container?.clientHeight ?? 0,
+    });
 
     return (
       <Popover.Portal container={container}>
         <Popover.Content
-          ref={ref}
-          className={clsx("focus-visible-none", className)}
+          className="floating-surface-positioner focus-visible-none properties-popover-positioner"
           data-prevent-outside-click
-          side={isMobilePortrait ? "bottom" : "right"}
-          align={isMobilePortrait ? "center" : "start"}
-          alignOffset={-16}
-          sideOffset={20}
-          collisionBoundary={container ?? undefined}
+          side={placement.popoverSide}
+          align={placement.popoverAlign}
+          alignOffset={0}
+          sideOffset={10}
+          collisionBoundary={placement.collisionBoundary ?? undefined}
+          collisionPadding={policy.collisionPadding}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
-            marginLeft:
-              editorInterface.formFactor === "phone" ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
@@ -65,7 +101,7 @@ export const PropertiesPopover = React.forwardRef<
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
             // prevent auto-focus on touch devices to avoid keyboard popup
-            if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
+            if (preventAutoFocusOnTouch && responsive.density === "touch") {
               e.preventDefault();
             }
           }}
@@ -74,20 +110,41 @@ export const PropertiesPopover = React.forwardRef<
             // prevents focusing the trigger
             e.preventDefault();
 
+            onClose();
+
+            if (
+              returnFocusRef?.current &&
+              !preventAutoFocusOnTouch &&
+              !isInteractive(document.activeElement)
+            ) {
+              returnFocusRef.current.focus();
+              return;
+            }
+
             // return focus to excalidraw container unless
             // user focuses an interactive element, such as a button, or
             // enters the text editor by clicking on canvas with the text tool
             if (container && !isInteractive(document.activeElement)) {
               container.focus();
             }
-
-            onClose();
           }}
         >
-          <Island padding={3} style={style}>
-            {children}
-          </Island>
+          <FloatingSurfaceFrame
+            ref={ref}
+            className={clsx("properties-popover-frame", className)}
+            density={policy.density}
+            kind={surfaceKind}
+            style={{
+              ...style,
+              ["--floating-surface-available-block-size" as string]: `min(${policy.maxBlockSize}px, var(--radix-popover-content-available-height))`,
+            }}
+          >
+            <FloatingSurfaceScrollViewport className="properties-popover-scroll-viewport">
+              {children}
+            </FloatingSurfaceScrollViewport>
+          </FloatingSurfaceFrame>
           <Popover.Arrow
+            className="properties-popover-arrow"
             width={20}
             height={10}
             style={{

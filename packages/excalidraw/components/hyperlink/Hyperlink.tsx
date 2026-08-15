@@ -58,8 +58,6 @@ const POPUP_PADDING = 5;
 const SPACE_BOTTOM = 85;
 const AUTO_HIDE_TIMEOUT = 500;
 
-let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-
 const embeddableLinkCache = new Map<
   ExcalidrawEmbeddableElement["id"],
   string
@@ -381,32 +379,65 @@ export const getContextMenuLabel = (
   return label;
 };
 
-let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;
+type HyperlinkTooltipState = {
+  timeoutId: number | null;
+  describedTarget: HTMLElement | null;
+};
+
+const hyperlinkTooltipStates = new WeakMap<
+  HTMLElement,
+  HyperlinkTooltipState
+>();
+
+const getHyperlinkTooltipState = (editor: HTMLElement) => {
+  const existing = hyperlinkTooltipStates.get(editor);
+  if (existing) {
+    return existing;
+  }
+  const state: HyperlinkTooltipState = {
+    timeoutId: null,
+    describedTarget: null,
+  };
+  hyperlinkTooltipStates.set(editor, state);
+  return state;
+};
+
 export const showHyperlinkTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  editor: HTMLElement | null,
 ) => {
-  if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+  if (!editor) {
+    return;
   }
-  HYPERLINK_TOOLTIP_TIMEOUT_ID = window.setTimeout(
-    () => renderTooltip(element, appState, elementsMap),
-    HYPERLINK_TOOLTIP_DELAY,
-  );
+  const state = getHyperlinkTooltipState(editor);
+  const ownerWindow = editor.ownerDocument.defaultView;
+  if (state.timeoutId !== null) {
+    ownerWindow?.clearTimeout(state.timeoutId);
+  }
+  state.timeoutId =
+    ownerWindow?.setTimeout(
+      () => renderTooltip(element, appState, elementsMap, editor),
+      HYPERLINK_TOOLTIP_DELAY,
+    ) ?? null;
 };
 
 const renderTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  editor: HTMLElement,
 ) => {
-  if (!element.link) {
+  if (!element.link || !editor.isConnected) {
     return;
   }
 
-  const tooltipDiv = getTooltipDiv();
+  const state = getHyperlinkTooltipState(editor);
+  state.timeoutId = null;
+  const tooltipDiv = getTooltipDiv(editor);
 
+  tooltipDiv.hidden = false;
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
   tooltipDiv.textContent = isElementLink(element.link)
@@ -428,6 +459,7 @@ const renderTooltip = (
 
   updateTooltipPosition(
     tooltipDiv,
+    editor,
     {
       left: linkViewportCoords.x,
       top: linkViewportCoords.y,
@@ -438,15 +470,35 @@ const renderTooltip = (
   );
   trackEvent("hyperlink", "tooltip", "link-icon");
 
-  IS_HYPERLINK_TOOLTIP_VISIBLE = true;
+  state.describedTarget =
+    editor.querySelector<HTMLCanvasElement>("canvas.interactive");
+  state.describedTarget?.setAttribute("aria-describedby", tooltipDiv.id);
 };
-export const hideHyperlinkToolip = () => {
-  if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+export const hideHyperlinkToolip = (editor: HTMLElement | null) => {
+  if (!editor) {
+    return;
   }
-  if (IS_HYPERLINK_TOOLTIP_VISIBLE) {
-    IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-    getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+  const state = hyperlinkTooltipStates.get(editor);
+  if (state?.timeoutId !== null && state?.timeoutId !== undefined) {
+    editor.ownerDocument.defaultView?.clearTimeout(state.timeoutId);
+    state.timeoutId = null;
+  }
+  const tooltip = editor.querySelector<HTMLDivElement>(
+    ":scope > .excalidraw-tooltip-canvas-bridge",
+  );
+  if (
+    tooltip &&
+    state?.describedTarget?.getAttribute("aria-describedby") === tooltip.id
+  ) {
+    state.describedTarget.removeAttribute("aria-describedby");
+  }
+  if (tooltip) {
+    tooltip.classList.remove("excalidraw-tooltip--visible");
+    tooltip.textContent = "";
+    tooltip.hidden = true;
+  }
+  if (state) {
+    state.describedTarget = null;
   }
 };
 

@@ -1,14 +1,9 @@
 import React from "react";
 
+import { FloatingSurfaceSeparator } from "../floatingSurface";
+
 const MenuSeparator = () => (
-  <div
-    style={{
-      height: "1px",
-      backgroundColor: "var(--default-border-color)",
-      margin: "6px 0",
-      flex: "0 0 auto",
-    }}
-  />
+  <FloatingSurfaceSeparator className="dropdown-menu-separator" />
 );
 
 export default MenuSeparator;

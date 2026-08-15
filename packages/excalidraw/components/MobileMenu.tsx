@@ -8,8 +8,8 @@ import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
+import { CanvasUiLayout } from "./CanvasUiLayout";
 import { MobileToolbar } from "./MobileToolbar";
-import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
 
@@ -62,9 +62,9 @@ export const MobileMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
-  const renderAppTopBar = () => {
+  const renderTopZones = () => {
     if (appState.openDialog?.name === "elementLinkSelector") {
-      return null;
+      return {};
     }
 
     const topRightUI = (
@@ -99,19 +99,7 @@ export const MobileMenu = ({
       </div>
     );
 
-    return (
-      <div
-        className="App-toolbar-content"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        {topLeftUI}
-        {topRightUI}
-      </div>
-    );
+    return { topStart: topLeftUI, topEnd: topRightUI };
   };
 
   const renderToolbar = () => {
@@ -139,6 +127,31 @@ export const MobileMenu = ({
       </button>
     ) : null;
 
+  const bottomCenter = shouldRenderDefaultBottomBar ? (
+    <div
+      className="App-bottom-bar"
+      style={{
+        marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
+      }}
+    >
+      <MobileShapeActions
+        appState={appState}
+        elementsMap={app.scene.getNonDeletedElementsMap()}
+        renderAction={actionManager.renderAction}
+        app={app}
+        setAppState={setAppState}
+      />
+
+      <Island
+        className="App-toolbar adaptive-toolbar-shell"
+        data-viewport-ui="bottom"
+      >
+        {appState.openDialog?.name !== "elementLinkSelector" && renderToolbar()}
+        {scrollBackToContentButton}
+      </Island>
+    </div>
+  ) : null;
+
   return (
     <>
       {renderSidebars()}
@@ -148,37 +161,14 @@ export const MobileMenu = ({
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </div>
 
-      {shouldRenderDefaultBottomBar && (
-        <div
-          className="App-bottom-bar"
-          style={{
-            marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
-          }}
-          data-viewport-ui="bottom"
-        >
-          <MobileShapeActions
-            appState={appState}
-            elementsMap={app.scene.getNonDeletedElementsMap()}
-            renderAction={actionManager.renderAction}
-            app={app}
-            setAppState={setAppState}
-          />
-
-          <Island className="App-toolbar">
-            {appState.openDialog?.name !== "elementLinkSelector" &&
-              renderToolbar()}
-            {scrollBackToContentButton}
-          </Island>
-        </div>
-      )}
+      <CanvasUiLayout
+        mode="phone"
+        zones={{ ...renderTopZones(), bottomCenter }}
+      />
 
       {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
         <div className="floating-status-stack">{scrollBackToContentButton}</div>
       )}
-
-      <FixedSideContainer side="top" className="App-top-bar">
-        {renderAppTopBar()}
-      </FixedSideContainer>
     </>
   );
 };

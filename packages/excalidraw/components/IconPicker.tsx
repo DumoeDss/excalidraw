@@ -1,14 +1,29 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useId, useMemo, useRef } from "react";
 
 import { isArrowKey, KEYS } from "@excalidraw/common";
 
 import { atom, useAtom } from "../editor-jotai";
-import { getLanguage, t } from "../i18n";
+import { t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
-import { useExcalidrawContainer } from "./App";
+import {
+  useExcalidrawContainer,
+  useResponsiveEditorShell,
+  useStylesPanelMode,
+} from "./App";
+import {
+  FloatingSurfaceFrame,
+  FloatingSurfaceHeading,
+  FloatingSurfaceItemVisual,
+  FloatingSurfaceScrollViewport,
+  FloatingSurfaceSection,
+  FloatingSurfaceShortcut,
+  resolveFloatingSurfacePolicy,
+  useFloatingSurfaceOwner,
+} from "./floatingSurface";
+import { resolvePropertyPlacement } from "./propertyPlacement";
 
 import "./IconPicker.scss";
 
@@ -80,7 +95,11 @@ function Picker<T>({
   onClose: () => void;
 }) {
   const { container } = useExcalidrawContainer();
+  const responsive = useResponsiveEditorShell();
+  const stylesPanelMode = useStylesPanelMode();
   const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
+  const selectedOptionRef = useRef<HTMLButtonElement>(null);
+  const direction = responsive.direction;
   const allSections = [...visibleSections, ...hiddenSections];
   const allOptions = flattenOptions(allSections);
   const navigationRows = getNavigationRows([
@@ -106,7 +125,7 @@ function Picker<T>({
       onChange(allOptions[nextIndex].value);
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
-      const isRTL = getLanguage().rtl;
+      const isRTL = direction === "rtl";
       const index = allOptions.findIndex((option) => option.value === value);
       if (index !== -1) {
         const length = allOptions.length;
@@ -194,40 +213,80 @@ function Picker<T>({
     }
   }, [value, hiddenSections, setShowMoreOptions]);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() =>
+      selectedOptionRef.current?.focus(),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  const placement = resolvePropertyPlacement({
+    formFactor: responsive.adapter,
+    isLandscape: responsive.orientation === "landscape",
+    direction,
+    surface:
+      responsive.presentation === "mobile"
+        ? "phone"
+        : stylesPanelMode === "full"
+        ? "full"
+        : "compact",
+    collisionBoundary: container,
+  });
+  const policy = resolveFloatingSurfacePolicy({
+    kind: "icon-picker",
+    intent:
+      responsive.adapter === "phone" ? "phone-up" : "property-canvas-inward",
+    formFactor: responsive.adapter,
+    direction,
+    pointerDensity: responsive.density === "touch" ? "coarse" : "fine",
+    collisionPadding: placement.collisionPadding,
+    safeArea: responsive.safeArea.physical,
+    availableBlockSize: container?.clientHeight ?? 0,
+  });
+
   const renderOptions = (options: readonly Option<T>[]) => {
     return (
-      <div className="picker-content">
+      <div
+        className="picker-content"
+        style={{
+          minInlineSize: 0,
+          inlineSize: "100%",
+          gridTemplateColumns: "repeat(4, minmax(2.75rem, 1fr))",
+        }}
+      >
         {options.map((option) => (
-          <button
-            type="button"
-            className={clsx("picker-option", {
-              active: value === option.value,
-            })}
-            onClick={() => {
-              onChange(option.value);
-            }}
-            title={
-              option.keyBinding
-                ? `${option.text} — ${option.keyBinding.toUpperCase()}`
-                : option.text
-            }
-            aria-label={option.text || "none"}
-            aria-keyshortcuts={option.keyBinding || undefined}
+          <FloatingSurfaceItemVisual
+            asChild
+            selected={value === option.value}
             key={option.text}
-            ref={(ref) => {
-              if (value === option.value) {
-                // Use a timeout here to render focus properly
-                setTimeout(() => {
-                  ref?.focus();
-                }, 0);
-              }
-            }}
           >
-            {option.icon}
-            {option.keyBinding && (
-              <span className="picker-keybinding">{option.keyBinding}</span>
-            )}
-          </button>
+            <button
+              type="button"
+              className={clsx("picker-option", {
+                active: value === option.value,
+              })}
+              data-selected={value === option.value || undefined}
+              onClick={() => {
+                onChange(option.value);
+              }}
+              title={
+                option.keyBinding
+                  ? `${option.text} — ${option.keyBinding.toUpperCase()}`
+                  : option.text
+              }
+              aria-label={option.text || "none"}
+              aria-keyshortcuts={option.keyBinding || undefined}
+              aria-pressed={value === option.value}
+              ref={value === option.value ? selectedOptionRef : undefined}
+            >
+              {option.icon}
+              {option.keyBinding && (
+                <FloatingSurfaceShortcut className="picker-keybinding">
+                  {option.keyBinding}
+                </FloatingSurfaceShortcut>
+              )}
+            </button>
+          </FloatingSurfaceItemVisual>
         ))}
       </div>
     );
@@ -240,46 +299,60 @@ function Picker<T>({
           {renderOptions(section.options)}
         </React.Fragment>
       ) : (
-        <div className="picker-section" key={`${section.name}-${index}`}>
-          <div className="picker-section-label">{section.name}</div>
+        <FloatingSurfaceSection
+          className="picker-section"
+          key={`${section.name}-${index}`}
+        >
+          <FloatingSurfaceHeading className="picker-section-label">
+            {section.name}
+          </FloatingSurfaceHeading>
           {renderOptions(section.options)}
-        </div>
+        </FloatingSurfaceSection>
       ),
     );
 
   return (
-    <Popover.Content
-      className="picker"
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
-      side={"bottom"}
-      align="start"
-      sideOffset={12}
-      alignOffset={12}
-      style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
-      onKeyDown={handleKeyDown}
-      collisionBoundary={container ?? undefined}
-    >
-      <div className="picker-sections">
-        {renderSections(visibleSections)}
+    <Popover.Portal container={container}>
+      <Popover.Content
+        className="floating-surface-positioner icon-picker-positioner"
+        aria-label={label}
+        side={placement.popoverSide}
+        align={placement.popoverAlign}
+        sideOffset={10}
+        collisionPadding={policy.collisionPadding}
+        style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
+        onKeyDown={handleKeyDown}
+        collisionBoundary={placement.collisionBoundary ?? undefined}
+      >
+        <FloatingSurfaceFrame
+          className="picker"
+          density={policy.density}
+          kind="icon-picker"
+          style={{
+            ["--floating-surface-available-block-size" as string]: `min(${policy.maxBlockSize}px, var(--radix-popover-content-available-height))`,
+          }}
+        >
+          <FloatingSurfaceScrollViewport className="picker-sections">
+            {renderSections(visibleSections)}
 
-        {hiddenSections.length > 0 && (
-          <Collapsible
-            label={t("labels.more_options")}
-            open={showMoreOptions}
-            openTrigger={() => {
-              setShowMoreOptions((value) => !value);
-            }}
-            className="picker-collapsible"
-          >
-            <div className="picker-sections">
-              {renderSections(hiddenSections)}
-            </div>
-          </Collapsible>
-        )}
-      </div>
-    </Popover.Content>
+            {hiddenSections.length > 0 && (
+              <Collapsible
+                label={t("labels.more_options")}
+                open={showMoreOptions}
+                openTrigger={() => {
+                  setShowMoreOptions((value) => !value);
+                }}
+                className="picker-collapsible"
+              >
+                <div className="picker-sections">
+                  {renderSections(hiddenSections)}
+                </div>
+              </Collapsible>
+            )}
+          </FloatingSurfaceScrollViewport>
+        </FloatingSurfaceFrame>
+      </Popover.Content>
+    </Popover.Portal>
   );
 }
 
@@ -297,6 +370,14 @@ export function IconPicker<T>({
   onChange: (value: T) => void;
 }) {
   const [isActive, setActive] = React.useState(false);
+  const { id: editorId } = useExcalidrawContainer();
+  const instanceId = useId();
+  useFloatingSurfaceOwner({
+    scope: `${editorId ?? "editor"}:picker`,
+    identity: `icon-picker:${instanceId}`,
+    open: isActive,
+    onOpenChange: setActive,
+  });
   const selectedOption = useMemo(
     () =>
       findOption(visibleSections, (option) => option.value === value) ??
@@ -310,7 +391,8 @@ export function IconPicker<T>({
         <Popover.Trigger
           type="button"
           aria-label={label}
-          onClick={() => setActive(!isActive)}
+          aria-haspopup="dialog"
+          aria-expanded={isActive}
           className={isActive ? "active" : ""}
         >
           {selectedOption?.icon}

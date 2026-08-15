@@ -1,0 +1,27 @@
+{
+  "pipeline": "small-feature",
+  "classification": "small-feature",
+  "tier": "A",
+  "repo": "excalidraw (fork)",
+  "branch": "feat/image-ref-results",
+  "portfolio": "excalidraw-canvas-integration (child 1 of 3)",
+  "autonomy": "no-gate-pause; LEAD commits at ship after review passes",
+  "stages": {
+    "propose": { "status": "done", "worker": { "role": "planner", "agentId": "a5a2c3576e1dd1a80" } },
+    "apply": { "status": "done", "worker": { "role": "implementer", "agentId": "a21ef82e148c5b6c0" } },
+    "verify": { "status": "done", "worker": { "role": "reviewer", "agentId": "a7b87162859332a0e" }, "verdict": "needs-fixes (0 blocker, 1 major, 2 minor, 1 trivial); all gates green" },
+    "review-loop": { "status": "done", "worker": { "role": "reviewer", "agentId": "a7b87162859332a0e" }, "verdict": "clean", "rounds": 1, "fixer": "a21ef82e148c5b6c0", "reReviewer": "a7b87162859332a0e" },
+    "ship": { "status": "done", "worker": { "role": "shipper" }, "disposition": "committed-fork-branch", "branch": "feat/image-ref-results", "commit": "3e0c2782" },
+    "archive": { "status": "done", "worker": { "role": "shipper" } }
+  },
+  "rounds": 1,
+  "openFindings": [],
+  "resolvedFindings": [
+    { "id": "M1", "severity": "Major", "status": "resolved", "round": 1 },
+    { "id": "m2", "severity": "Minor", "status": "resolved", "round": 1 }
+  ],
+  "acceptedKnown": [
+    { "id": "m1", "severity": "Minor", "summary": "mount + syncActionResult double-prime harmless (idempotent); document only" },
+    { "id": "t1", "severity": "Trivial", "summary": "orphaned toolBar.audioGenerator locale key; harmless" }
+  ]
+}

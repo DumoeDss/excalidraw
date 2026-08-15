@@ -2,9 +2,9 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  aria-labelledby="radix-:rc6:"
+  aria-labelledby="radix-:rl:"
   aria-orientation="vertical"
-  class="dropdown-menu main-menu"
+  class="floating-surface-positioner dropdown-menu-positioner"
   data-align="start"
   data-orientation="vertical"
   data-radix-menu-content=""
@@ -12,88 +12,93 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
   data-state="open"
   data-testid="dropdown-menu"
   dir="ltr"
-  id="radix-:rc7:"
   role="menu"
   style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
   tabindex="-1"
 >
   <div
-    class="Island dropdown-menu-container"
-    style="--padding: 2;"
+    class="floating-surface dropdown-menu main-menu"
+    data-floating-surface="true"
+    data-surface-density="compact"
+    data-surface-kind="main-menu"
+    data-surface-tone="default"
+    style="--floating-surface-available-block-size: min(0px, var(--radix-dropdown-menu-content-available-height));"
   >
-    <button
-      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
-      data-orientation="vertical"
-      data-radix-collection-item=""
-      role="menuitem"
-      tabindex="-1"
-    >
-      <div
-        class="dropdown-menu-item__text"
-      >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Click me
-        </span>
-      </div>
-    </button>
-    <a
-      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
-      data-orientation="vertical"
-      data-radix-collection-item=""
-      href="blog.excalidaw.com"
-      rel="noopener noopener"
-      role="menuitem"
-      tabindex="-1"
-      target="_blank"
-    >
-      <div
-        class="dropdown-menu-item__text"
-      >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
-        >
-          Excalidraw blog
-        </span>
-      </div>
-    </a>
     <div
-      class="dropdown-menu-item-base dropdown-menu-item-custom"
+      class="floating-surface__scroll-viewport dropdown-menu-container"
     >
       <button
-        style="height: 2rem;"
+        class="floating-surface__item radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
+        role="menuitem"
+        tabindex="-1"
       >
-        custom menu item
-      </button>
-    </div>
-    <button
-      aria-label="Help"
-      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
-      data-orientation="vertical"
-      data-radix-collection-item=""
-      data-testid="help-menu-item"
-      role="menuitem"
-      tabindex="-1"
-      title="Help"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+        <div
+          class="dropdown-menu-item__text"
         >
-          <g
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            Click me
+          </span>
+        </div>
+      </button>
+      <a
+        class="floating-surface__item radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
+        href="blog.excalidaw.com"
+        rel="noopener noopener"
+        role="menuitem"
+        tabindex="-1"
+        target="_blank"
+      >
+        <div
+          class="dropdown-menu-item__text"
+        >
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            Excalidraw blog
+          </span>
+        </div>
+      </a>
+      <div
+        class="floating-surface__item dropdown-menu-item-base dropdown-menu-item-custom"
+      >
+        <button
+          style="height: 2rem;"
+        >
+          custom menu item
+        </button>
+      </div>
+      <button
+        aria-label="Help"
+        class="floating-surface__item radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+        data-orientation="vertical"
+        data-radix-collection-item=""
+        data-testid="help-menu-item"
+        role="menuitem"
+        tabindex="-1"
+        title="Help"
+      >
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            height="20"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
             stroke-width="1.5"
+            viewBox="0 0 24 24"
+            width="20"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               d="M0 0h24v24H0z"
@@ -114,24 +119,24 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
             <path
               d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
             />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        <span
-          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
         >
-          Help
+          <span
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            Help
+          </span>
+        </div>
+        <span
+          class="floating-surface__shortcut dropdown-menu-item__shortcut"
+        >
+          ?
         </span>
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        ?
-      </div>
-    </button>
+      </button>
+    </div>
   </div>
 </div>
 `;
@@ -386,36 +391,34 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
           class=""
           fill="none"
           focusable="false"
-          role="img"
+          height="20"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.5"
           viewBox="0 0 24 24"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <g
-            stroke-width="1.5"
-          >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="9"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="17"
-              y2="17.01"
-            />
-            <path
-              d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
-            />
-          </g>
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+            stroke="none"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+          />
+          <line
+            x1="12"
+            x2="12"
+            y1="17"
+            y2="17.01"
+          />
+          <path
+            d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
+          />
         </svg>
       </div>
       <div

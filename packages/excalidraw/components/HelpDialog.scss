@@ -2,14 +2,10 @@
 
 .excalidraw {
   .HelpDialog {
-    .Modal__content {
-      max-width: 960px;
-    }
-
     h3 {
-      margin: 1.5rem 0;
-      font-weight: 700;
-      font-size: 1.125rem;
+      margin: 0;
+      font-weight: var(--ui-font-weight-semibold);
+      font-size: var(--ui-font-size-lg);
     }
 
     &__header {
@@ -60,24 +56,10 @@
 
     &__islands-container {
       display: grid;
+      min-width: 0;
       grid-column-gap: 1.5rem;
       grid-row-gap: 2rem;
-
-      @media screen and (min-width: 1024px) {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media screen and (min-width: 1024px) {
-      &__island--tools {
-        grid-area: 1 / 1 / 2 / 2;
-      }
-      &__island--view {
-        grid-area: 2 / 1 / 3 / 2;
-      }
-      &__island--editor {
-        grid-area: 1 / 2 / 3 / 3;
-      }
+      grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
     }
 
     &__island {
@@ -91,6 +73,7 @@
       &-content {
         border: 1px solid var(--dialog-border-color);
         border-radius: var(--border-radius-lg);
+        overflow: hidden;
       }
     }
 
@@ -102,9 +85,14 @@
       align-items: center;
       font-size: 0.875rem;
       column-gap: 0.5rem;
+      min-width: 0;
 
       &:last-child {
         border-bottom: none;
+      }
+
+      > :first-child {
+        min-width: 0;
       }
     }
 

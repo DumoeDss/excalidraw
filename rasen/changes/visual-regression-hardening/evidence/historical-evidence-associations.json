@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Hash and dimension associations that make every retained evidence PNG self-contained in the committed change; these entries are metadata only and do not replace role-owned inspection inventories.",
+  "entries": [
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-library__1440x900__dpr1__light__ltr__library-content__fixer__fixer-r1c-library-desktop-probe-1__evidence.png",
+      "sha256": "911217f93716869069d59b95ffa64a129dcceacb8e47f2cff05c3fed12083b4b",
+      "width": 1440,
+      "height": 900,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/fixer-004b-desktop-fine-direct.png",
+      "sha256": "ae1db8ebde417dbeefdeaea6da56a103a4086fe161a82a263eb127b3aa144701",
+      "width": 1440,
+      "height": 900,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/fixer-004b-phone-dark-direct.png",
+      "sha256": "e19c959aed92e1f0730ad12dbd5cc2fa752e9316a85c23079058c6ff9c7f3646",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-002-phone-11__evidence.png",
+      "sha256": "0200011638f24dfcc16b773b44f03a00900fe3af4abb04ac1fec80da7945e269",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-integration-r1-adjacency-6__evidence.png",
+      "sha256": "98241289b951e018dbf8e0ac85495cb1a7e0b8765d6f2065da986b00552d55ff",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-10__evidence.png",
+      "sha256": "2aa9f98a024aead51d24f78b3d0a003765b56c9f47d291a5193858b13155a44d",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-11__evidence.png",
+      "sha256": "2aa9f98a024aead51d24f78b3d0a003765b56c9f47d291a5193858b13155a44d",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-12__evidence.png",
+      "sha256": "2aa9f98a024aead51d24f78b3d0a003765b56c9f47d291a5193858b13155a44d",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-7__evidence.png",
+      "sha256": "34b445aea34be2b4831383b0a76164902f17c6e8f57c1397742f58e5407bb638",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-8__evidence.png",
+      "sha256": "2aa9f98a024aead51d24f78b3d0a003765b56c9f47d291a5193858b13155a44d",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-002-phone-9__evidence.png",
+      "sha256": "2aa9f98a024aead51d24f78b3d0a003765b56c9f47d291a5193858b13155a44d",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-integration-r1-adjacency-2__evidence.png",
+      "sha256": "53bfe0874f8bf294bf29c91a3ce0f18b2e00c1d76ce01e6080eeb55d9f1675f7",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-integration-r1-adjacency-3__evidence.png",
+      "sha256": "53bfe0874f8bf294bf29c91a3ce0f18b2e00c1d76ce01e6080eeb55d9f1675f7",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-integration-r1-adjacency-6__evidence.png",
+      "sha256": "1962e5fe35307bcf951e9005d944899e32d923990987c4cc2640c67257ac8354",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__toolbar-restored__fixer__fixer-integration-r1-phone-focus-1__evidence.png",
+      "sha256": "0d4a19f8a993e9a17d945ea4a059184c07690b4bbe556dff3539f9ec994d150b",
+      "width": 812,
+      "height": 375,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-004b-phone-light-1__evidence.png",
+      "sha256": "753e61478c64064509469384847593353657fc649bb58457e868c42f17e75e2e",
+      "width": 375,
+      "height": 812,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-004b-phone-light-3__evidence.png",
+      "sha256": "6aba6f4003b4b1d5635d3b7c059f1ec510fd43f6d2031cfb3d477ff3e8ca90f4",
+      "width": 375,
+      "height": 812,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-005-library-1__evidence.png",
+      "sha256": "28e9aee538890a66bf08741fcca8fdb9b2c5da5f49261ff6e1cbba232c06d813",
+      "width": 375,
+      "height": 812,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-library-probe-3__evidence.png",
+      "sha256": "1dbd77a412006732b08b1e89d3b271c7e160d07c3ed6ead54600be6b87626f86",
+      "width": 375,
+      "height": 812,
+      "classification": "historical-exploratory-not-final-acceptance"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-ai__1440x900__dpr1__dark__ltr__ai-dialog__fixer__fixer-integration-r1-adjacency-2__evidence.png",
+      "sha256": "3be7c3d93e79b0b487fb1db050d807bc9e3c0a534ea34a3fd9f2296e1b21b46f",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-dark-main-menu__1440x900__dpr1__dark__rtl__main-menu-open__fixer__fixer-integration-r1-full20-verify-22__evidence.png",
+      "sha256": "33b951e52713710ab97c0bacf708da72f4c1e7df95e3fcd7fd0e785f69b17e9f",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-dark-sidebar-docked__1440x900__dpr1__dark__rtl__sidebar-docked__fixer__fixer-integration-r1-full20-verify-22__evidence.png",
+      "sha256": "c4e5932219249080ce168b770adfbbcf00ea39b9a5732c20f19d22c23a154eb6",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-dark-sidebar-overlay__1440x900__dpr1__dark__rtl__sidebar-overlay__fixer__fixer-integration-r1-full20-verify-22__evidence.png",
+      "sha256": "a1a3599dab6b599fc65c8ec30f3747f087f74be092340f2ff3b8ef53dd5331a6",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-library__1440x900__dpr1__light__ltr__library-content__fixer__fixer-005-library-1__evidence.png",
+      "sha256": "3b008d125b35059d794895de85599e814ad39edd620fd4a180c445b71e02c52c",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/desktop-library__1440x900__dpr1__light__ltr__library-content__fixer__fixer-r1c-library-desktop-probe-2__evidence.png",
+      "sha256": "4efb746c60da26810cfde31f9f061d8f94a9e69a60010abfa925d96db11b5eb0",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/multi-editor-isolation__1440x900__dpr1__light__ltr__multi-editor__fixer__fixer-integration-r1-adjacency-7__evidence.png",
+      "sha256": "079ab5a5c9830504d364325c0f48955f173683f9c2b47ab360a79038e8a461f1",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-integration-r1-adjacency-2__evidence.png",
+      "sha256": "ca7158848ca1f7c6a1d6ccbd4c11f84252ce2d00fff63042cd6e097d195f6ccc",
+      "width": 812,
+      "height": 375,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-integration-r1-adjacency-3__evidence.png",
+      "sha256": "72063b22be8a691ebdac3623b293182d4e1c108d30ddc1932361424382c7a3d1",
+      "width": 812,
+      "height": 375,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__fixer__fixer-integration-r1-adjacency-7__evidence.png",
+      "sha256": "2286b11d7e465a61f415f2a63621bccf2ff80deea919ee0b3da2f83f7c184bae",
+      "width": 812,
+      "height": 375,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-integration-r1-adjacency-2__evidence.png",
+      "sha256": "f2c538c30cd40e739bbff9cf10d4fdf9c44a899063bb87c8259f027ab18aeb5d",
+      "width": 375,
+      "height": 812,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/phone-light-library__375x812__dpr1__light__ltr__phone-library__fixer__fixer-integration-r1-full20-verify-22__evidence.png",
+      "sha256": "cdcea0ecf57810672375b7523db78a4999a109d5df74f1812c54a80724ffd1b7",
+      "width": 375,
+      "height": 812,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/fixer/screenshots/tablet-dark-library__1024x768__dpr1__dark__rtl__tablet-library-sidebar__fixer__fixer-005-library-1__evidence.png",
+      "sha256": "11ce6607e55e5869363bad78f706e856f0b28f5a907d7a2145ec629f60b63fe9",
+      "width": 1024,
+      "height": 768,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/desktop-active-text__1440x900__dpr1__light__ltr__active-text-editing__implementer__implementer-matrix-2__evidence.png",
+      "sha256": "68e6555246450b02a32f640db9586e9c1c8eb2302b780b9be67d6bf994f57278",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/desktop-selected-rectangle__1440x900__dpr1__light__ltr__selected-rectangle__implementer__implementer-matrix-2__evidence.png",
+      "sha256": "dba50eb35ece5a0831b3aaa85d8754a20cef09008da868dc0d7cc9a02249bb6e",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__implementer-matrix-2__evidence.png",
+      "sha256": "d6127ef78b2fc47b28f01a4f50067665887549aa7fa1eed2e10218e478ae2d64",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__implementer-matrix-3__evidence.png",
+      "sha256": "d0432c755e831f2a4a27e4d63b84ab6cadf347ea6bae873dcd80b207ecac5d46",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__welcome-focus-probe-1__evidence.png",
+      "sha256": "d0432c755e831f2a4a27e4d63b84ab6cadf347ea6bae873dcd80b207ecac5d46",
+      "width": 1440,
+      "height": 900,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/narrow-loading__375x812__dpr1__light__ltr__loading__implementer__implementer-matrix-5__evidence.png",
+      "sha256": "5e8340badb9e288efe82a6f1629aa1b5f5731f33080907cc359ecffb8bf81539",
+      "width": 375,
+      "height": 812,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/narrow-loading__375x812__dpr1__light__ltr__loading__implementer__narrow-loading-probe-implementer-3__evidence.png",
+      "sha256": "49cccebe21f95481457952305e1b27d68230de95a1a7b5d0a2aeaa31fbf0b9d0",
+      "width": 375,
+      "height": 812,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__implementer__implementer-matrix-4__evidence.png",
+      "sha256": "baaa550db7ab5dafced0f81a9766b5212baed79ca636dfe998f14e9b1218db9f",
+      "width": 812,
+      "height": 375,
+      "classification": "retained-evidence-hash-association"
+    },
+    {
+      "file": "rasen/changes/visual-regression-hardening/evidence/implementer/screenshots/phone-dark-landscape__812x375__dpr1__dark__rtl__short-toolbar-overflow__implementer__implementer-matrix-5__evidence.png",
+      "sha256": "600aba1ecd1a4f101e6f694f40cd569f8c9b38797c57e0021ffced85a3a5d361",
+      "width": 812,
+      "height": 375,
+      "classification": "retained-evidence-hash-association"
+    }
+  ]
+}

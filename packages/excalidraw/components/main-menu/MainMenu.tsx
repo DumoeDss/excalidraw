@@ -8,13 +8,14 @@ import { t } from "../../i18n";
 import {
   useAppProps,
   useEditorInterface,
+  useExcalidrawContainer,
   useExcalidrawSetAppState,
 } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { HamburgerMenuIcon } from "../icons";
+import { HamburgerMenuIcon } from "../primitives/chrome-icons";
 
 import * as DefaultItems from "./DefaultItems";
 
@@ -36,30 +37,39 @@ const MainMenu = Object.assign(
       const appState = useUIAppState();
       const appProps = useAppProps();
       const setAppState = useExcalidrawSetAppState();
+      const { id: editorId } = useExcalidrawContainer();
 
       return (
         <MainMenuTunnel.In>
-          <DropdownMenu open={appState.openMenu === "canvas"}>
-            <DropdownMenu.Trigger
-              onToggle={() => {
+          <DropdownMenu
+            open={appState.openMenu === "canvas"}
+            ownerIdentity={`${editorId ?? "editor"}:main-menu`}
+            onOpenChange={(open) => {
+              if (open) {
                 setAppState({
-                  openMenu: appState.openMenu === "canvas" ? null : "canvas",
+                  openMenu: "canvas",
                   openPopup: null,
                   openDialog: null,
                 });
-              }}
+              } else {
+                setAppState({ openMenu: null });
+              }
+            }}
+          >
+            <DropdownMenu.Trigger
               data-testid="main-menu-trigger"
               className="main-menu-trigger"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
-              onClickOutside={() => setAppState({ openMenu: null })}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
               className="main-menu"
               align="start"
+              surfaceKind="main-menu"
+              placementIntent="main-menu-start-bottom"
             >
               {children}
               {editorInterface.formFactor === "phone" &&

@@ -20,9 +20,9 @@
   --zIndex-ui-main-menu: 110;
   --zIndex-ui-library: 120;
 
+  --zIndex-toast: 900;
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
-  --zIndex-toast: 999999;
 
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
@@ -59,7 +59,7 @@ body.excalidraw-cursor-resize * {
   font-family: var(--ui-font);
 
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   color: var(--text-primary-color);
   display: flex;
   top: 0;
@@ -171,14 +171,14 @@ body.excalidraw-cursor-resize * {
   .selected-shape-actions {
     display: flex;
     flex-direction: column;
-    row-gap: 0.75rem;
+    row-gap: var(--ui-space-4);
 
     h3,
     legend,
     .control-label {
       margin: 0;
       margin-bottom: 0.25rem;
-      font-size: 0.75rem;
+      font-size: var(--ui-font-size-xs);
       color: var(--text-primary-color);
       font-weight: 400;
       display: block;
@@ -201,8 +201,8 @@ body.excalidraw-cursor-resize * {
     .buttonList {
       flex-wrap: wrap;
       display: flex;
-      column-gap: 0.5rem;
-      row-gap: 0.5rem;
+      column-gap: var(--ui-space-3);
+      row-gap: var(--ui-space-3);
 
       label {
         font-size: 0.75rem;
@@ -288,26 +288,12 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-top-bar {
-    z-index: var(--zIndex-ui-top);
-    display: flex;
-    flex-direction: column;
-  }
-
   .App-welcome-screen {
     z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
-    position: absolute;
-    // account for margins
-    width: calc(100% - 28px);
-    max-width: 450px;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: var(--zIndex-ui-bottom);
     display: flex;
     flex-direction: column;
 
@@ -344,15 +330,9 @@ body.excalidraw-cursor-resize * {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-
-  .App-toolbar-content {
-    display: flex;
-    flex-direction: column;
-
     pointer-events: none;
 
-    & > * {
+    > * {
       pointer-events: var(--ui-pointerEvents);
     }
   }
@@ -377,37 +357,13 @@ body.excalidraw-cursor-resize * {
   .shapes-section {
     display: flex;
     justify-content: center;
-    pointer-events: none !important;
+    pointer-events: none;
 
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
+    & > *,
+    .Stack,
+    .App-toolbar-container {
+      pointer-events: none;
     }
-  }
-
-  .App-menu_top {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 1rem;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
-    }
-
-    @media (min-width: 1536px) {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 3rem;
-    }
-  }
-
-  .App-menu_top > .App-menu_top__left {
-    grid-column: 1;
-    justify-self: start;
-  }
-
-  .App-menu_top > .shapes-section {
-    grid-column: 2;
   }
 
   .selected-shape-actions-container {
@@ -416,41 +372,6 @@ body.excalidraw-cursor-resize * {
     &--compact {
       min-width: 48px;
     }
-  }
-
-  .App-menu_top > .layer-ui__wrapper__top-right {
-    grid-column: 3;
-    justify-self: end;
-  }
-
-  .App-menu_bottom {
-    position: absolute;
-    bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-    box-sizing: border-box;
-    padding: 0 1rem;
-
-    &--transition-left {
-      section {
-        width: 185px;
-      }
-    }
-
-    section {
-      display: flex;
-    }
-  }
-
-  .App-menu_bottom > *:first-child {
-    justify-self: flex-start;
-  }
-
-  .App-menu_bottom > *:last-child {
-    justify-self: flex-end;
   }
 
   .App-menu_left {
@@ -573,6 +494,23 @@ body.excalidraw-cursor-resize * {
 
     width: var(--lg-button-size);
     height: var(--lg-button-size);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    background: color-mix(in srgb, var(--ui-surface-panel) 98%, transparent);
+    box-shadow: var(--ui-shadow-2);
+
+    &:hover {
+      background: var(--ui-surface-hover);
+    }
+
+    &:active {
+      background: var(--ui-surface-selected);
+    }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--focus-highlight-color),
+        var(--ui-shadow-2);
+    }
 
     svg {
       width: var(--lg-icon-size);
@@ -849,8 +787,11 @@ body.excalidraw-cursor-resize * {
 }
 
 .ErrorSplash.excalidraw {
-  min-height: 100vh;
-  padding: 20px 0;
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-height: 100%;
+  padding: var(--ui-space-5);
   overflow: auto;
   display: flex;
   align-items: center;
@@ -858,14 +799,29 @@ body.excalidraw-cursor-resize * {
   user-select: text;
 
   .ErrorSplash-messageContainer {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    padding: 40px;
-    background-color: $color-red-1;
-    border: 3px solid $color-red-9;
+    inline-size: min(
+      calc(44rem + var(--ui-space-7) + var(--ui-space-7) + 2px),
+      100%
+    );
+    max-inline-size: 100%;
+    max-height: 100%;
+    padding: var(--ui-space-7);
+    border: 1px solid
+      color-mix(in srgb, var(--color-danger) 45%, var(--ui-border));
+    border-radius: var(--ui-radius-xl);
+    background: var(--ui-surface-panel);
+    box-shadow: var(--ui-shadow-4);
+    pointer-events: none;
+
+    > .app-content {
+      padding: 0;
+    }
   }
 
   .ErrorSplash-paragraph {

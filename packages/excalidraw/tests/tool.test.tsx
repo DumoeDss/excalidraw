@@ -260,10 +260,18 @@ describe("props.activeTool (forced tool)", () => {
       />,
     );
 
-    expect(queryToolButton("rectangle")!.disabled).toBe(false);
-    expect(queryToolButton("rectangle")!.getAttribute("aria-pressed")).toBe(
-      "true",
-    );
+    const shapesTrigger =
+      GlobalTestState.renderResult.container.querySelector<HTMLButtonElement>(
+        '[data-testid="toolbar-shapes-group"]',
+      )!;
+    expect(shapesTrigger.disabled).toBe(false);
+    expect(shapesTrigger).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(shapesTrigger);
+    const rectangleItem = document.querySelector<HTMLButtonElement>(
+      '[data-testid="toolbar-rectangle"]',
+    )!;
+    expect(rectangleItem.disabled).toBe(false);
+    expect(rectangleItem).toHaveAttribute("aria-checked", "true");
     expect(queryToolButton("freedraw")!.disabled).toBe(true);
     expect(queryToolButton("eraser")!.disabled).toBe(true);
     expect(queryToolButton("lock")).toBe(null);

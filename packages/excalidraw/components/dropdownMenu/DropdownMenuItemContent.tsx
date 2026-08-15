@@ -1,6 +1,10 @@
 import { useEditorInterface } from "../App";
 
 import { Ellipsify } from "../Ellipsify";
+import {
+  FloatingSurfaceBadge,
+  FloatingSurfaceShortcut,
+} from "../floatingSurface";
 
 import type { JSX } from "react";
 
@@ -24,9 +28,15 @@ const MenuItemContent = ({
       <div style={textStyle} className="dropdown-menu-item__text">
         <Ellipsify>{children}</Ellipsify>
       </div>
-      {badge && <div className="dropdown-menu-item__badge">{badge}</div>}
+      {badge && (
+        <FloatingSurfaceBadge className="dropdown-menu-item__badge">
+          {badge}
+        </FloatingSurfaceBadge>
+      )}
       {shortcut && editorInterface.formFactor !== "phone" && (
-        <div className="dropdown-menu-item__shortcut">{shortcut}</div>
+        <FloatingSurfaceShortcut className="dropdown-menu-item__shortcut">
+          {shortcut}
+        </FloatingSurfaceShortcut>
       )}
     </>
   );

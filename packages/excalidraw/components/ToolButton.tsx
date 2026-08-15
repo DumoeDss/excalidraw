@@ -20,6 +20,9 @@ type ToolButtonBaseProps = {
   icon?: React.ReactNode;
   "aria-label": string;
   "aria-keyshortcuts"?: string;
+  "aria-haspopup"?: React.AriaAttributes["aria-haspopup"];
+  "aria-expanded"?: boolean;
+  "aria-controls"?: string;
   "data-testid"?: string;
   label?: string;
   title?: string;
@@ -35,6 +38,8 @@ type ToolButtonBaseProps = {
   className?: string;
   style?: CSSProperties;
   isLoading?: boolean;
+  onKeyDown?: React.KeyboardEventHandler<HTMLButtonElement>;
+  onPointerDown?: (data: { pointerType: PointerType }) => void;
 };
 
 type ToolButtonProps =
@@ -57,7 +62,6 @@ type ToolButtonProps =
       type: "radio";
       checked: boolean;
       onChange?(data: { pointerType: PointerType | null }): void;
-      onPointerDown?(data: { pointerType: PointerType }): void;
     });
 
 export const ToolButton = React.forwardRef(
@@ -137,8 +141,17 @@ export const ToolButton = React.forwardRef(
           hidden={props.hidden}
           title={props.title}
           aria-label={props["aria-label"]}
+          aria-keyshortcuts={props["aria-keyshortcuts"]}
+          aria-haspopup={props["aria-haspopup"]}
+          aria-expanded={props["aria-expanded"]}
+          aria-controls={props["aria-controls"]}
+          aria-pressed={props.selected ? true : undefined}
           type={type}
           onClick={onClick}
+          onKeyDown={props.onKeyDown}
+          onPointerDown={(event) => {
+            props.onPointerDown?.({ pointerType: event.pointerType });
+          }}
           ref={innerRef}
           disabled={isLoading || props.isLoading || !!props.disabled}
         >

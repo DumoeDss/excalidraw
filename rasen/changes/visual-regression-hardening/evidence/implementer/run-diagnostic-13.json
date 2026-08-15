@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "mode": "verify",
+  "role": "implementer",
+  "runId": "diagnostic-13",
+  "beforeBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "afterBaselineHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scenarios": [
+    {
+      "scenarioId": "desktop-welcome",
+      "status": "fail",
+      "expectedPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\baselines\\desktop-welcome__1440x900__dpr1__light__ltr__welcome.png",
+      "currentPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\diagnostic-13\\desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__diagnostic-13__current.png",
+      "diffPath": null,
+      "reportPath": "E:\\AI\\ChatAI\\Agents\\VibeCodingProjects\\ace_agent\\excalidraw\\.claude\\worktrees\\editor-ui-redesign\\scripts\\visual-regression\\results\\implementer\\diagnostic-13\\desktop-welcome__1440x900__dpr1__light__ltr__welcome__implementer__diagnostic-13__result.json",
+      "expectedHash": null,
+      "currentHash": "e375a93829ff0f8813b09cce01ce2fb46e014ad497b24c23860c2ed4f6cf558a",
+      "diffHash": null,
+      "mismatchCount": null,
+      "mismatchRatio": null,
+      "changedBounds": null,
+      "maskCount": 0,
+      "maskRatio": 0,
+      "semanticFailures": ["Canonical baseline is missing", "Visible checker overlays: 84"],
+      "cleanupFailures": [],
+      "performance": {
+        "warmup": null,
+        "samples": [],
+        "medians": {},
+        "failures": []
+      },
+      "environment": {
+        "browser": "Chrome",
+        "platform": "win32-x64-10.0.26200",
+        "node": "v24.15.0",
+        "chromePort": 9222,
+        "fontsReady": true,
+        "debuggerRestored": true,
+        "targetActivated": true,
+        "actions": 1,
+        "semanticAssertions": 6,
+        "blankCanvasRouting": true,
+        "checkerOverlays": 84,
+        "consoleErrors": 0
+      }
+    }
+  ],
+  "disposableTargets": ["D8CD22660CE9E8415DAB62AAE3F8CD5B"],
+  "targetsClean": true,
+  "proxyHealthy": true
+}

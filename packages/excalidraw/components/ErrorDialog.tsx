@@ -4,6 +4,7 @@ import { t } from "../i18n";
 
 import { useExcalidrawContainer } from "./App";
 import { Dialog } from "./Dialog";
+import { AppContentState } from "./appContent/AppContent";
 
 export const ErrorDialog = ({
   children,
@@ -33,7 +34,11 @@ export const ErrorDialog = ({
           onCloseRequest={handleClose}
           title={t("errorDialog.title")}
         >
-          <div style={{ whiteSpace: "pre-wrap" }}>{children}</div>
+          <AppContentState
+            kind="error"
+            title={t("errorDialog.title")}
+            message={<div style={{ whiteSpace: "pre-wrap" }}>{children}</div>}
+          />
         </Dialog>
       )}
     </>

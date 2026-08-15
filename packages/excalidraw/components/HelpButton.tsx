@@ -1,6 +1,6 @@
 import { t } from "../i18n";
 
-import { HelpIcon } from "./icons";
+import { HelpIcon } from "./primitives/chrome-icons";
 import { Tooltip } from "./Tooltip";
 
 type HelpButtonProps = {

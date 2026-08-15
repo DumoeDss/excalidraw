@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "desktop-welcome",
+  "filename": "desktop-welcome__1440x900__dpr1__light__ltr__welcome.png",
+  "width": 1440,
+  "height": 900,
+  "deviceScaleFactor": 1,
+  "crop": {
+    "selector": ".excalidraw",
+    "target": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "editor": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "browser": "Chrome",
+  "platform": "win32-x64-10.0.26200",
+  "fontVersion": "repository-fonts-v1",
+  "fixtureVersion": "visual-fixtures-v1",
+  "comparison": {
+    "channelTolerance": 4,
+    "antialiasTolerance": 12,
+    "maxMismatchRatio": 0.0005,
+    "maxMaskRatio": 0
+  },
+  "imageHash": "e0eccd087fe6395c91c83806dba17166ff698c1dca4098a71c859d878bb79d9a",
+  "budgetSource": null,
+  "approval": "intentional-change",
+  "approvedBy": "fixer",
+  "inspectedAt": "2026-08-14T14:08:47.995Z",
+  "sourceFingerprint": "70737b62e062eb3269a9d266c079576b79147caf9ba3275a13230f20f35509ad"
+}

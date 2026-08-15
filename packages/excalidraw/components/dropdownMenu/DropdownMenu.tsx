@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useId } from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { CLASSES } from "@excalidraw/common";
+
+import { getLanguage, useI18n } from "../../i18n";
+import { useExcalidrawContainer } from "../App";
+import { useFloatingSurfaceOwner } from "../floatingSurface";
 
 import DropdownMenuContent from "./DropdownMenuContent";
 import DropdownMenuGroup from "./DropdownMenuGroup";
@@ -23,24 +27,51 @@ import "./DropdownMenu.scss";
 const DropdownMenu = ({
   children,
   open,
+  onOpenChange = () => {},
+  ownerIdentity,
 }: {
   children?: React.ReactNode;
   open: boolean;
+  onOpenChange?: (open: boolean) => void;
+  ownerIdentity?: string;
 }) => {
+  const { container } = useExcalidrawContainer();
+  useI18n();
+  const generatedOwnerIdentity = useId();
+  const direction =
+    container?.getAttribute("dir") === "rtl" ||
+    container?.closest<HTMLElement>("[dir=rtl]") ||
+    document.documentElement.getAttribute("dir") === "rtl" ||
+    getLanguage().rtl
+      ? "rtl"
+      : "ltr";
+  useFloatingSurfaceOwner({
+    scope: "dropdown-menu",
+    identity: ownerIdentity ?? generatedOwnerIdentity,
+    open,
+    onOpenChange,
+  });
   const MenuTriggerComp = getMenuTriggerComponent(children);
   const MenuContentComp = getMenuContentComponent(children);
-  const MenuContentWithState =
-    MenuContentComp && React.isValidElement(MenuContentComp)
+  const MenuTriggerWithOpenChange =
+    MenuTriggerComp && React.isValidElement(MenuTriggerComp)
       ? React.cloneElement(
-          MenuContentComp as React.ReactElement<
-            React.ComponentProps<typeof DropdownMenuContent>
+          MenuTriggerComp as React.ReactElement<
+            React.ComponentProps<typeof DropdownMenuTrigger>
           >,
-          { open },
+          {
+            onToggle: () => onOpenChange(!open),
+          },
         )
-      : MenuContentComp;
+      : MenuTriggerComp;
 
   return (
-    <DropdownMenuPrimitive.Root open={open} modal={false}>
+    <DropdownMenuPrimitive.Root
+      open={open}
+      onOpenChange={onOpenChange}
+      modal={false}
+      dir={direction}
+    >
       <div
         className={CLASSES.DROPDOWN_MENU_EVENT_WRAPPER}
         style={{
@@ -48,8 +79,8 @@ const DropdownMenu = ({
           display: "contents",
         }}
       >
-        {MenuTriggerComp}
-        {MenuContentWithState}
+        {MenuTriggerWithOpenChange}
+        {MenuContentComp}
       </div>
     </DropdownMenuPrimitive.Root>
   );

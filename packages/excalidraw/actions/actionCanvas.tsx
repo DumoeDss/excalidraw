@@ -27,8 +27,8 @@ import {
   zoomAreaIcon,
   ZoomInIcon,
   ZoomOutIcon,
-  ZoomResetIcon,
 } from "../components/icons";
+import { ZoomResetIcon } from "../components/primitives/chrome-icons";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";

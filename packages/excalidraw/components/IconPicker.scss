@@ -1,23 +1,26 @@
-@use "sass:color";
 @use "../css/variables.module" as *;
 
 .excalidraw {
   .picker {
-    padding: 0.5rem;
-    background: var(--popup-bg-color);
-    border: 0 solid color.adjust(#fff, $alpha: -0.75);
-    box-shadow: var(--shadow-island-stronger);
-    border-radius: 4px;
-    :root[dir="rtl"] & {
-      padding: 0.4rem;
-    }
+    inline-size: max-content;
+    max-inline-size: min(
+      20rem,
+      var(
+        --radix-popover-content-available-width,
+        calc(100% - var(--ui-space-5))
+      )
+    );
   }
 
-  .picker-sections,
-  .picker-section {
+  .picker > .floating-surface__scroll-viewport {
+    min-inline-size: 0;
+    inline-size: 100%;
+  }
+
+  .picker-collapsible .picker-sections {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--ui-space-2);
   }
 
   .picker-container button,
@@ -26,26 +29,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    &:focus-visible {
-      outline: transparent;
-      background-color: var(--button-gray-2);
-      & svg {
-        opacity: 1;
-      }
-    }
-
-    &:hover {
-      background-color: var(--button-gray-2);
-    }
-
-    &:active {
-      background-color: var(--button-gray-3);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-    }
 
     svg {
       margin: 0;
@@ -56,24 +39,18 @@
   }
 
   .picker button {
+    min-inline-size: 0;
     padding: 0.25rem 0.28rem 0.35rem 0.25rem;
   }
 
   .picker-content {
     display: grid;
-    grid-template-columns: repeat(4, auto);
-    grid-gap: 0.5rem;
-    border-radius: 4px;
+    gap: var(--ui-space-2);
   }
 
   .picker-collapsible {
     font-size: 0.75rem;
     padding: 0;
-    color: var(--text-primary-color);
-  }
-
-  .picker-section-label {
-    font-size: 0.75rem;
     color: var(--text-primary-color);
   }
 

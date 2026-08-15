@@ -1,0 +1,91 @@
+.excalidraw {
+  .canvas-ui-layout {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+
+    &--desktop {
+      z-index: var(--zIndex-layerUI);
+    }
+
+    &--docked-sidebar {
+      width: calc(100% - var(--right-sidebar-width));
+    }
+
+    &__row {
+      position: absolute;
+      left: calc(var(--editor-container-padding) + var(--sal));
+      right: calc(var(--editor-container-padding) + var(--sar));
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--ui-space-5);
+      align-items: start;
+      min-width: 0;
+      pointer-events: none;
+
+      &--top {
+        top: calc(var(--editor-container-padding) + var(--sat));
+        bottom: calc(var(--editor-container-padding) + var(--sab) + 4.5rem);
+
+        > .canvas-ui-layout__zone,
+        > .canvas-ui-layout__zone > .canvas-ui-layout__content {
+          block-size: 100%;
+          max-block-size: 100%;
+        }
+      }
+
+      &--bottom {
+        bottom: calc(var(--editor-container-padding) + var(--sab));
+      }
+    }
+
+    &__zone {
+      min-width: 0;
+      max-width: 100%;
+      pointer-events: none;
+
+      &--top-start,
+      &--bottom-start {
+        justify-self: start;
+      }
+
+      &--top-center,
+      &--bottom-center {
+        justify-self: center;
+      }
+
+      &--top-end,
+      &--bottom-end {
+        justify-self: end;
+      }
+    }
+
+    &__content {
+      min-width: 0;
+      max-width: 100%;
+      pointer-events: none;
+    }
+
+    &--phone {
+      .canvas-ui-layout__row--top {
+        z-index: var(--zIndex-ui-top);
+      }
+
+      .canvas-ui-layout__row--bottom {
+        z-index: var(--zIndex-ui-bottom);
+        left: var(--sal);
+        right: var(--sar);
+        grid-template-columns:
+          minmax(0, 1fr)
+          minmax(0, min(450px, calc(100% - (var(--ui-space-4) * 2))))
+          minmax(0, 1fr);
+        column-gap: var(--ui-space-4);
+      }
+
+      .canvas-ui-layout__zone--bottom-center {
+        width: 100%;
+      }
+    }
+  }
+}

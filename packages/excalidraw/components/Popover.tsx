@@ -3,13 +3,16 @@ import { unstable_batchedUpdates } from "react-dom";
 
 import { KEYS, queryFocusableElements } from "@excalidraw/common";
 
-import { clamp } from "@excalidraw/math";
-
 import clsx from "clsx";
+
+import { EMPTY_SAFE_AREA, fitFloatingSurfacePoint } from "./floatingSurface";
 
 import "./Popover.scss";
 
-const POPOVER_CONTAINER_GAP = 10;
+import type {
+  FloatingSurfaceDirection,
+  PhysicalSafeAreaInsets,
+} from "./floatingSurface";
 
 type Props = {
   top?: number;
@@ -20,6 +23,11 @@ type Props = {
   viewportWidth?: number;
   viewportHeight?: number;
   className?: string;
+  autoFocus?: boolean;
+  trapTab?: boolean;
+  collisionPadding?: number;
+  direction?: FloatingSurfaceDirection;
+  safeArea?: PhysicalSafeAreaInsets;
 };
 
 export const Popover = ({
@@ -31,6 +39,11 @@ export const Popover = ({
   viewportWidth = window.innerWidth,
   viewportHeight = window.innerHeight,
   className,
+  autoFocus = true,
+  trapTab = true,
+  collisionPadding = 10,
+  direction = "ltr",
+  safeArea = EMPTY_SAFE_AREA,
 }: Props) => {
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -45,12 +58,12 @@ export const Popover = ({
     // within the popover, which should take precedence. Fixes cases
     // like color picker listening to keydown events on containers nested
     // in the popover.
-    if (!container.contains(document.activeElement)) {
+    if (autoFocus && !container.contains(document.activeElement)) {
       container.focus();
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === KEYS.TAB) {
+      if (trapTab && event.key === KEYS.TAB) {
         const focusableElements = queryFocusableElements(container);
         const { activeElement } = document;
         const currentIndex = focusableElements.findIndex(
@@ -83,57 +96,54 @@ export const Popover = ({
     container.addEventListener("keydown", handleKeyDown);
 
     return () => container.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const lastInitializedPosRef = useRef<{ top: number; left: number } | null>(
-    null,
-  );
+  }, [autoFocus, trapTab]);
 
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
     if (fitInViewport && popoverRef.current && top != null && left != null) {
       const element = popoverRef.current;
-      const { width, height } = element.getBoundingClientRect();
+      const fit = () => {
+        const { width, height } = element.getBoundingClientRect();
+        const fitted = fitFloatingSurfacePoint({
+          anchor: { x: left, y: top },
+          measuredSize: { width, height },
+          editorSize: { width: viewportWidth, height: viewportHeight },
+          direction,
+          collisionPadding,
+          safeArea,
+        });
+        element.style.left = `${fitted.left}px`;
+        element.style.top = `${fitted.top}px`;
+        element.style.maxWidth = `${fitted.maxInlineSize}px`;
+        element.style.maxHeight = `${fitted.maxBlockSize}px`;
+        element.style.setProperty(
+          "--floating-surface-available-block-size",
+          `${fitted.maxBlockSize}px`,
+        );
+      };
 
-      // hack for StrictMode so this effect only runs once for
-      // the same top/left position, otherwise
-      // we'd potentically reposition twice (once for viewport overflow)
-      // and once for top/left position afterwards
-      if (
-        lastInitializedPosRef.current?.top === top &&
-        lastInitializedPosRef.current?.left === left
-      ) {
+      fit();
+      if (typeof ResizeObserver === "undefined") {
         return;
       }
-      lastInitializedPosRef.current = { top, left };
-
-      const maxWidth = Math.max(0, viewportWidth - POPOVER_CONTAINER_GAP * 2);
-      if (width >= maxWidth) {
-        element.style.width = `${maxWidth}px`;
-        element.style.left = `${POPOVER_CONTAINER_GAP}px`;
-        element.style.overflowX = "scroll";
-      } else {
-        element.style.left = `${clamp(
-          left,
-          POPOVER_CONTAINER_GAP,
-          viewportWidth - POPOVER_CONTAINER_GAP - width,
-        )}px`;
+      const observer = new ResizeObserver(fit);
+      observer.observe(element);
+      const editor = element.parentElement;
+      if (editor) {
+        observer.observe(editor);
       }
-
-      const maxHeight = Math.max(0, viewportHeight - POPOVER_CONTAINER_GAP * 2);
-      if (height >= maxHeight) {
-        element.style.height = `${maxHeight}px`;
-        element.style.top = `${POPOVER_CONTAINER_GAP}px`;
-        element.style.overflowY = "scroll";
-      } else {
-        element.style.top = `${clamp(
-          top,
-          POPOVER_CONTAINER_GAP,
-          viewportHeight - POPOVER_CONTAINER_GAP - height,
-        )}px`;
-      }
+      return () => observer.disconnect();
     }
-  }, [top, left, fitInViewport, viewportWidth, viewportHeight]);
+  }, [
+    collisionPadding,
+    direction,
+    fitInViewport,
+    left,
+    safeArea,
+    top,
+    viewportHeight,
+    viewportWidth,
+  ]);
 
   useEffect(() => {
     if (onCloseRequest) {

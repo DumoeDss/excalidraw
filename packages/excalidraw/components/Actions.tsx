@@ -1,8 +1,15 @@
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Popover } from "radix-ui";
 
-import { CLASSES, KEYS, capitalizeString } from "@excalidraw/common";
+import { CLASSES } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -23,47 +30,52 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
-
-import { SHAPES } from "./shapes";
-
 import "./Actions.scss";
 
 import { useExcalidrawContainer, useStylesPanelMode } from "./App";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { ToolGroupDropdown } from "./ToolGroupDropdown";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { AdaptiveEditorToolbar } from "./AdaptiveEditorToolbar";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
-  EmbedIcon,
-  VideoIcon,
-  AudioIcon,
-  ImageIcon,
-  extraToolsIcon,
-  frameToolIcon,
-  mermaidLogoIcon,
-  laserPointerToolIcon,
-  MagicIcon,
-  LassoIcon,
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
   TextSizeIcon,
   adjustmentsIcon,
-  DotsHorizontalIcon,
-  SelectionIcon,
   pencilIcon,
 } from "./icons";
+import { DotsHorizontalIcon } from "./primitives/chrome-icons";
 
 import { Island } from "./Island";
 
-import { getShapeActionPredicates } from "./shapeActionPredicates";
+import {
+  getPropertyModelForAdapter,
+  projectPropertySections,
+  resolvePropertyModel,
+} from "./propertyModel";
+import {
+  claimPropertyPopupOwnership,
+  createPropertyPopupOwnerClaim,
+  getPropertyPopupTransition,
+  isCurrentPropertyPopupOwner,
+  isOwnedPropertyPopup,
+  releasePropertyPopupOwnership,
+  type PropertyPopupIdentity,
+} from "./propertyPopup";
+import {
+  phonePropertyPlanSignature,
+  planPhonePropertyLayout,
+  type PhonePropertyPlan,
+} from "./phonePropertyLayout";
+import { UiButton } from "./primitives/UiButton";
 
-import type { ShapeActionPredicates } from "./shapeActionPredicates";
-import type { ToolGroupOption } from "./ToolGroupDropdown";
+import type {
+  PropertyDescriptor,
+  PropertyIdentity,
+  ResolvedPropertyModel,
+  ResolvedPropertySection,
+} from "./propertyModel";
 import type {
   AppClassProperties,
   AppProps,
@@ -71,7 +83,6 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
-import type { JSX } from "react";
 
 // re-exported for consumers outside the styles panel (e.g. CommandPalette)
 export {
@@ -85,88 +96,269 @@ const PROPERTIES_CLASSES = clsx([
   "properties-content",
 ]);
 
-/** lookup of a toolbar tool's static config (icon, keybindings) by value */
-const SHAPE_BY_VALUE = SHAPES.reduce((acc, shape) => {
-  acc[shape.value] = shape;
-  return acc;
-}, {} as Record<string, typeof SHAPES[number]>);
+const PROPERTY_SECTION_LABELS: Record<
+  ResolvedPropertySection["id"],
+  () => string
+> = {
+  appearance: () => `${t("labels.stroke")} / ${t("labels.background")}`,
+  stroke: () => t("labels.stroke"),
+  text: () => t("element.text"),
+  arrangement: () => t("labels.layers"),
+  selection: () => t("labels.actions"),
+};
 
-/** a media icon decorated with a sparkle to denote an AI generator node */
-const GeneratorToolIcon = ({ base }: { base: JSX.Element }) => (
-  <span className="generator-tool-icon">
-    {base}
-    <span className="generator-tool-icon__sparkle">{MagicIcon}</span>
-  </span>
-);
-
-/**
- * The "arrange" (z-order) fieldset, identical across every styles-panel layout.
- */
-const LayersFieldset = ({
-  renderAction,
-}: {
-  renderAction: ActionManager["renderAction"];
-}) => (
-  <fieldset>
-    <legend>{t("labels.layers")}</legend>
-    <div className="buttonList">
-      {renderAction("sendToBack")}
-      {renderAction("sendBackward")}
-      {renderAction("bringForward")}
-      {renderAction("bringToFront")}
-    </div>
-  </fieldset>
-);
-
-/**
- * The align + distribute fieldset, identical across every styles-panel layout.
- * Button order is mirrored for RTL so the leftmost button always aligns left.
- */
-const AlignFieldset = ({
-  renderAction,
-  showDistribute,
-}: {
-  renderAction: ActionManager["renderAction"];
-  showDistribute: boolean;
-}) => {
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
-
+export const renderPropertyDescriptor = (
+  descriptor: PropertyDescriptor,
+  renderAction: ActionManager["renderAction"],
+) => {
+  const selected = descriptor.selected === true;
+  const disabled = descriptor.disabled === true;
   return (
-    <fieldset>
-      <legend>{t("labels.align")}</legend>
-      <div className="buttonList">
-        {isRTL ? (
-          <>
-            {renderAction("alignRight")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignLeft")}
-          </>
-        ) : (
-          <>
-            {renderAction("alignLeft")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignRight")}
-          </>
-        )}
-        {showDistribute && renderAction("distributeHorizontally")}
-        {/* breaks the row ˇˇ */}
-        <div style={{ flexBasis: "100%", height: 0 }} />
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: ".5rem",
-            marginTop: "-0.5rem",
-          }}
-        >
-          {renderAction("alignTop")}
-          {renderAction("alignVerticallyCentered")}
-          {renderAction("alignBottom")}
-          {showDistribute && renderAction("distributeVertically")}
-        </div>
-      </div>
-    </fieldset>
+    <div
+      className={clsx("property-control", {
+        "property-control--complex":
+          descriptor.capabilities.includes("complex"),
+        "property-control--destructive":
+          descriptor.capabilities.includes("destructive"),
+        "property-control--selected": selected,
+        "property-control--disabled": disabled,
+      })}
+      data-property-id={descriptor.id}
+      data-property-section={descriptor.section}
+      data-property-selected={String(descriptor.selected)}
+      data-property-disabled={String(descriptor.disabled)}
+      aria-current={selected ? "true" : undefined}
+      aria-disabled={
+        descriptor.disabled === "action" ? undefined : descriptor.disabled
+      }
+      inert={disabled || undefined}
+      key={descriptor.id}
+    >
+      {renderAction(descriptor.action, descriptor.renderOptions)}
+    </div>
   );
+};
+
+const descriptorsById = (
+  model: ResolvedPropertyModel,
+  ids: readonly PropertyIdentity[],
+) =>
+  ids.flatMap((id) => {
+    const descriptor = model.descriptors.find((item) => item.id === id);
+    return descriptor ? [descriptor] : [];
+  });
+
+export const usePropertyPopupOwner = ({
+  appState,
+  setAppState,
+  eligible,
+  ownerKey,
+}: {
+  appState: UIAppState;
+  setAppState: React.Component<any, AppState>["setState"];
+  eligible: readonly PropertyPopupIdentity[];
+  ownerKey: string;
+}) => {
+  const currentPopupRef = useRef(appState.openPopup);
+  const eligibleRef = useRef(new Set(eligible));
+  const generationRef = useRef(0);
+  const ownerKeyRef = useRef(ownerKey);
+  const claimRef = useRef(createPropertyPopupOwnerClaim());
+  currentPopupRef.current = appState.openPopup;
+  eligibleRef.current = new Set(eligible);
+
+  const change = useCallback(
+    (identity: PropertyPopupIdentity, open: boolean) => {
+      if (open) {
+        claimPropertyPopupOwnership(identity, claimRef.current);
+      }
+      setAppState((state) => ({
+        openPopup: getPropertyPopupTransition(state.openPopup, identity, open),
+      }));
+    },
+    [setAppState],
+  );
+
+  const eligibleSignature = eligible.join("|");
+  useEffect(() => {
+    const generation = ++generationRef.current;
+    const claim = createPropertyPopupOwnerClaim();
+    claimRef.current = claim;
+    const claimedIdentities = [...eligibleRef.current];
+    claimedIdentities.forEach((identity) =>
+      claimPropertyPopupOwnership(identity, claim),
+    );
+    const current = currentPopupRef.current;
+    const ownerChanged = ownerKeyRef.current !== ownerKey;
+    ownerKeyRef.current = ownerKey;
+    if (
+      isOwnedPropertyPopup(current) &&
+      (ownerChanged || !eligibleRef.current.has(current))
+    ) {
+      change(current, false);
+    }
+
+    return () => {
+      const owned = currentPopupRef.current;
+      queueMicrotask(() => {
+        // The current generation intentionally distinguishes a superseding
+        // effect from the final owner unmount.
+        if (
+          generationRef.current === generation && // eslint-disable-line react-hooks/exhaustive-deps
+          isOwnedPropertyPopup(owned) &&
+          isCurrentPropertyPopupOwner(owned, claim)
+        ) {
+          setAppState((state) =>
+            state.openPopup === owned ? { openPopup: null } : null,
+          );
+        }
+        claimedIdentities.forEach((identity) =>
+          releasePropertyPopupOwnership(identity, claim),
+        );
+      });
+    };
+  }, [change, eligibleSignature, ownerKey, setAppState]);
+
+  return {
+    isOpen: (identity: PropertyPopupIdentity) =>
+      appState.openPopup === identity,
+    onOpenChange: (identity: PropertyPopupIdentity) => (open: boolean) =>
+      change(identity, open),
+  };
+};
+
+type PhonePropertyUnit = Readonly<{
+  id: string;
+  required?: boolean;
+}>;
+
+const fallbackPhonePropertyPlan = (
+  units: readonly PhonePropertyUnit[],
+): PhonePropertyPlan =>
+  planPhonePropertyLayout({
+    candidates: units.map((unit) => ({ ...unit, width: 0 })),
+    availableWidth: 0,
+    gap: 0,
+    paddingInline: 0,
+  });
+
+export const usePhonePropertyLayout = (units: readonly PhonePropertyUnit[]) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const measurementRef = useRef<HTMLDivElement>(null);
+  const unitsRef = useRef(units);
+  unitsRef.current = units;
+  const unitSignature = units.map((unit) => unit.id).join("|");
+  const fallback = useMemo(
+    () => fallbackPhonePropertyPlan(units),
+    // The semantic unit signature is the invalidation boundary.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unitSignature],
+  );
+  const [plan, setPlan] = useState<PhonePropertyPlan>(fallback);
+  const planSignatureRef = useRef(phonePropertyPlanSignature(fallback));
+
+  useLayoutEffect(() => {
+    let mounted = true;
+    let frame: number | null = null;
+    let fallbackTimer: number | null = null;
+    let measurementSignature: string | null = null;
+    const container = containerRef.current;
+    const rail = measurementRef.current;
+
+    planSignatureRef.current = phonePropertyPlanSignature(fallback);
+    setPlan(fallback);
+    if (!container || !rail || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const read = () => {
+      frame = null;
+      if (fallbackTimer != null) {
+        window.clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+      if (!mounted) {
+        return;
+      }
+      const containerStyle = getComputedStyle(container);
+      const railStyle = getComputedStyle(rail);
+      const availableWidth =
+        Math.round(container.getBoundingClientRect().width * 100) / 100;
+      const gap =
+        Number.parseFloat(railStyle.columnGap || railStyle.gap || "0") || 0;
+      const paddingInline =
+        (Number.parseFloat(containerStyle.paddingLeft || "0") || 0) +
+        (Number.parseFloat(containerStyle.paddingRight || "0") || 0);
+      const candidates = unitsRef.current.map((unit) => {
+        const node = rail.querySelector<HTMLElement>(
+          `[data-property-measure-id="${unit.id}"]`,
+        );
+        return {
+          ...unit,
+          width: node
+            ? Math.round(node.getBoundingClientRect().width * 100) / 100
+            : 0,
+        };
+      });
+      const nextMeasurementSignature = [
+        availableWidth,
+        gap,
+        paddingInline,
+        ...candidates.map((candidate) => `${candidate.id}:${candidate.width}`),
+      ].join("|");
+      if (nextMeasurementSignature === measurementSignature) {
+        return;
+      }
+      measurementSignature = nextMeasurementSignature;
+      const nextPlan = planPhonePropertyLayout({
+        candidates,
+        availableWidth,
+        gap,
+        paddingInline,
+      });
+      const nextSignature = phonePropertyPlanSignature(nextPlan);
+      if (nextSignature !== planSignatureRef.current && mounted) {
+        planSignatureRef.current = nextSignature;
+        setPlan(nextPlan);
+      }
+    };
+    const schedule = () => {
+      if (frame == null && fallbackTimer == null) {
+        frame = requestAnimationFrame(read);
+        // Background tabs may suspend animation frames indefinitely. Keep the
+        // frame as the primary batch boundary, with a bounded timer so valid
+        // container geometry can still replace the deterministic fallback.
+        fallbackTimer = window.setTimeout(() => {
+          fallbackTimer = null;
+          if (frame != null) {
+            cancelAnimationFrame(frame);
+            frame = null;
+          }
+          read();
+        }, 120);
+      }
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(container);
+    observer.observe(rail);
+    rail
+      .querySelectorAll<HTMLElement>("[data-property-measure-id]")
+      .forEach((node) => observer.observe(node));
+    schedule();
+
+    return () => {
+      mounted = false;
+      observer.disconnect();
+      if (frame != null) {
+        cancelAnimationFrame(frame);
+      }
+      if (fallbackTimer != null) {
+        window.clearTimeout(fallbackTimer);
+      }
+    };
+  }, [fallback, unitSignature]);
+
+  return { containerRef, measurementRef, plan };
 };
 
 /**
@@ -185,140 +377,103 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const predicates = getShapeActionPredicates(
+  const model = resolvePropertyModel(
     appState,
     targetElements,
     elementsMap,
     app,
   );
 
-  // the bucket fill tool configures only the fill it creates: color, fill
-  // style, and opacity (shared `currentItem*` values; no stroke properties)
-  if (appState.activeTool.type === "bucketfill") {
-    return (
-      <div className="selected-shape-actions">
-        <div>{renderAction("changeBucketFillBackgroundColor")}</div>
-        {renderAction("changeFillStyle")}
-        {renderAction("changeOpacity")}
-      </div>
-    );
-  }
-
   return (
-    <div className="selected-shape-actions">
-      <div>{predicates.strokeColor && renderAction("changeStrokeColor")}</div>
-      {predicates.backgroundColor && (
-        <div>{renderAction("changeBackgroundColor")}</div>
-      )}
-      {predicates.fill && renderAction("changeFillStyle")}
-
-      {predicates.strokeWidth && renderAction("changeStrokeWidth")}
-
-      {predicates.strokeStyle && <>{renderAction("changeStrokeStyle")}</>}
-
-      {predicates.freedrawMode && renderAction("changeFreedrawMode")}
-
-      {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
-
-      {predicates.roundness && <>{renderAction("changeRoundness")}</>}
-
-      {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
-
-      {predicates.text && (
-        <>
-          <fieldset>{renderAction("changeFontFamily")}</fieldset>
-          {renderAction("changeFontSize")}
-          {predicates.textAlign && renderAction("changeTextAlign")}
-        </>
-      )}
-
-      {predicates.verticalAlign && renderAction("changeVerticalAlign")}
-      {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
-
-      {predicates.opacity && renderAction("changeOpacity")}
-
-      {predicates.layers && <LayersFieldset renderAction={renderAction} />}
-
-      {predicates.align && (
-        <AlignFieldset
-          renderAction={renderAction}
-          showDistribute={predicates.distribute}
-        />
-      )}
-      {predicates.showExtraActions && (
-        <fieldset>
-          <legend>{t("labels.actions")}</legend>
-          <div className="buttonList">
-            {renderAction("duplicateSelection")}
-            {renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {predicates.link && renderAction("hyperlink")}
-            {predicates.cropEditor && renderAction("cropEditor")}
-            {predicates.lineEditor && renderAction("toggleLinearEditor")}
-          </div>
-        </fieldset>
-      )}
+    <div
+      className="selected-shape-actions property-inspector"
+      data-property-adapter="full"
+    >
+      <div className="property-inspector__header">
+        <span className="property-inspector__eyebrow">{t("stats.title")}</span>
+        <strong>
+          {targetElements.length > 1
+            ? `${targetElements.length} ${t("stats.selected")}`
+            : targetElements[0]
+            ? t(`element.${targetElements[0].type}`)
+            : appState.activeTool.type === "custom"
+            ? appState.activeTool.customType || t("toolBar.selection")
+            : t(`toolBar.${appState.activeTool.type}`)}
+        </strong>
+      </div>
+      <div className="property-inspector__content">
+        {model.sections.map((section) => (
+          <section
+            className="property-section"
+            data-property-section={section.id}
+            key={section.id}
+          >
+            <h2>{PROPERTY_SECTION_LABELS[section.id]()}</h2>
+            <div className="property-section__controls">
+              {section.descriptors.map((descriptor) =>
+                renderPropertyDescriptor(descriptor, renderAction),
+              )}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 };
 
 const CombinedShapeProperties = ({
-  appState,
   renderAction,
-  setAppState,
-  predicates,
+  model,
+  popupOwner,
   container,
+  railSlot,
 }: {
-  appState: UIAppState;
   renderAction: ActionManager["renderAction"];
-  setAppState: React.Component<any, AppState>["setState"];
-  predicates: ShapeActionPredicates;
+  model: ResolvedPropertyModel;
+  popupOwner: ReturnType<typeof usePropertyPopupOwner>;
   container: HTMLDivElement | null;
+  railSlot?: string;
 }) => {
-  const shouldShowCombinedProperties =
-    predicates.hasSelection ||
-    (appState.activeTool.type !== "selection" &&
-      appState.activeTool.type !== "eraser" &&
-      appState.activeTool.type !== "hand" &&
-      appState.activeTool.type !== "laser" &&
-      appState.activeTool.type !== "lasso");
-  const isOpen = appState.openPopup === "compactStrokeStyles";
+  const descriptors = descriptorsById(model, [
+    "fillStyle",
+    "opacity",
+    "strokeWidth",
+    "freedrawMode",
+    "strokeStyle",
+    "sloppiness",
+    "roundness",
+  ]);
+  const isOpen = popupOwner.isOpen("compactStrokeStyles");
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  if (!shouldShowCombinedProperties) {
+  if (!descriptors.length) {
     return null;
   }
 
   return (
-    <div className="compact-action-item">
+    <div className="compact-action-item" data-property-rail-slot={railSlot}>
       <Popover.Root
         open={isOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            setAppState({ openPopup: "compactStrokeStyles" });
-          } else {
-            setAppState({ openPopup: null });
-          }
-        }}
+        onOpenChange={popupOwner.onOpenChange("compactStrokeStyles")}
       >
         <Popover.Trigger asChild>
-          <button
-            type="button"
+          <UiButton
+            ref={triggerRef}
+            variant="ghost"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
             })}
             title={t("labels.stroke")}
+            aria-label={t("labels.stroke")}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            selected={isOpen}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-
-              setAppState({
-                openPopup: isOpen ? null : "compactStrokeStyles",
-              });
             }}
           >
             {adjustmentsIcon}
-          </button>
+          </UiButton>
         </Popover.Trigger>
         {isOpen && (
           <PropertiesPopover
@@ -326,23 +481,12 @@ const CombinedShapeProperties = ({
             container={container}
             style={{ maxWidth: "13rem" }}
             onClose={() => {}}
+            returnFocusRef={triggerRef}
           >
             <div className="selected-shape-actions">
-              {predicates.fill && renderAction("changeFillStyle")}
-              {predicates.strokeWidth && renderAction("changeStrokeWidth")}
-              {
-                /* in compact UI the freedraw pressure setting is rendered as a
-                  standalone cycle button in the compact actions list; we render
-                  it in the combined properties popup as well for clarity
-                */
-                predicates.freedrawMode && renderAction("changeFreedrawMode")
-              }
-              {predicates.strokeStyle && (
-                <>{renderAction("changeStrokeStyle")}</>
+              {descriptors.map((descriptor) =>
+                renderPropertyDescriptor(descriptor, renderAction),
               )}
-              {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
-              {predicates.roundness && renderAction("changeRoundness")}
-              {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
         )}
@@ -354,52 +498,50 @@ const CombinedShapeProperties = ({
 const CombinedArrowProperties = ({
   appState,
   renderAction,
-  setAppState,
   targetElements,
-  predicates,
+  model,
+  popupOwner,
   container,
   app,
+  railSlot,
 }: {
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
-  setAppState: React.Component<any, AppState>["setState"];
   targetElements: ExcalidrawElement[];
-  predicates: ShapeActionPredicates;
+  model: ResolvedPropertyModel;
+  popupOwner: ReturnType<typeof usePropertyPopupOwner>;
   container: HTMLDivElement | null;
   app: AppClassProperties;
+  railSlot?: string;
 }) => {
-  if (!predicates.arrowType) {
+  const descriptors = descriptorsById(model, ["arrowType", "arrowheads"]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  if (!descriptors.length) {
     return null;
   }
 
-  const isOpen = appState.openPopup === "compactArrowProperties";
+  const isOpen = popupOwner.isOpen("compactArrowProperties");
 
   return (
-    <div className="compact-action-item">
+    <div className="compact-action-item" data-property-rail-slot={railSlot}>
       <Popover.Root
         open={isOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            setAppState({ openPopup: "compactArrowProperties" });
-          } else {
-            setAppState({ openPopup: null });
-          }
-        }}
+        onOpenChange={popupOwner.onOpenChange("compactArrowProperties")}
       >
         <Popover.Trigger asChild>
-          <button
-            type="button"
+          <UiButton
+            ref={triggerRef}
+            variant="ghost"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
             })}
             title={t("labels.arrowtypes")}
+            aria-label={t("labels.arrowtypes")}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            selected={isOpen}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-
-              setAppState({
-                openPopup: isOpen ? null : "compactArrowProperties",
-              });
             }}
           >
             {(() => {
@@ -430,7 +572,7 @@ const CombinedArrowProperties = ({
               }
               return sharpArrowIcon;
             })()}
-          </button>
+          </UiButton>
         </Popover.Trigger>
         {isOpen && (
           <PropertiesPopover
@@ -438,8 +580,13 @@ const CombinedArrowProperties = ({
             className="properties-content"
             style={{ maxWidth: "13rem" }}
             onClose={() => {}}
+            returnFocusRef={triggerRef}
           >
-            {renderAction("changeArrowProperties")}
+            <div className="selected-shape-actions">
+              {descriptors.map((descriptor) =>
+                renderPropertyDescriptor(descriptor, renderAction),
+              )}
+            </div>
           </PropertiesPopover>
         )}
       </Popover.Root>
@@ -450,21 +597,33 @@ const CombinedArrowProperties = ({
 const CombinedTextProperties = ({
   appState,
   renderAction,
-  setAppState,
-  predicates,
+  model,
+  popupOwner,
   container,
+  railSlot,
 }: {
   appState: UIAppState;
   renderAction: ActionManager["renderAction"];
-  setAppState: React.Component<any, AppState>["setState"];
-  predicates: ShapeActionPredicates;
+  model: ResolvedPropertyModel;
+  popupOwner: ReturnType<typeof usePropertyPopupOwner>;
   container: HTMLDivElement | null;
+  railSlot?: string;
 }) => {
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
-  const isOpen = appState.openPopup === "compactTextProperties";
+  const isOpen = popupOwner.isOpen("compactTextProperties");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const descriptors = descriptorsById(model, [
+    "fontSize",
+    "textAlign",
+    "verticalAlign",
+  ]);
+
+  if (!descriptors.length) {
+    return null;
+  }
 
   return (
-    <div className="compact-action-item">
+    <div className="compact-action-item" data-property-rail-slot={railSlot}>
       <Popover.Root
         open={isOpen}
         onOpenChange={(open) => {
@@ -472,46 +631,37 @@ const CombinedTextProperties = ({
             if (appState.editingTextElement) {
               saveCaretPosition();
             }
-            setAppState({ openPopup: "compactTextProperties" });
-          } else {
-            setAppState({ openPopup: null });
-            if (appState.editingTextElement) {
-              restoreCaretPosition();
-            }
           }
+          popupOwner.onOpenChange("compactTextProperties")(open);
         }}
       >
         <Popover.Trigger asChild>
-          <button
-            type="button"
+          <UiButton
+            ref={triggerRef}
+            variant="ghost"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
             })}
             title={t("labels.textAlign")}
+            aria-label={t("labels.textAlign")}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            selected={isOpen}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-
-              if (isOpen) {
-                setAppState({ openPopup: null });
-              } else {
-                if (appState.editingTextElement) {
-                  saveCaretPosition();
-                }
-                setAppState({ openPopup: "compactTextProperties" });
-              }
             }}
           >
             {TextSizeIcon}
-          </button>
+          </UiButton>
         </Popover.Trigger>
-        {appState.openPopup === "compactTextProperties" && (
+        {isOpen && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
             container={container}
             style={{ maxWidth: "13rem" }}
             // Improve focus handling for text editing scenarios
             preventAutoFocusOnTouch={!!appState.editingTextElement}
+            returnFocusRef={triggerRef}
             onClose={() => {
               // Refocus text editor when popover closes with caret restoration
               if (appState.editingTextElement) {
@@ -520,9 +670,9 @@ const CombinedTextProperties = ({
             }}
           >
             <div className="selected-shape-actions">
-              {predicates.text && renderAction("changeFontSize")}
-              {predicates.textAlign && renderAction("changeTextAlign")}
-              {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+              {descriptors.map((descriptor) =>
+                renderPropertyDescriptor(descriptor, renderAction),
+              )}
             </div>
           </PropertiesPopover>
         )}
@@ -532,113 +682,107 @@ const CombinedTextProperties = ({
 };
 
 const CombinedExtraActions = ({
-  appState,
   renderAction,
-  predicates,
-  setAppState,
+  model,
+  popupOwner,
   container,
-  showDuplicate,
-  showDelete,
+  combinedDescriptorIds = [],
+  excludedDescriptorIds = [],
+  maxContentBlockSize,
+  railSlot,
 }: {
-  appState: UIAppState;
   renderAction: ActionManager["renderAction"];
-  predicates: ShapeActionPredicates;
-  setAppState: React.Component<any, AppState>["setState"];
+  model: ResolvedPropertyModel;
+  popupOwner: ReturnType<typeof usePropertyPopupOwner>;
   container: HTMLDivElement | null;
-  showDuplicate?: boolean;
-  showDelete?: boolean;
+  combinedDescriptorIds?: readonly PropertyIdentity[];
+  excludedDescriptorIds?: readonly PropertyIdentity[];
+  maxContentBlockSize?: number;
+  railSlot?: string;
 }) => {
-  const isOpen = appState.openPopup === "compactOtherProperties";
+  const isOpen = popupOwner.isOpen("compactOtherProperties");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const excludedDescriptors = new Set(excludedDescriptorIds);
+  const baseDescriptors = model.descriptors.filter(
+    (descriptor) =>
+      (descriptor.section === "arrangement" ||
+        descriptor.section === "selection") &&
+      !excludedDescriptors.has(descriptor.id),
+  );
+  const extraDescriptors = descriptorsById(model, combinedDescriptorIds);
+  const sections = projectPropertySections(
+    model,
+    [...baseDescriptors, ...extraDescriptors].map(
+      (descriptor) => descriptor.id,
+    ),
+  );
 
-  if (!predicates.showExtraActions) {
+  if (!sections.length) {
     return null;
   }
 
   return (
-    <div className="compact-action-item">
+    <div className="compact-action-item" data-property-rail-slot={railSlot}>
       <Popover.Root
         open={isOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            setAppState({ openPopup: "compactOtherProperties" });
-          } else {
-            setAppState({ openPopup: null });
-          }
-        }}
+        onOpenChange={popupOwner.onOpenChange("compactOtherProperties")}
       >
         <Popover.Trigger asChild>
-          <button
-            type="button"
+          <UiButton
+            ref={triggerRef}
+            variant="ghost"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
             })}
             title={t("labels.actions")}
+            aria-label={t("labels.actions")}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            selected={isOpen}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              setAppState({
-                openPopup: isOpen ? null : "compactOtherProperties",
-              });
             }}
           >
             {DotsHorizontalIcon}
-          </button>
+          </UiButton>
         </Popover.Trigger>
         {isOpen && (
           <PropertiesPopover
-            className={PROPERTIES_CLASSES}
+            className={clsx(PROPERTIES_CLASSES, "property-extra-popover")}
             container={container}
             style={{
-              maxWidth: "12rem",
-              justifyContent: "center",
-              alignItems: "center",
+              width: "13rem",
+              maxWidth: "calc(100vw - 2rem)",
+              ...(maxContentBlockSize
+                ? {
+                    maxBlockSize: `${maxContentBlockSize}px`,
+                    overflowY: "auto",
+                    overscrollBehavior: "contain",
+                  }
+                : {}),
             }}
             onClose={() => {}}
+            returnFocusRef={triggerRef}
           >
-            <div className="selected-shape-actions">
-              {predicates.layers && (
-                <LayersFieldset renderAction={renderAction} />
-              )}
-
-              {predicates.align && (
-                <AlignFieldset
-                  renderAction={renderAction}
-                  showDistribute={predicates.distribute}
-                />
-              )}
-              <fieldset>
-                <legend>{t("labels.actions")}</legend>
-                <div className="buttonList">
-                  {renderAction("group")}
-                  {renderAction("ungroup")}
-                  {predicates.linkSingleOnly && renderAction("hyperlink")}
-                  {predicates.cropEditor && renderAction("cropEditor")}
-                  {showDuplicate && renderAction("duplicateSelection")}
-                  {showDelete && renderAction("deleteSelectedElements")}
-                </div>
-              </fieldset>
+            <div className="selected-shape-actions property-popover-sections">
+              {sections.map((section) => (
+                <section
+                  className="property-popover-section"
+                  data-property-section={section.id}
+                  key={section.id}
+                >
+                  <h3>{PROPERTY_SECTION_LABELS[section.id]()}</h3>
+                  <div className="property-popover-section__controls">
+                    {section.descriptors.map((descriptor) =>
+                      renderPropertyDescriptor(descriptor, renderAction),
+                    )}
+                  </div>
+                </section>
+              ))}
             </div>
           </PropertiesPopover>
         )}
       </Popover.Root>
-    </div>
-  );
-};
-
-const LinearEditorAction = ({
-  renderAction,
-  predicates,
-}: {
-  renderAction: ActionManager["renderAction"];
-  predicates: ShapeActionPredicates;
-}) => {
-  if (!predicates.lineEditor) {
-    return null;
-  }
-
-  return (
-    <div className="compact-action-item">
-      {renderAction("toggleLinearEditor")}
     </div>
   );
 };
@@ -661,102 +805,134 @@ export const CompactShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const predicates = getShapeActionPredicates(
+  const model = resolvePropertyModel(
     appState,
     targetElements,
     elementsMap,
     app,
   );
   const { container } = useExcalidrawContainer();
+  const compactModel = getPropertyModelForAdapter(model, "compact");
+  const compactDescriptors = compactModel.descriptors;
+  const hasAny = (ids: readonly PropertyIdentity[]) =>
+    ids.some((id) => compactDescriptors.some((item) => item.id === id));
+  const eligible = [
+    hasAny([
+      "fillStyle",
+      "opacity",
+      "strokeWidth",
+      "freedrawMode",
+      "strokeStyle",
+      "sloppiness",
+      "roundness",
+    ]) && "compactStrokeStyles",
+    hasAny(["arrowType", "arrowheads"]) && "compactArrowProperties",
+    hasAny(["fontSize", "textAlign", "verticalAlign"]) &&
+      "compactTextProperties",
+    compactModel.sections.some(
+      (section) => section.id === "arrangement" || section.id === "selection",
+    ) && "compactOtherProperties",
+  ].filter(Boolean) as PropertyPopupIdentity[];
+  const popupOwner = usePropertyPopupOwner({
+    appState,
+    setAppState,
+    eligible,
+    ownerKey: `compact:${appState.activeTool.type}`,
+  });
+  const appearanceDescriptors = descriptorsById(compactModel, [
+    "strokeColor",
+    "backgroundColor",
+  ]);
+  const tailDescriptors = descriptorsById(compactModel, ["lineEditor"]);
 
   return (
-    <div className="compact-shape-actions">
-      {/* Stroke Color */}
-      {predicates.strokeColor && (
-        <div className={clsx("compact-action-item")}>
-          {renderAction("changeStrokeColor")}
-        </div>
-      )}
-
-      {/* Background Color (the bucket fill variant excludes `transparent`) */}
-      {predicates.backgroundColor && (
-        <div className="compact-action-item">
-          {renderAction(
-            appState.activeTool.type === "bucketfill"
-              ? "changeBucketFillBackgroundColor"
-              : "changeBackgroundColor",
-          )}
-        </div>
-      )}
-
-      {/* Freedraw pressure: standalone button cycling the variability mode */}
-      {predicates.freedrawMode && (
-        <div className="compact-action-item">
-          {renderAction("changeFreedrawMode", { cycle: true })}
-        </div>
-      )}
-
-      <CombinedShapeProperties
-        appState={appState}
-        renderAction={renderAction}
-        setAppState={setAppState}
-        predicates={predicates}
-        container={container}
-      />
-
-      <CombinedArrowProperties
-        appState={appState}
-        renderAction={renderAction}
-        setAppState={setAppState}
-        targetElements={targetElements}
-        predicates={predicates}
-        container={container}
-        app={app}
-      />
-      {/* Linear Editor */}
-      {predicates.lineEditor && (
-        <div className="compact-action-item">
-          {renderAction("toggleLinearEditor")}
-        </div>
-      )}
-
-      {/* Text Properties */}
-      {predicates.text && (
-        <>
-          <div className="compact-action-item">
-            {renderAction("changeFontFamily")}
+    <div
+      className="compact-shape-actions property-rail"
+      data-property-adapter="compact"
+      role="toolbar"
+      aria-label={t("stats.title")}
+    >
+      <div
+        className="property-rail__group property-rail__appearance"
+        data-property-rail-group="appearance"
+      >
+        {appearanceDescriptors.map((descriptor) => (
+          <div
+            className="compact-action-item"
+            data-property-rail-slot={`appearance:${descriptor.id}`}
+            key={descriptor.id}
+          >
+            {renderPropertyDescriptor(descriptor, renderAction)}
           </div>
-          <CombinedTextProperties
-            appState={appState}
-            renderAction={renderAction}
-            setAppState={setAppState}
-            predicates={predicates}
-            container={container}
-          />
-        </>
-      )}
+        ))}
+      </div>
 
-      {/* Dedicated Copy Button */}
-      {predicates.showExtraActions && (
-        <div className="compact-action-item">
-          {renderAction("duplicateSelection")}
-        </div>
-      )}
+      <div
+        className="property-rail__group property-rail__categories"
+        data-property-rail-group="categories"
+      >
+        <CombinedShapeProperties
+          renderAction={renderAction}
+          model={compactModel}
+          popupOwner={popupOwner}
+          container={container}
+          railSlot="category:stroke"
+        />
 
-      {/* Dedicated Delete Button */}
-      {predicates.showExtraActions && (
-        <div className="compact-action-item">
-          {renderAction("deleteSelectedElements")}
-        </div>
-      )}
+        <CombinedArrowProperties
+          appState={appState}
+          renderAction={renderAction}
+          targetElements={targetElements}
+          model={compactModel}
+          popupOwner={popupOwner}
+          container={container}
+          app={app}
+          railSlot="category:arrow"
+        />
+        {hasAny(["fontFamily", "fontSize", "textAlign", "verticalAlign"]) && (
+          <>
+            {descriptorsById(compactModel, ["fontFamily"]).map((descriptor) => (
+              <div
+                className="compact-action-item"
+                data-property-rail-slot="category:font"
+                key={descriptor.id}
+              >
+                {renderPropertyDescriptor(descriptor, renderAction)}
+              </div>
+            ))}
+            <CombinedTextProperties
+              appState={appState}
+              renderAction={renderAction}
+              model={compactModel}
+              popupOwner={popupOwner}
+              container={container}
+              railSlot="category:text"
+            />
+          </>
+        )}
+      </div>
 
-      <CombinedExtraActions
-        appState={appState}
-        renderAction={renderAction}
-        predicates={predicates}
-        setAppState={setAppState}
-        container={container}
-      />
+      <div
+        className="property-rail__group property-rail__tail"
+        data-property-rail-group="tail"
+      >
+        {tailDescriptors.map((descriptor) => (
+          <div
+            className="compact-action-item"
+            data-property-rail-slot={`tail:${descriptor.id}`}
+            key={descriptor.id}
+          >
+            {renderPropertyDescriptor(descriptor, renderAction)}
+          </div>
+        ))}
+        <CombinedExtraActions
+          renderAction={renderAction}
+          model={compactModel}
+          popupOwner={popupOwner}
+          container={container}
+          railSlot="tail:actions"
+        />
+      </div>
     </div>
   );
 };
@@ -780,140 +956,168 @@ export const MobileShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const predicates = getShapeActionPredicates(
+  const model = resolvePropertyModel(
     appState,
     targetElements,
     elementsMap,
     app,
   );
   const { container } = useExcalidrawContainer();
-  const mobileActionsRef = useRef<HTMLDivElement>(null);
+  const phoneModel = getPropertyModelForAdapter(model, "phone");
+  const phoneDescriptors = phoneModel.descriptors;
+  const candidateDescriptorIds = [
+    "strokeColor",
+    "backgroundColor",
+    "fontFamily",
+  ].filter((id): id is PropertyIdentity =>
+    phoneDescriptors.some((descriptor) => descriptor.id === id),
+  );
+  const units = useMemo<readonly PhonePropertyUnit[]>(
+    () => [
+      ...candidateDescriptorIds.map((id) => ({ id })),
+      { id: "combined", required: true },
+      { id: "undo", required: true },
+      { id: "redo", required: true },
+      ...(phoneDescriptors.some((descriptor) => descriptor.id === "duplicate")
+        ? [{ id: "duplicate" }]
+        : []),
+      ...(phoneDescriptors.some((descriptor) => descriptor.id === "delete")
+        ? [{ id: "delete" }]
+        : []),
+    ],
+    // Descriptor identity is the complete semantic invalidation boundary.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [phoneDescriptors.map((descriptor) => descriptor.id).join("|")],
+  );
+  const { containerRef, measurementRef, plan } = usePhonePropertyLayout(units);
+  const popupOwner = usePropertyPopupOwner({
+    appState,
+    setAppState,
+    eligible: ["compactOtherProperties"],
+    ownerKey: `phone:${
+      appState.width > appState.height ? "landscape" : "portrait"
+    }`,
+  });
+  const directDescriptorIds = new Set(
+    plan.directIds.filter((id): id is PropertyIdentity =>
+      phoneDescriptors.some((descriptor) => descriptor.id === id),
+    ),
+  );
+  const combinedDescriptorIds = phoneDescriptors
+    .filter((descriptor) => !directDescriptorIds.has(descriptor.id))
+    .map((descriptor) => descriptor.id);
+  const propertyPopupOpen = popupOwner.isOpen("compactOtherProperties");
+  const propertyForegroundOpen =
+    propertyPopupOpen ||
+    (appState.openPopup !== null && appState.openPopup !== "canvasBackground");
+  const propertyPopupMaxBlockSize = Math.max(
+    128,
+    Math.min(340, Math.floor(appState.height * 0.42)),
+  );
 
-  const ACTIONS_WIDTH =
-    mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
+  useEffect(() => {
+    if (!propertyForegroundOpen || !container) {
+      return;
+    }
+    const toolbar = container.querySelector<HTMLElement>(
+      ".App-bottom-bar > .adaptive-toolbar-shell",
+    );
+    if (!toolbar) {
+      return;
+    }
+    const previous = {
+      opacity: toolbar.style.opacity,
+      pointerEvents: toolbar.style.pointerEvents,
+      ariaHidden: toolbar.getAttribute("aria-hidden"),
+      inert: toolbar.inert,
+    };
+    toolbar.dataset.propertyPopupShielded = "true";
+    toolbar.style.opacity = "0";
+    toolbar.style.pointerEvents = "none";
+    toolbar.setAttribute("aria-hidden", "true");
+    toolbar.inert = true;
 
-  // 7 actions + 2 for undo/redo
-  const MIN_ACTIONS = 9;
+    return () => {
+      if (toolbar.dataset.propertyPopupShielded !== "true") {
+        return;
+      }
+      delete toolbar.dataset.propertyPopupShielded;
+      toolbar.style.opacity = previous.opacity;
+      toolbar.style.pointerEvents = previous.pointerEvents;
+      toolbar.inert = previous.inert;
+      if (previous.ariaHidden == null) {
+        toolbar.removeAttribute("aria-hidden");
+      } else {
+        toolbar.setAttribute("aria-hidden", previous.ariaHidden);
+      }
+    };
+  }, [container, propertyForegroundOpen]);
 
-  const GAP = 6;
-  const WIDTH = 32;
-
-  const MIN_WIDTH = MIN_ACTIONS * WIDTH + (MIN_ACTIONS - 1) * GAP;
-
-  const ADDITIONAL_WIDTH = WIDTH + GAP;
-
-  const showDeleteOutside = ACTIONS_WIDTH >= MIN_WIDTH + ADDITIONAL_WIDTH;
-  const showDuplicateOutside =
-    ACTIONS_WIDTH >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const renderUnit = (id: string) => {
+    const descriptor = phoneDescriptors.find((item) => item.id === id);
+    if (descriptor) {
+      return (
+        <div className="compact-action-item" key={id}>
+          {renderPropertyDescriptor(descriptor, renderAction)}
+        </div>
+      );
+    }
+    if (id === "combined") {
+      return (
+        <CombinedExtraActions
+          key={id}
+          renderAction={renderAction}
+          model={phoneModel}
+          popupOwner={popupOwner}
+          container={container}
+          combinedDescriptorIds={combinedDescriptorIds}
+          excludedDescriptorIds={[...directDescriptorIds]}
+          maxContentBlockSize={propertyPopupMaxBlockSize}
+        />
+      );
+    }
+    if (id === "undo" || id === "redo") {
+      return (
+        <div className="compact-action-item" key={id}>
+          {renderAction(id)}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <Island
-      className="compact-shape-actions mobile-shape-actions"
-      style={{
-        flexDirection: "row",
-        boxShadow: "none",
-        padding: 0,
-        zIndex: 2,
-        backgroundColor: "transparent",
-        height: WIDTH * 1.35,
-        marginBottom: 4,
-        alignItems: "center",
-        gap: GAP,
-        pointerEvents: "none",
-      }}
-      ref={mobileActionsRef}
+      className="compact-shape-actions mobile-shape-actions property-phone-surface"
+      data-viewport-ui="bottom"
+      data-viewport-ui-name="stylesPanel"
+      aria-label={t("stats.title")}
+      style={{ pointerEvents: "none" }}
+      ref={containerRef}
     >
       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: GAP,
-          flex: 1,
-        }}
+        className="property-phone-surface__visible"
+        data-property-adapter="phone"
       >
-        {predicates.strokeColor && (
-          <div className={clsx("compact-action-item")}>
-            {renderAction("changeStrokeColor")}
-          </div>
-        )}
-        {/* Background Color (the bucket fill variant excludes `transparent`) */}
-        {predicates.backgroundColor && (
-          <div className="compact-action-item">
-            {renderAction(
-              appState.activeTool.type === "bucketfill"
-                ? "changeBucketFillBackgroundColor"
-                : "changeBackgroundColor",
-            )}
-          </div>
-        )}
-        <CombinedShapeProperties
-          appState={appState}
-          renderAction={renderAction}
-          setAppState={setAppState}
-          predicates={predicates}
-          container={container}
-        />
-        {/* Combined Arrow Properties */}
-        <CombinedArrowProperties
-          appState={appState}
-          renderAction={renderAction}
-          setAppState={setAppState}
-          targetElements={targetElements}
-          predicates={predicates}
-          container={container}
-          app={app}
-        />
-        {/* Linear Editor */}
-        <LinearEditorAction
-          renderAction={renderAction}
-          predicates={predicates}
-        />
-        {/* Text Properties */}
-        {predicates.text && (
-          <>
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily")}
-            </div>
-            <CombinedTextProperties
-              appState={appState}
-              renderAction={renderAction}
-              setAppState={setAppState}
-              predicates={predicates}
-              container={container}
-            />
-          </>
-        )}
-
-        {/* Combined Other Actions */}
-        <CombinedExtraActions
-          appState={appState}
-          renderAction={renderAction}
-          predicates={predicates}
-          setAppState={setAppState}
-          container={container}
-          showDuplicate={!showDuplicateOutside}
-          showDelete={!showDeleteOutside}
-        />
+        {plan.directIds.map(renderUnit)}
       </div>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: GAP,
-        }}
+        aria-hidden="true"
+        className="property-phone-surface__measurement"
+        data-property-measurement
+        inert
+        ref={measurementRef}
       >
-        <div className="compact-action-item">{renderAction("undo")}</div>
-        <div className="compact-action-item">{renderAction("redo")}</div>
-        {showDuplicateOutside && (
-          <div className="compact-action-item">
-            {renderAction("duplicateSelection")}
-          </div>
-        )}
-        {showDeleteOutside && (
-          <div className="compact-action-item">
-            {renderAction("deleteSelectedElements")}
-          </div>
-        )}
+        {units.map((unit) => (
+          <button
+            type="button"
+            aria-hidden="true"
+            className="property-phone-surface__measure-control"
+            data-property-measure-id={unit.id}
+            key={unit.id}
+            tabIndex={-1}
+          />
+        ))}
       </div>
     </Island>
   );
@@ -924,344 +1128,25 @@ export const ShapesSwitcher = ({
   setAppState,
   app,
   UIOptions,
+  maxWidth,
 }: {
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
+  maxWidth?: number;
 }) => {
-  const [openGroup, setOpenGroup] = useState<
-    "selection" | "upload" | "shapes" | "extra" | null
-  >(null);
-  // remember the last picked tool per group so the trigger reflects it
-  const [lastSelectionType, setLastSelectionType] = useState("selection");
-  const [lastUploadType, setLastUploadType] = useState("image");
-  const [lastShapeType, setLastShapeType] = useState("rectangle");
-
-  const stylesPanelMode = useStylesPanelMode();
-  const isFullStylesPanel = stylesPanelMode === "full";
-
-  const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected =
-    isFullStylesPanel &&
-    activeTool.type === "lasso" &&
-    app.state.preferredSelectionTool.type !== "lasso";
-  const embeddableToolSelected = activeTool.type === "embeddable";
-
-  const { TTDDialogTriggerTunnel } = useTunnels();
-
-  // close any open group dropdown when the user starts drawing on the canvas
-  useEffect(() => {
-    const unsubscribe = app.onPointerDownEmitter.on(() => setOpenGroup(null));
-    return () => unsubscribe?.();
-  }, [app]);
-
-  const isToolEnabled = (value: string) =>
-    (UIOptions.tools as Record<string, boolean | undefined> | undefined)?.[
-      value
-    ] !== false;
-
-  const labelFor = (
-    value:
-      | "selection"
-      | "hand"
-      | "select"
-      | "image"
-      | "video"
-      | "audio"
-      | "upload"
-      | "rectangle"
-      | "diamond"
-      | "ellipse"
-      | "arrow"
-      | "line"
-      | "shapes",
-  ) => capitalizeString(t(`toolBar.${value}`));
-
-  const selectionOptions: ToolGroupOption[] = (
-    [
-      {
-        type: "selection",
-        icon: SelectionIcon,
-        label: labelFor("selection"),
-        shortcut: capitalizeString(KEYS.V),
-        fillable: true,
-      },
-      {
-        type: "hand",
-        icon: SHAPE_BY_VALUE.hand.icon,
-        label: labelFor("hand"),
-        shortcut: capitalizeString(KEYS.H),
-      },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  const uploadOptions: ToolGroupOption[] = (
-    [
-      { type: "image", icon: ImageIcon, label: labelFor("image") },
-      { type: "video", icon: VideoIcon, label: labelFor("video") },
-      { type: "audio", icon: AudioIcon, label: labelFor("audio") },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  const shapeOptions: ToolGroupOption[] = (
-    [
-      {
-        type: "rectangle",
-        icon: SHAPE_BY_VALUE.rectangle.icon,
-        label: labelFor("rectangle"),
-        shortcut: capitalizeString(KEYS.R),
-        fillable: true,
-      },
-      {
-        type: "diamond",
-        icon: SHAPE_BY_VALUE.diamond.icon,
-        label: labelFor("diamond"),
-        shortcut: capitalizeString(KEYS.D),
-        fillable: true,
-      },
-      {
-        type: "ellipse",
-        icon: SHAPE_BY_VALUE.ellipse.icon,
-        label: labelFor("ellipse"),
-        shortcut: capitalizeString(KEYS.O),
-        fillable: true,
-      },
-      {
-        type: "arrow",
-        icon: SHAPE_BY_VALUE.arrow.icon,
-        label: labelFor("arrow"),
-        shortcut: capitalizeString(KEYS.A),
-        fillable: true,
-      },
-      {
-        type: "line",
-        icon: SHAPE_BY_VALUE.line.icon,
-        label: labelFor("line"),
-        shortcut: capitalizeString(KEYS.L),
-        fillable: true,
-      },
-    ] as ToolGroupOption[]
-  ).filter((o) => isToolEnabled(o.type));
-
-  // freedraw / text / eraser stay as standalone toolbar buttons
-  const renderStandaloneTool = (value: "freedraw" | "text" | "eraser") => {
-    if (!isToolEnabled(value)) {
-      return null;
-    }
-    const shape = SHAPE_BY_VALUE[value];
-    const label = t(`toolBar.${value}`);
-    const letter =
-      shape.key &&
-      capitalizeString(
-        typeof shape.key === "string" ? shape.key : shape.key[0],
-      );
-    const shortcut = letter
-      ? `${letter} ${t("helpDialog.or")} ${shape.numericKey}`
-      : `${shape.numericKey}`;
-    return (
-      <ToolButton
-        className={clsx("Shape", { fillable: shape.fillable })}
-        key={value}
-        type="radio"
-        icon={shape.icon}
-        checked={activeTool.type === value}
-        name="editor-current-shape"
-        title={`${capitalizeString(label)} — ${shortcut}`}
-        keyBindingLabel={shape.numericKey || letter || undefined}
-        aria-label={capitalizeString(label)}
-        aria-keyshortcuts={shortcut}
-        data-testid={`toolbar-${value}`}
-        onPointerDown={({ pointerType }) => {
-          if (!app.state.penDetected && pointerType === "pen") {
-            app.togglePenMode(true);
-          }
-        }}
-        onChange={() => {
-          if (app.state.activeTool.type !== value) {
-            trackEvent("toolbar", value, "ui");
-          }
-          app.setActiveTool({ type: value });
-        }}
-      />
-    );
-  };
-
+  const isFullStylesPanel = useStylesPanelMode() === "full";
   return (
-    <>
-      {selectionOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={selectionOptions}
-          title={labelFor("select")}
-          data-testid="toolbar-selection-group"
-          isOpen={openGroup === "selection"}
-          onOpenChange={(open) => setOpenGroup(open ? "selection" : null)}
-          lastSelectedType={lastSelectionType}
-          onLastSelectedTypeChange={setLastSelectionType}
-        />
-      )}
-
-      {uploadOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={uploadOptions}
-          title={labelFor("upload")}
-          data-testid="toolbar-upload-group"
-          isOpen={openGroup === "upload"}
-          onOpenChange={(open) => setOpenGroup(open ? "upload" : null)}
-          lastSelectedType={lastUploadType}
-          onLastSelectedTypeChange={setLastUploadType}
-          // activating image/video/audio opens a file picker, so the trigger
-          // should only reveal the menu rather than fire it immediately
-          activateOnOpen={false}
-        />
-      )}
-
-      {shapeOptions.length > 0 && (
-        <ToolGroupDropdown
-          app={app}
-          activeToolType={activeTool.type}
-          options={shapeOptions}
-          title={labelFor("shapes")}
-          data-testid="toolbar-shapes-group"
-          isOpen={openGroup === "shapes"}
-          onOpenChange={(open) => setOpenGroup(open ? "shapes" : null)}
-          lastSelectedType={lastShapeType}
-          onLastSelectedTypeChange={setLastShapeType}
-        />
-      )}
-
-      {renderStandaloneTool("freedraw")}
-      {renderStandaloneTool("text")}
-      {renderStandaloneTool("eraser")}
-
-      {!!app.props.renderGeneratorPanel && (
-        <>
-          <div className="App-toolbar__divider" />
-          <ToolButton
-            className="Shape"
-            type="button"
-            icon={<GeneratorToolIcon base={ImageIcon} />}
-            title={t("toolBar.imageGenerator")}
-            aria-label={t("toolBar.imageGenerator")}
-            data-testid="toolbar-image-generator"
-            onClick={() => app.createGeneratorNode("image")}
-          />
-          {/* audio generation is disabled (no audio-generation backend); the
-              audio player node, audio upload tool, and audio-as-reference are
-              unaffected. `app.createGeneratorNode("audio")` stays available
-              programmatically. */}
-          <ToolButton
-            className="Shape"
-            type="button"
-            icon={<GeneratorToolIcon base={VideoIcon} />}
-            title={t("toolBar.videoGenerator")}
-            aria-label={t("toolBar.videoGenerator")}
-            data-testid="toolbar-video-generator"
-            onClick={() => app.createGeneratorNode("video")}
-          />
-        </>
-      )}
-
-      <div className="App-toolbar__divider" />
-
-      <DropdownMenu open={openGroup === "extra"}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => {
-            setOpenGroup(openGroup === "extra" ? null : "extra");
-            setAppState({ openMenu: null, openPopup: null });
-          }}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setOpenGroup(null)}
-          onSelect={() => setOpenGroup(null)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          {isFullStylesPanel && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "lasso" })}
-              icon={LassoIcon}
-              data-testid="toolbar-lasso"
-              selected={lassoToolSelected}
-            >
-              {t("toolBar.lasso")}
-            </DropdownMenu.Item>
-          )}
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-mermaid"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <DropdownMenu.Item
-              onSelect={() => app.onMagicframeToolSelect()}
-              icon={MagicIcon}
-              data-testid="toolbar-magicframe"
-              badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
-            >
-              {t("toolBar.magicframe")}
-            </DropdownMenu.Item>
-          )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-    </>
+    <AdaptiveEditorToolbar
+      activeTool={activeTool}
+      setAppState={setAppState}
+      app={app}
+      UIOptions={UIOptions}
+      isFullStylesPanel={isFullStylesPanel}
+      variant="desktop"
+      maxWidth={maxWidth}
+    />
   );
 };
 

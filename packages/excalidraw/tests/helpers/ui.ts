@@ -448,7 +448,47 @@ type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
 
 export class UI {
   static clickTool = (toolName: ToolType | "lock") => {
-    fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
+    const queryVisibleTool = () => {
+      const matches = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          `[data-testid="toolbar-${toolName}"]`,
+        ),
+      );
+      return (
+        matches.find((element) => !element.closest(".tool-popover-content")) ??
+        matches[0] ??
+        null
+      );
+    };
+    let tool = queryVisibleTool();
+    if (!tool) {
+      const groupTrigger = (
+        ["hand", "selection", "lasso"].includes(toolName)
+          ? "toolbar-selection"
+          : ["image", "video", "audio"].includes(toolName)
+          ? "toolbar-upload-group"
+          : ["rectangle", "diamond", "ellipse", "arrow", "line"].includes(
+              toolName,
+            )
+          ? "toolbar-shapes-group"
+          : ["freedraw", "autoshape"].includes(toolName)
+          ? "toolbar-freedraw"
+          : null
+      ) as string | null;
+      if (groupTrigger) {
+        const trigger = GlobalTestState.renderResult.container.querySelector(
+          `[data-testid="${groupTrigger}"]`,
+        );
+        if (trigger) {
+          fireEvent.click(trigger);
+          tool = queryVisibleTool();
+        }
+      }
+    }
+    if (!tool) {
+      throw new Error(`Unable to find an element with tool name: ${toolName}`);
+    }
+    fireEvent.click(tool);
   };
 
   static clickLabeledElement = (label: string) => {

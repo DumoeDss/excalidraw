@@ -24,7 +24,7 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
-    border-radius: 0.5rem;
+    border-radius: var(--ui-radius-lg);
     border-width: 1px;
     border-style: solid;
 
@@ -66,12 +66,12 @@
       &.ExcButton--variant-filled,
       &:hover {
         --back-color: var(--color-surface-low) !important;
-        --text-color: var(--color-on-surface-variant) !important;
+        --text-color: var(--color-disabled) !important;
       }
 
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
-        --text-color: var(--color-on-surface-variant);
+        --text-color: var(--color-disabled);
         --border-color: var(--color-surface-high);
       }
     }
@@ -288,8 +288,8 @@
     }
 
     &--size-large {
-      font-weight: 600;
-      font-size: 0.875rem;
+      font-weight: var(--ui-font-weight-semibold);
+      font-size: var(--ui-font-size-md);
       min-height: 3rem;
       padding: 0.5rem 1.5rem;
 
@@ -301,8 +301,8 @@
     }
 
     &--size-medium {
-      font-weight: 600;
-      font-size: 0.75rem;
+      font-weight: var(--ui-font-weight-semibold);
+      font-size: var(--ui-font-size-xs);
       min-height: 2.5rem;
       padding: 0.5rem 1rem;
 

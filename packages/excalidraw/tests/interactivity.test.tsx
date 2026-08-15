@@ -1,13 +1,17 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CODES, CURSOR_TYPE, POINTER_BUTTON } from "@excalidraw/common";
+import { CODES, CURSOR_TYPE, POINTER_BUTTON, THEME } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { actionZoomIn } from "../actions/actionCanvas";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { DefaultSidebar, Excalidraw, Footer, MainMenu } from "../index";
+import { setLanguage } from "../i18n";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -133,6 +137,820 @@ describe("baseline (interactive & ui enabled by default)", () => {
     expect(queryContainer(".App-toolbar")).not.toBe(null);
     expect(queryContainer(".excalidraw--non-interactive")).toBe(null);
     expect(queryContainer(".excalidraw--ui-hidden")).toBe(null);
+  });
+
+  it("draws through the layout shell and keeps populated zones interactive", () => {
+    expect(queryContainer('[data-canvas-ui-layout="desktop"]')).not.toBe(null);
+
+    act(() => h.app.setActiveTool({ type: "rectangle" }));
+    mouse.downAt(100, 100);
+    mouse.moveTo(150, 150);
+    mouse.upAt(150, 150);
+    expect(h.elements).toHaveLength(1);
+    expect(h.elements[0].type).toBe("rectangle");
+
+    fireEvent.click(queryContainer(".dropdown-menu-button")!);
+    expect(queryContainer("[data-testid='dropdown-menu']")).not.toBe(null);
+  });
+
+  it("measures the selected-style and toolbar leaves instead of layout zones", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const surface = await waitFor(() => {
+      const node = queryContainer(
+        '[data-viewport-ui="side"][data-viewport-ui-name="stylesPanel"]',
+      );
+      expect(node).not.toBe(null);
+      return node as HTMLElement;
+    });
+    const zone = surface.closest<HTMLElement>(
+      '[data-canvas-ui-zone="top-end"]',
+    );
+    expect(zone).not.toBe(null);
+    expect(zone).not.toHaveAttribute("data-viewport-ui");
+    const toolbar = queryContainer(
+      '[data-canvas-ui-zone="bottom-center"] .adaptive-toolbar-shell[data-viewport-ui="bottom"]',
+    ) as HTMLElement;
+    expect(toolbar).not.toBeNull();
+    expect(
+      toolbar.closest('[data-canvas-ui-zone="bottom-center"]'),
+    ).not.toHaveAttribute("data-viewport-ui");
+
+    const container = queryContainer(".excalidraw-container") as HTMLElement;
+    vi.spyOn(container, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, h.state.width, h.state.height),
+    );
+    const measuredSurface = queryContainer(
+      '[data-viewport-ui="side"][data-viewport-ui-name="stylesPanel"]',
+    ) as HTMLElement;
+    vi.spyOn(measuredSurface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(h.app.state.width - 80, 20, 80, 100),
+    );
+    vi.spyOn(toolbar, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(50, h.state.height - 40, 100, 40),
+    );
+
+    expect(h.app.viewport.getOffsets({ padding: 0 })).toEqual({
+      top: 0,
+      right: 80,
+      bottom: 40,
+      left: 0,
+    });
+
+    API.setSelectedElements([]);
+    await waitFor(() =>
+      expect(
+        queryContainer(
+          '[data-viewport-ui-name="stylesPanel"][data-viewport-ui="side"]',
+        ),
+      ).toBe(null),
+    );
+    expect(
+      h.app.viewport.getOffsets({
+        padding: 0,
+        reserve: { stylesPanel: true },
+      }).right,
+    ).toBe(80);
+
+    fireEvent.click(queryContainer(".default-sidebar-trigger")!);
+    await waitFor(() => {
+      const sidebar = queryContainer(".sidebar");
+      expect(sidebar).not.toBe(null);
+      expect(sidebar).toHaveAttribute(
+        "data-large-surface-presentation",
+        "overlay",
+      );
+      expect(sidebar).not.toHaveAttribute("data-viewport-ui");
+      expect(sidebar!.closest("[data-canvas-ui-zone]")).toBe(null);
+    });
+  });
+
+  it("mirrors hidden style reservation and rejects a cached old side", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const container = queryContainer(".excalidraw-container") as HTMLElement;
+    vi.spyOn(container, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, h.state.width, h.state.height),
+    );
+    const surface = await waitFor(() => {
+      const node = queryContainer(
+        '[data-viewport-ui="side"][data-viewport-ui-name="stylesPanel"]',
+      ) as HTMLElement | null;
+      expect(node).not.toBeNull();
+      return node!;
+    });
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(h.state.width - 80, 20, 80, 100),
+    );
+    expect(h.app.viewport.getOffsets({ padding: 0 }).right).toBe(80);
+
+    API.setSelectedElements([]);
+    await waitFor(() =>
+      expect(
+        queryContainer(
+          '[data-viewport-ui="side"][data-viewport-ui-name="stylesPanel"]',
+        ),
+      ).toBeNull(),
+    );
+
+    try {
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="ar-SA"
+        />,
+      );
+      await waitFor(() =>
+        expect(h.app.editorInterface.responsive.direction).toBe("rtl"),
+      );
+      expect(
+        h.app.viewport.getOffsets({
+          padding: 0,
+          reserve: { stylesPanel: true },
+        }),
+      ).toMatchObject({ left: 256, right: 0 });
+
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="en"
+        />,
+      );
+      await waitFor(() =>
+        expect(h.app.editorInterface.responsive.direction).toBe("ltr"),
+      );
+      expect(
+        h.app.viewport.getOffsets({
+          padding: 0,
+          reserve: { stylesPanel: true },
+        }),
+      ).toMatchObject({ left: 0, right: 256 });
+    } finally {
+      GlobalTestState.renderResult.rerender(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          langCode="en"
+        />,
+      );
+    }
+  });
+});
+
+describe("adaptive toolbar live behavior", () => {
+  let originalButtonRect: typeof HTMLButtonElement.prototype.getBoundingClientRect;
+  let originalResizeObserver: typeof ResizeObserver | undefined;
+
+  beforeEach(() => {
+    originalButtonRect = HTMLButtonElement.prototype.getBoundingClientRect;
+    originalResizeObserver = global.ResizeObserver;
+    HTMLButtonElement.prototype.getBoundingClientRect = () =>
+      new DOMRect(0, 0, 36, 36);
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+    mockBoundingClientRect({
+      top: 0,
+      left: 0,
+      bottom: 900,
+      right: 1440,
+      width: 1440,
+      height: 900,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+  });
+
+  afterEach(() => {
+    HTMLButtonElement.prototype.getBoundingClientRect = originalButtonRect;
+    if (originalResizeObserver) {
+      global.ResizeObserver = originalResizeObserver;
+    } else {
+      delete (global as any).ResizeObserver;
+    }
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it.each(["desktop", "phone"] as const)(
+    "uses the complete mounted-editor pointer-aware activation authority on %s",
+    async (formFactor) => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
+      );
+      fireEvent.resize(window);
+      await waitFor(() =>
+        expect(h.app.editorInterface.formFactor).toBe(formFactor),
+      );
+
+      const textTool = container.querySelector<HTMLButtonElement>(
+        '[data-testid="toolbar-text"]',
+      )!;
+      expect(textTool).not.toBeNull();
+
+      fireEvent.pointerDown(textTool, { pointerType: "pen", pointerId: 7 });
+      fireEvent.pointerUp(textTool, { pointerType: "pen", pointerId: 7 });
+      fireEvent.click(textTool);
+
+      await waitFor(() => {
+        expect(h.state.activeTool.type).toBe("text");
+        expect(h.state.penMode).toBe(true);
+        expect(h.state.penDetected).toBe(true);
+      });
+    },
+  );
+
+  it("keeps every desktop toolbar wrapper pointer-neutral", async () => {
+    const { container } = await render(<Excalidraw />);
+    const toolbar = container.querySelector(
+      '[data-adaptive-toolbar="desktop"]',
+    )!;
+    const wrappers: [string, Element | null][] = [
+      ["section", toolbar.closest(".shapes-section")],
+      ["row", toolbar.closest(".App-toolbar-container")],
+      ["column", toolbar.closest(".Stack_vertical")],
+      ["bottom stack", toolbar.closest(".layer-ui__bottom-center-stack")],
+      ["shell", toolbar.closest(".adaptive-toolbar-shell")],
+    ];
+
+    for (const [, wrapper] of wrappers) {
+      expect(wrapper).not.toBeNull();
+      expect(getComputedStyle(wrapper!).pointerEvents).toBe("none");
+    }
+  });
+
+  it("returns focus on Escape from secondary and group menus", async () => {
+    const { container } = await render(<Excalidraw />);
+    const triggers = await waitFor(() => {
+      const values = [
+        container.querySelector<HTMLButtonElement>(
+          '[data-testid="toolbar-extra-group"]',
+        ),
+        container.querySelector<HTMLButtonElement>(
+          '[data-testid="toolbar-shapes-group"]',
+        ),
+      ];
+      expect(values.every(Boolean)).toBe(true);
+      return values as HTMLButtonElement[];
+    });
+
+    for (const trigger of triggers) {
+      fireEvent.click(trigger);
+      expect(trigger).toHaveAttribute("aria-expanded", "true");
+      fireEvent.keyDown(document, { key: "Escape" });
+      await waitFor(() => {
+        expect(trigger).toHaveAttribute("aria-expanded", "false");
+        expect(document.activeElement).toBe(trigger);
+      });
+    }
+  });
+
+  it("keeps collaboration laser selection on its dedicated control", async () => {
+    const { container } = await render(<Excalidraw isCollaborating={true} />);
+    act(() => h.app.setActiveTool({ type: "laser" }));
+
+    const { dedicatedLaser, secondaryTrigger } = await waitFor(() => {
+      const values = {
+        dedicatedLaser: container.querySelector<HTMLButtonElement>(
+          '[data-testid="toolbar-LaserPointer"]',
+        ),
+        secondaryTrigger: container.querySelector<HTMLButtonElement>(
+          '[data-testid="toolbar-extra-group"]',
+        ),
+      };
+      expect(values.dedicatedLaser).not.toBeNull();
+      expect(values.secondaryTrigger).not.toBeNull();
+      return values as {
+        dedicatedLaser: HTMLButtonElement;
+        secondaryTrigger: HTMLButtonElement;
+      };
+    });
+    expect(dedicatedLaser).toHaveAttribute("aria-pressed", "true");
+    expect(secondaryTrigger).not.toHaveClass(
+      "adaptive-editor-toolbar__menu-trigger--selected",
+    );
+
+    fireEvent.click(secondaryTrigger);
+    expect(
+      document.querySelector('[data-testid="toolbar-laser"]'),
+    ).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("associates menus with instance-local IDs across embedded editors", async () => {
+    const { container } = await render(
+      <div>
+        <Excalidraw />
+        <Excalidraw />
+      </div>,
+    );
+    const controls = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        ".adaptive-editor-toolbar [aria-controls]",
+      ),
+    ).map((trigger) => trigger.getAttribute("aria-controls"));
+
+    expect(controls.length).toBeGreaterThan(2);
+    expect(new Set(controls).size).toBe(controls.length);
+  });
+
+  it("feeds the same canonical unit order through both live adapters", async () => {
+    let formFactor: "desktop" | "phone" = "desktop";
+    const view = await render(
+      <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
+    );
+    const readUnits = () =>
+      Array.from(
+        view.container.querySelectorAll("[data-toolbar-measure-id]"),
+      ).map((node) => node.getAttribute("data-toolbar-measure-id"));
+    const desktopUnits = readUnits();
+
+    formFactor = "phone";
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    expect(readUnits()).toEqual(desktopUnits);
+  });
+
+  it("visually shields and restores the adjacent phone action row while a toolbar menu is open", async () => {
+    const { container } = await render(
+      <Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const trigger = container.querySelector<HTMLButtonElement>(
+      '[data-testid="toolbar-shapes-group"]',
+    )!;
+    fireEvent.click(trigger);
+    const actions = container.querySelector<HTMLElement>(
+      ".mobile-shape-actions",
+    )!;
+    const actionButtons = Array.from(actions.querySelectorAll("button"));
+    const effectiveOpacity = (element: Element) => {
+      let opacity = 1;
+      let current: Element | null = element;
+      while (current) {
+        opacity *= Number.parseFloat(getComputedStyle(current).opacity || "1");
+        current = current.parentElement;
+      }
+      return opacity;
+    };
+
+    expect(actionButtons.length).toBeGreaterThanOrEqual(2);
+
+    await waitFor(() => {
+      expect(container.querySelector(".excalidraw-container")).toHaveAttribute(
+        "data-toolbar-menu-open",
+        "true",
+      );
+      expect(actions).toHaveAttribute("aria-hidden", "true");
+      expect(actions.inert).toBe(true);
+      expect(getComputedStyle(actions).pointerEvents).toBe("none");
+      expect(getComputedStyle(actions).opacity).toBe("0");
+      actionButtons.forEach((button) => {
+        expect(effectiveOpacity(button)).toBe(0);
+      });
+    });
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => {
+      expect(
+        container.querySelector(".excalidraw-container"),
+      ).not.toHaveAttribute("data-toolbar-menu-open");
+      expect(actions).not.toHaveAttribute("aria-hidden");
+      expect(actions.inert).toBe(false);
+      expect(getComputedStyle(actions).opacity).not.toBe("0");
+      actionButtons.forEach((button) => {
+        expect(effectiveOpacity(button)).toBe(1);
+        expect(getComputedStyle(button).visibility).toBe("visible");
+      });
+    });
+  });
+
+  it("cleans phone toolbar shielding when the editor unmounts while open", async () => {
+    const view = await render(
+      <Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const root = view.container.querySelector<HTMLElement>(
+      ".excalidraw-container",
+    )!;
+    const actions = view.container.querySelector<HTMLElement>(
+      ".mobile-shape-actions",
+    )!;
+    fireEvent.click(
+      view.container.querySelector<HTMLButtonElement>(
+        '[data-testid="toolbar-shapes-group"]',
+      )!,
+    );
+    await waitFor(() => {
+      expect(root).toHaveAttribute("data-toolbar-menu-open", "true");
+      expect(actions).toHaveAttribute("aria-hidden", "true");
+      expect(actions.inert).toBe(true);
+    });
+
+    view.unmount();
+    expect(root).not.toHaveAttribute("data-toolbar-menu-open");
+    expect(actions).not.toHaveAttribute("aria-hidden");
+    expect(actions.inert).toBe(false);
+    expect(actions.style.opacity).toBe("");
+  });
+});
+
+describe("property adapter live behavior", () => {
+  let originalResizeObserver: typeof ResizeObserver | undefined;
+
+  beforeEach(() => {
+    originalResizeObserver = global.ResizeObserver;
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+    mockBoundingClientRect({
+      top: 0,
+      left: 0,
+      bottom: 900,
+      right: 1440,
+      width: 1440,
+      height: 900,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+  });
+
+  afterEach(() => {
+    if (originalResizeObserver) {
+      global.ResizeObserver = originalResizeObserver;
+    } else {
+      delete (global as any).ResizeObserver;
+    }
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  const selectRectangle = async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+    await waitFor(() =>
+      expect(queryContainer("[data-property-adapter]")).not.toBeNull(),
+    );
+  };
+
+  const selectElements = async (elements: NonDeletedExcalidrawElement[]) => {
+    API.setElements(elements);
+    API.setSelectedElements(elements);
+    await waitFor(() =>
+      expect(queryContainer("[data-property-adapter]")).not.toBeNull(),
+    );
+  };
+
+  it("renders full sections in canonical order and omits ineligible text", async () => {
+    await render(<Excalidraw theme={THEME.DARK} />);
+    await selectRectangle();
+
+    const inspector = queryContainer(
+      '[data-property-adapter="full"]',
+    ) as HTMLElement;
+    expect(inspector).not.toBeNull();
+    expect(
+      Array.from(
+        inspector.querySelectorAll(
+          ":scope > .property-inspector__content > .property-section",
+        ),
+      ).map((section) => section.getAttribute("data-property-section")),
+    ).toEqual(["appearance", "stroke", "arrangement", "selection"]);
+    expect(
+      inspector.querySelector('[data-property-section="text"]'),
+    ).toBeNull();
+    expect(inspector.querySelector('[data-property-id="delete"]')).toHaveClass(
+      "property-control--destructive",
+    );
+    expect(queryContainer(".excalidraw-container")).toHaveClass("theme--dark");
+  });
+
+  it.each(["ltr", "rtl"] as const)(
+    "keeps semantic compact rail slots stable across selections in %s",
+    async (direction) => {
+      localStorage.setItem("excalidraw.desktopUIMode", "compact");
+      if (direction === "rtl") {
+        await setLanguage({ code: "__test__.rtl", label: "rtl", rtl: true });
+      }
+      try {
+        await render(<Excalidraw />);
+        h.app.refreshEditorInterface();
+
+        const readSlots = () => {
+          const rail = queryContainer(
+            '[data-property-adapter="compact"]',
+          ) as HTMLElement;
+          expect(rail).not.toBeNull();
+          const slots = Array.from(
+            rail.querySelectorAll<HTMLElement>("[data-property-rail-slot]"),
+          ).map((node) => node.dataset.propertyRailSlot);
+          rail.querySelectorAll("button").forEach((button) => {
+            expect(button).toHaveAccessibleName();
+          });
+          rail
+            .querySelectorAll('[aria-haspopup="dialog"]')
+            .forEach((trigger) => {
+              expect(trigger).toHaveAttribute("aria-expanded", "false");
+            });
+          return slots;
+        };
+
+        const rectangle = API.createElement({ type: "rectangle" });
+        await selectElements([rectangle]);
+        expect(readSlots()).toEqual([
+          "appearance:strokeColor",
+          "appearance:backgroundColor",
+          "category:stroke",
+          "tail:actions",
+        ]);
+
+        const arrow = API.createElement({ type: "arrow" });
+        await selectElements([arrow]);
+        expect(readSlots()).toEqual([
+          "appearance:strokeColor",
+          "category:stroke",
+          "category:arrow",
+          "tail:lineEditor",
+          "tail:actions",
+        ]);
+
+        const text = API.createElement({ type: "text", text: "Text" });
+        await selectElements([text]);
+        expect(readSlots()).toEqual([
+          "appearance:strokeColor",
+          "category:stroke",
+          "category:font",
+          "category:text",
+          "tail:actions",
+        ]);
+
+        const first = API.createElement({ type: "rectangle" });
+        const second = API.createElement({ type: "rectangle", x: 200 });
+        await selectElements([first, second]);
+        expect(readSlots()).toEqual([
+          "appearance:strokeColor",
+          "appearance:backgroundColor",
+          "category:stroke",
+          "tail:actions",
+        ]);
+
+        const rail = queryContainer(
+          '[data-property-adapter="compact"]',
+        ) as HTMLElement;
+        expect(rail.querySelector('[data-property-id="delete"]')).toBeNull();
+        fireEvent.click(
+          rail.querySelector<HTMLButtonElement>(
+            '[data-property-rail-slot="tail:actions"] button',
+          )!,
+        );
+        await waitFor(() =>
+          expect(
+            document.querySelector('[data-property-id="delete"]'),
+          ).toHaveClass("property-control--destructive"),
+        );
+      } finally {
+        if (direction === "rtl") {
+          await setLanguage({ code: "__test__", label: "ltr" });
+        }
+      }
+    },
+  );
+
+  it.each(["full", "compact", "phone"] as const)(
+    "renders canonical active and disabled state through the live %s adapter",
+    async (adapter) => {
+      if (adapter === "compact") {
+        localStorage.setItem("excalidraw.desktopUIMode", "compact");
+      }
+      await render(
+        <Excalidraw
+          UIOptions={
+            adapter === "phone" ? { getFormFactor: () => "phone" } : undefined
+          }
+        />,
+      );
+      if (adapter === "phone") {
+        fireEvent.resize(window);
+        await waitFor(() =>
+          expect(h.app.editorInterface.formFactor).toBe("phone"),
+        );
+      } else if (adapter === "compact") {
+        h.app.refreshEditorInterface();
+      }
+
+      act(() => {
+        h.app.setActiveTool({ type: "freedraw" });
+        API.setAppState({ currentItemStrokeVariability: "variable" });
+      });
+      const surface = await waitFor(() => {
+        const node = queryContainer(`[data-property-adapter="${adapter}"]`);
+        expect(node).not.toBeNull();
+        return node as HTMLElement;
+      });
+      if (adapter === "compact") {
+        fireEvent.click(
+          surface.querySelector<HTMLButtonElement>(
+            '[data-property-rail-slot="category:stroke"] button',
+          )!,
+        );
+      } else if (adapter === "phone") {
+        fireEvent.click(
+          surface.querySelector<HTMLButtonElement>(
+            'button[aria-label="Actions"]',
+          )!,
+        );
+      }
+      const pressure = await waitFor(() => {
+        const node = document.querySelector<HTMLElement>(
+          '[data-property-id="freedrawMode"]',
+        );
+        expect(node).not.toBeNull();
+        return node!;
+      });
+      expect(pressure).toHaveAttribute("data-property-selected", "true");
+      expect(pressure.querySelector("button")).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+
+      if (adapter !== "full") {
+        fireEvent.keyDown(document, { key: "Escape" });
+        await waitFor(() =>
+          expect(document.querySelector(".properties-content")).toBeNull(),
+        );
+      }
+
+      act(() => {
+        API.setElements([]);
+        API.setSelectedElements([]);
+        h.app.setActiveTool({ type: "rectangle" });
+      });
+      const nextSurface = await waitFor(() => {
+        const node = queryContainer(`[data-property-adapter="${adapter}"]`);
+        expect(node).not.toBeNull();
+        return node as HTMLElement;
+      });
+      if (adapter !== "full") {
+        fireEvent.click(
+          nextSurface.querySelector<HTMLButtonElement>(
+            'button[aria-label="Actions"]',
+          )!,
+        );
+      }
+      const disabledLayer = await waitFor(() => {
+        const node = document.querySelector<HTMLElement>(
+          '[data-property-id="sendToBack"]',
+        );
+        expect(node).not.toBeNull();
+        return node!;
+      });
+      expect(disabledLayer).toHaveAttribute("data-property-disabled", "true");
+      expect(disabledLayer).toHaveAttribute("aria-disabled", "true");
+      expect(disabledLayer).toHaveAttribute("inert");
+    },
+  );
+
+  it("returns focus to the compact rail trigger after Escape", async () => {
+    localStorage.setItem("excalidraw.desktopUIMode", "compact");
+    await render(<Excalidraw />);
+    h.app.refreshEditorInterface();
+    await selectRectangle();
+
+    const rail = await waitFor(() => {
+      const node = queryContainer('[data-property-adapter="compact"]');
+      expect(node).not.toBeNull();
+      return node as HTMLElement;
+    });
+    const triggers = Array.from(
+      rail.querySelectorAll<HTMLButtonElement>('[aria-haspopup="dialog"]'),
+    );
+    expect(triggers.length).toBeGreaterThan(0);
+    triggers.forEach((trigger) => {
+      expect(trigger).toHaveAccessibleName();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+    });
+
+    const actionsTrigger = rail.querySelector<HTMLButtonElement>(
+      'button[aria-label="Actions"]',
+    )!;
+    fireEvent.click(actionsTrigger);
+    await waitFor(() => {
+      expect(actionsTrigger).toHaveAttribute("aria-expanded", "true");
+      expect(document.querySelector(".property-extra-popover")).not.toBeNull();
+    });
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => {
+      expect(actionsTrigger).toHaveAttribute("aria-expanded", "false");
+      expect(document.activeElement).toBe(actionsTrigger);
+      expect(document.querySelector(".property-extra-popover")).toBeNull();
+    });
+  });
+
+  it("shields and restores the phone toolbar while property shells and direct pickers own foreground", async () => {
+    await render(<Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />);
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+    await selectRectangle();
+
+    const actionsTrigger = await waitFor(() => {
+      const node = queryContainer(
+        '[data-property-adapter="phone"] button[aria-label="Actions"]',
+      );
+      expect(node).not.toBeNull();
+      return node as HTMLButtonElement;
+    });
+    const toolbar = queryContainer(
+      ".App-bottom-bar > .adaptive-toolbar-shell",
+    ) as HTMLElement;
+    const expectShielded = async () => {
+      await waitFor(() => {
+        expect(toolbar).toHaveAttribute("data-property-popup-shielded", "true");
+        expect(toolbar).toHaveAttribute("aria-hidden", "true");
+        expect(toolbar.inert).toBe(true);
+        expect(toolbar.style.opacity).toBe("0");
+        expect(toolbar.style.pointerEvents).toBe("none");
+      });
+    };
+    const expectRestored = async () => {
+      await waitFor(() => {
+        expect(toolbar).not.toHaveAttribute("data-property-popup-shielded");
+        expect(toolbar).not.toHaveAttribute("aria-hidden");
+        expect(toolbar.inert).not.toBe(true);
+        expect(toolbar.style.opacity).toBe("");
+        expect(toolbar.style.pointerEvents).toBe("");
+      });
+    };
+
+    act(() => API.setAppState({ openPopup: "elementStroke" }));
+    await expectShielded();
+
+    act(() => API.setAppState({ openPopup: null }));
+    await expectRestored();
+
+    fireEvent.click(actionsTrigger);
+    await expectShielded();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    await expectRestored();
+  });
+});
+
+describe("canvas layout freshness", () => {
+  it("updates host content and swaps adapters when form factor changes", async () => {
+    let formFactor: "desktop" | "phone" = "desktop";
+    await render(
+      <Excalidraw
+        UIOptions={{ getFormFactor: () => formFactor }}
+        renderTopLeftUI={(isMobile, appState) => (
+          <div
+            data-testid="fresh-host-ui"
+            data-mobile={String(isMobile)}
+            data-zen={String(appState.zenModeEnabled)}
+          />
+        )}
+      />,
+    );
+
+    expect(queryContainer('[data-canvas-ui-layout="desktop"]')).not.toBe(null);
+    expect(queryContainer("[data-testid='fresh-host-ui']")).toHaveAttribute(
+      "data-zen",
+      "false",
+    );
+
+    API.setAppState({ zenModeEnabled: true });
+    await waitFor(() =>
+      expect(queryContainer("[data-testid='fresh-host-ui']")).toHaveAttribute(
+        "data-zen",
+        "true",
+      ),
+    );
+
+    formFactor = "phone";
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+    expect(queryContainer('[data-canvas-ui-layout="desktop"]')).toBe(null);
+    expect(queryContainer('[data-canvas-ui-layout="phone"]')).not.toBe(null);
+    expect(queryContainer("[data-testid='fresh-host-ui']")).toHaveAttribute(
+      "data-mobile",
+      "true",
+    );
   });
 });
 
@@ -704,7 +1522,11 @@ describe("ui={{ enabled: ... }}", () => {
   it("renders opted-in zoom controls while the rest of the default UI stays hidden", async () => {
     await render(<Excalidraw ui={{ enabled: { zoom: true } }} />);
 
-    expect(queryContainer(".zoom-actions")).not.toBe(null);
+    const zoomActions = queryContainer(".zoom-actions");
+    expect(zoomActions).not.toBe(null);
+    expect(
+      zoomActions!.closest('[data-canvas-ui-zone="bottom-start"]'),
+    ).not.toBe(null);
     expect(queryContainer(".undo-redo-buttons")).toBe(null);
     expect(queryContainer(".App-toolbar")).toBe(null);
     expect(queryContainer(".dropdown-menu-button")).toBe(null);
@@ -768,6 +1590,122 @@ describe("ui={{ enabled: ... }}", () => {
     expect(queryContainer(".scroll-back-to-content")).not.toBe(null);
     expect(queryContainer(".mobile-toolbar")).toBe(null);
   });
+
+  it("renders the shared phone zones while keeping bottom measurement on the surface", async () => {
+    await render(<Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />);
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const layout = queryContainer('[data-canvas-ui-layout="phone"]');
+    expect(layout).not.toBe(null);
+    expect(layout!.querySelectorAll("[data-canvas-ui-zone]")).toHaveLength(6);
+
+    const bottomSurface = queryContainer(
+      '[data-canvas-ui-zone="bottom-center"] .adaptive-toolbar-shell[data-viewport-ui="bottom"]',
+    ) as HTMLElement;
+    expect(bottomSurface).not.toBe(null);
+    expect(bottomSurface).toHaveClass("adaptive-toolbar-shell");
+    expect(bottomSurface).toHaveClass("App-toolbar");
+    const propertySurface = queryContainer(
+      '[data-canvas-ui-zone="bottom-center"] .property-phone-surface[data-viewport-ui="bottom"]',
+    ) as HTMLElement;
+    expect(propertySurface).not.toBe(null);
+
+    for (const zone of layout!.querySelectorAll("[data-canvas-ui-zone]")) {
+      expect(zone).not.toHaveAttribute("data-viewport-ui");
+      expect(zone).not.toHaveAttribute("data-viewport-ui-name");
+    }
+
+    const container = queryContainer(".excalidraw-container") as HTMLElement;
+    vi.spyOn(container, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, h.state.width, h.state.height),
+    );
+    vi.spyOn(bottomSurface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, h.state.height - 40, h.state.width, 40),
+    );
+    vi.spyOn(propertySurface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, h.state.height - 96, h.state.width, 44),
+    );
+    expect(h.app.viewport.getOffsets({ padding: 0 }).bottom).toBe(96);
+  });
+
+  it("draws through blank phone bottom content while preserving the pointer guard", async () => {
+    mockBoundingClientRect({
+      top: 0,
+      left: 0,
+      bottom: 812,
+      right: 375,
+      width: 375,
+      height: 812,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+    await render(<Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />);
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const content = queryContainer(
+      '[data-canvas-ui-zone="bottom-center"] .canvas-ui-layout__content',
+    ) as HTMLElement;
+    const contentRect = new DOMRect(12, 700, 351, 91);
+    vi.spyOn(content, "getBoundingClientRect").mockReturnValue(contentRect);
+
+    const point = { x: 187.5, y: 744 };
+    expect(point.x).toBeGreaterThan(contentRect.left);
+    expect(point.x).toBeLessThan(contentRect.right);
+    expect(point.y).toBeGreaterThan(contentRect.top);
+    expect(point.y).toBeLessThan(contentRect.bottom);
+
+    const root = queryContainer(".excalidraw-container") as HTMLElement;
+    expect(root.style.getPropertyValue("--ui-pointerEvents")).toBe("all");
+
+    const originalElementFromPoint = document.elementFromPoint;
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.interactiveCanvas,
+    });
+
+    const pointer = {
+      pointerType: "mouse",
+      pointerId: 1,
+      clientX: point.x,
+      clientY: point.y,
+    };
+
+    try {
+      act(() => h.app.setActiveTool({ type: "rectangle" }));
+      fireEvent.pointerDown(
+        document.elementFromPoint(point.x, point.y)!,
+        pointer,
+      );
+
+      const end = { ...pointer, clientX: 220, clientY: 720 };
+      fireEvent.mouseMove(document, end);
+      fireEvent.pointerMove(
+        document.elementFromPoint(end.clientX, end.clientY)!,
+        end,
+      );
+      fireEvent.pointerUp(
+        document.elementFromPoint(end.clientX, end.clientY)!,
+        end,
+      );
+    } finally {
+      Object.assign(document, { elementFromPoint: originalElementFromPoint });
+    }
+
+    expect(h.elements).toHaveLength(1);
+    expect(h.elements[0].type).toBe("rectangle");
+    expect(root.style.getPropertyValue("--ui-pointerEvents")).toBe("all");
+
+    const toolbarSurface = queryContainer(
+      ".App-bottom-bar > .Island.App-toolbar",
+    ) as HTMLElement;
+    root.style.setProperty("--ui-pointerEvents", "none");
+    expect(root.style.getPropertyValue("--ui-pointerEvents")).toBe("none");
+    expect(content).not.toHaveAttribute("style");
+    expect(toolbarSurface.style.pointerEvents).toBe("");
+    root.style.setProperty("--ui-pointerEvents", "all");
+  });
 });
 
 describe("ui={false} with host UI", () => {
@@ -793,6 +1731,32 @@ describe("ui={false} with host UI", () => {
     expect(queryContainer("[data-testid='host-top-right']")).not.toBe(null);
     expect(queryContainer("[data-testid='host-footer']")).not.toBe(null);
     expect(queryContainer("[aria-label='host sidebar']")).not.toBe(null);
+
+    expect(
+      queryContainer("[data-testid='host-top-left']")!.closest(
+        '[data-canvas-ui-zone="top-start"]',
+      ),
+    ).not.toBe(null);
+    expect(
+      queryContainer("[data-testid='host-top-right']")!.closest(
+        '[data-canvas-ui-zone="top-end"]',
+      ),
+    ).not.toBe(null);
+    expect(
+      queryContainer(".dropdown-menu-button")!.closest(
+        '[data-canvas-ui-zone="top-start"]',
+      ),
+    ).not.toBe(null);
+    expect(
+      queryContainer("[aria-label='host sidebar']")!.closest(
+        '[data-canvas-ui-zone="top-end"]',
+      ),
+    ).not.toBe(null);
+    expect(
+      queryContainer("[data-testid='host-footer']")!.closest(
+        '[data-canvas-ui-zone="bottom-center"]',
+      ),
+    ).not.toBe(null);
 
     fireEvent.click(container.querySelector(".dropdown-menu-button")!);
     expect(container.textContent).toContain("host menu item");

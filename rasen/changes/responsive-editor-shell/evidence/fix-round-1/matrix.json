@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "change": "responsive-editor-shell",
+  "role": "fresh non-reviewer fixer",
+  "round": 1,
+  "states": [
+    {
+      "id": "375x812-cold-phone-library",
+      "target": "1517F63CA40492E84B3CC6F95F94181B",
+      "screenshot": "375x812-cold-phone-library.png",
+      "setup": "fresh target, mobile viewport before cold hard reload, no debug refresh or state helper",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "portrait",
+        "blockSize": "regular",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "ltr"
+      },
+      "root": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "clientHeight": 812,
+        "scrollHeight": 812
+      },
+      "renderedDOM": {
+        "mobileClass": true,
+        "desktopWrappers": 0,
+        "phoneLayouts": 1
+      },
+      "sidebar": {
+        "left": 82,
+        "right": 375,
+        "width": 293
+      },
+      "focus": {
+        "tag": "BUTTON",
+        "accessibleName": "Library"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "1024x768-instance-rtl-library-document-ltr",
+      "target": "2A4C3BBE8ACBE2BFBA8D57DA207B08A5",
+      "screenshot": "1024x768-instance-rtl-library-doc-ltr.png",
+      "setup": "RTL App language, document root then set LTR, Library selected by direct trusted click",
+      "profile": {
+        "tier": "tablet",
+        "adapter": "desktop",
+        "presentation": "compact",
+        "direction": "rtl"
+      },
+      "documentDirection": "ltr",
+      "instanceDirection": "rtl",
+      "root": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024
+      },
+      "sidebar": {
+        "left": 0,
+        "right": 293,
+        "width": 293,
+        "borderLeftWidth": "0px",
+        "borderRightWidth": "1px",
+        "physicalSide": "left",
+        "libraryTabState": "active"
+      },
+      "closeControlAccessibleName": "إغلاق",
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "1440x900-instance-rtl-help-document-ltr",
+      "target": "3EE215D394B01CF37A21F7DC488D1805",
+      "screenshot": "1440x900-instance-rtl-help-doc-ltr.png",
+      "setup": "RTL App language, document root then set LTR, Help opened by direct trusted click",
+      "profile": {
+        "tier": "desktop",
+        "adapter": "desktop",
+        "presentation": "full",
+        "direction": "rtl"
+      },
+      "documentDirection": "ltr",
+      "instanceDirection": "rtl",
+      "root": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "clientHeight": 900,
+        "scrollHeight": 986
+      },
+      "welcomeHelpHint": {
+        "left": 318,
+        "right": 475.203125,
+        "svgLeft": 306.73883056640625,
+        "svgRight": 386.62054443359375,
+        "minimumDescendantLeft": 306.73883056640625,
+        "maximumDescendantRight": 475.203125,
+        "boundedByEditorHorizontalScrollExtent": true
+      },
+      "focus": {
+        "tag": "A",
+        "accessibleText": "دليل الاستخدام"
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    },
+    {
+      "id": "640x480-rtl-asymmetric-safe-help",
+      "target": "25FCD61890E373E6C27C3506C6A898AD",
+      "screenshot": "640x480-rtl-asymmetric-safe-help.png",
+      "setup": "RTL phone embed, base safe variables 7/19/23/11, profile refresh through the real resize event, Help opened through the editor keyboard path",
+      "profile": {
+        "tier": "phone",
+        "adapter": "phone",
+        "orientation": "landscape",
+        "blockSize": "short",
+        "density": "touch",
+        "presentation": "mobile",
+        "direction": "rtl",
+        "signature": "[1,\"phone\",\"phone\",\"landscape\",\"short\",\"touch\",\"mobile\",\"rtl\",false,7,19,23,11,7,11,23,19]"
+      },
+      "safeArea": {
+        "physical": {
+          "top": 7,
+          "right": 19,
+          "bottom": 23,
+          "left": 11
+        },
+        "logical": {
+          "blockStart": 7,
+          "inlineEnd": 11,
+          "blockEnd": 23,
+          "inlineStart": 19
+        }
+      },
+      "root": {
+        "clientWidth": 640,
+        "scrollWidth": 640
+      },
+      "helpSurface": {
+        "left": 0,
+        "right": 640,
+        "bounded": true
+      },
+      "focus": {
+        "tag": "A",
+        "focusVisible": true
+      },
+      "checkerMessages": 0,
+      "visibleErrorOverlays": 0,
+      "errorConsoleEntries": 0
+    }
+  ],
+  "screenshots": {
+    "count": 4,
+    "aggregateMethod": "SHA-256 over ordinal-sorted filename<TAB>file-sha256 records joined with LF",
+    "aggregateSha256": "99545c92027abf2fbf9090a7eff33a0cdd9d95a7d48bd02da942477c6f7f38d0",
+    "personallyInspected": true
+  },
+  "sourceFingerprint": {
+    "scopedBase": "500c5762306548a3293f4e39acfe59d05d9e0025",
+    "algorithm": "SHA-256 over ordinal-sorted UTF-8 path<TAB>git-hash-object records joined with LF and no terminal newline",
+    "manifest": "source-manifest.tsv",
+    "manifestCount": 30,
+    "aggregateSha256": "1df2728231959da528ba2c2ffcf818c952148c547d1494050a6fca9e83a0e503",
+    "fixerDeltaManifest": "fixer-delta-manifest.tsv",
+    "fixerDeltaManifestCount": 5,
+    "fixerDeltaAggregateSha256": "ca425a2c4b9aa142fac9a8b8a3e32b50d7c594896735ed6954a075da316b3c7c",
+    "historicalImplementerFingerprintStatus": "superseded because its algorithm was not documented; no reproduction claim"
+  }
+}

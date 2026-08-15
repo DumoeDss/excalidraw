@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "narrow-loading",
+  "filename": "narrow-loading__375x812__dpr1__light__ltr__loading.png",
+  "width": 375,
+  "height": 812,
+  "deviceScaleFactor": 1,
+  "crop": {
+    "selector": ".excalidraw",
+    "target": {
+      "x": 0,
+      "y": 0,
+      "width": 375,
+      "height": 812
+    },
+    "editor": {
+      "x": 0,
+      "y": 0,
+      "width": 375,
+      "height": 812
+    }
+  },
+  "browser": "Chrome",
+  "platform": "win32-x64-10.0.26200",
+  "fontVersion": "repository-fonts-v1",
+  "fixtureVersion": "visual-fixtures-v1",
+  "comparison": {
+    "channelTolerance": 4,
+    "antialiasTolerance": 12,
+    "maxMismatchRatio": 0.0005,
+    "maxMaskRatio": 0
+  },
+  "imageHash": "463ccc55ee3e92a411ce59b8db86df491a377fbc259b7efb2257600580e429a6",
+  "budgetSource": null,
+  "approval": "intentional-change",
+  "approvedBy": "fixer",
+  "inspectedAt": "2026-08-14T14:08:47.995Z",
+  "sourceFingerprint": "70737b62e062eb3269a9d266c079576b79147caf9ba3275a13230f20f35509ad"
+}

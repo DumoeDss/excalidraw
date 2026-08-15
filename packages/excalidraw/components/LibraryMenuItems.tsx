@@ -32,9 +32,16 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useEditorInterface } from "./App";
+import { useResponsiveEditorShell } from "./App";
 
 import { Button } from "./Button";
+import {
+  AppContent,
+  AppContentBody,
+  AppContentHeader,
+  AppContentSection,
+  AppContentState,
+} from "./appContent/AppContent";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -75,7 +82,7 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
-  const editorInterface = useEditorInterface();
+  const responsive = useResponsiveEditorShell();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -268,16 +275,19 @@ export default function LibraryMenuItems({
       )}
       {!pendingElements.length && !unpublishedItems.length ? (
         <div className="library-menu-items__no-items">
-          {!publishedItems.length && (
-            <div className="library-menu-items__no-items__label">
-              {t("library.noItems")}
-            </div>
-          )}
-          <div className="library-menu-items__no-items__hint">
-            {publishedItems.length > 0
-              ? t("library.hint_emptyPrivateLibrary")
-              : t("library.hint_emptyLibrary")}
-          </div>
+          <AppContentState
+            kind="empty"
+            title={
+              publishedItems.length > 0
+                ? t("labels.personalLib")
+                : t("library.noItems")
+            }
+            message={
+              publishedItems.length > 0
+                ? t("library.hint_emptyPrivateLibrary")
+                : t("library.hint_emptyLibrary")
+            }
+          />
         </div>
       ) : (
         <LibraryMenuSectionGrid>
@@ -359,18 +369,19 @@ export default function LibraryMenuItems({
         </LibraryMenuSectionGrid>
       ) : (
         <div className="library-menu-items__no-items">
-          <div className="library-menu-items__no-items__hint">
-            {t("library.search.noResults")}
-          </div>
-          <Button
-            onPointerDown={(e) => e.preventDefault()}
-            onSelect={() => {
-              setSearchInputValue("");
-            }}
-            style={{ width: "auto", marginTop: "1rem" }}
-          >
-            {t("library.search.clearSearch")}
-          </Button>
+          <AppContentState
+            kind="empty"
+            title={t("library.search.noResults")}
+            actions={
+              <Button
+                onPointerDown={(e) => e.preventDefault()}
+                onSelect={() => setSearchInputValue("")}
+                style={{ width: "auto" }}
+              >
+                {t("library.search.clearSearch")}
+              </Button>
+            }
+          />
         </div>
       )}
     </>
@@ -387,60 +398,74 @@ export default function LibraryMenuItems({
           : { borderBottom: 0 }
       }
     >
-      <div className="library-menu-items-header">
-        {!IS_LIBRARY_EMPTY && (
-          <TextField
-            ref={searchInputRef}
-            type="search"
-            className={clsx("library-menu-items-container__search", {
-              hideCancelButton: editorInterface.formFactor !== "phone",
-            })}
-            placeholder={t("library.search.inputPlaceholder")}
-            value={searchInputValue}
-            onChange={(value) => setSearchInputValue(value)}
-          />
-        )}
-        <LibraryDropdownMenu
-          selectedItems={selectedItems}
-          onSelectItems={onSelectItems}
-          className="library-menu-dropdown-container--in-heading"
-        />
-      </div>
-      <Stack.Col
-        className="library-menu-items-container__items"
-        align="start"
-        gap={1}
-        style={{
-          flex: publishedItems.length > 0 ? 1 : "0 1 auto",
-          margin: IS_LIBRARY_EMPTY ? "auto" : 0,
-        }}
-        ref={libraryContainerRef}
+      <AppContent
+        as="div"
+        density={responsive.density}
+        label={t("toolBar.library")}
       >
-        {isLoading && (
-          <div
-            style={{
-              position: "absolute",
-              top: "var(--container-padding-y)",
-              right: "var(--container-padding-x)",
-              transform: "translateY(50%)",
-            }}
-          >
-            <Spinner />
+        <AppContentSection>
+          <div className="library-menu-items-header">
+            <AppContentHeader
+              title={t("toolBar.library")}
+              actions={
+                <>
+                  {!IS_LIBRARY_EMPTY && (
+                    <TextField
+                      ref={searchInputRef}
+                      type="search"
+                      className={clsx("library-menu-items-container__search", {
+                        hideCancelButton: responsive.adapter !== "phone",
+                      })}
+                      placeholder={t("library.search.inputPlaceholder")}
+                      value={searchInputValue}
+                      onChange={(value) => setSearchInputValue(value)}
+                    />
+                  )}
+                  <LibraryDropdownMenu
+                    selectedItems={selectedItems}
+                    onSelectItems={onSelectItems}
+                    className="library-menu-dropdown-container--in-heading"
+                  />
+                </>
+              }
+            />
           </div>
-        )}
+          <AppContentBody>
+            <Stack.Col
+              className="library-menu-items-container__items"
+              align="start"
+              gap={1}
+              style={{
+                flex: publishedItems.length > 0 ? 1 : "0 1 auto",
+                margin: IS_LIBRARY_EMPTY ? "auto" : 0,
+              }}
+              ref={libraryContainerRef}
+            >
+              {isLoading && (
+                <div className="library-menu-items__loading">
+                  <AppContentState
+                    kind="loading"
+                    title={t("labels.loadingScene")}
+                    visual={<Spinner />}
+                  />
+                </div>
+              )}
 
-        {JSX_whenNotSearching}
-        {JSX_whenSearching}
+              {JSX_whenNotSearching}
+              {JSX_whenSearching}
 
-        {IS_LIBRARY_EMPTY && (
-          <LibraryMenuControlButtons
-            style={{ padding: "16px 0", width: "100%" }}
-            id={id}
-            libraryReturnUrl={libraryReturnUrl}
-            theme={theme}
-          />
-        )}
-      </Stack.Col>
+              {IS_LIBRARY_EMPTY && (
+                <LibraryMenuControlButtons
+                  style={{ padding: "16px 0", width: "100%" }}
+                  id={id}
+                  libraryReturnUrl={libraryReturnUrl}
+                  theme={theme}
+                />
+              )}
+            </Stack.Col>
+          </AppContentBody>
+        </AppContentSection>
+      </AppContent>
     </div>
   );
 }

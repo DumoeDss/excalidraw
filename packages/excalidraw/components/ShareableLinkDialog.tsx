@@ -7,7 +7,7 @@ import { useI18n } from "../i18n";
 import { Dialog } from "./Dialog";
 import { FilledButton } from "./FilledButton";
 import { TextField } from "./TextField";
-import { copyIcon } from "./icons";
+import { copyIcon } from "./primitives/chrome-icons";
 
 import "./ShareableLinkDialog.scss";
 

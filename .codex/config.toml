@@ -1,0 +1,4 @@
+[features.multi_agent_v2]
+min_wait_timeout_ms = 3600000
+default_wait_timeout_ms = 3600000
+max_wait_timeout_ms = 3600000
