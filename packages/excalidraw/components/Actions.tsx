@@ -19,21 +19,27 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { actionToggleZenMode } from "../actions";
+import {
+  actionToggleZenMode,
+  actionZoomIn,
+  actionZoomOut,
+  actionZoomToFit,
+} from "../actions";
 
 import { t } from "../i18n";
-import { getTargetElements } from "../scene";
+import { getNormalizedZoom, getTargetElements } from "../scene";
+import { getViewportForZoomWithScrollConstraints } from "../viewport";
 
 import { getFormValue } from "../actions/actionProperties";
 
 import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
+import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import "./Actions.scss";
 
-import { useExcalidrawContainer, useStylesPanelMode } from "./App";
-import Stack from "./Stack";
+import { useApp, useExcalidrawContainer, useStylesPanelMode } from "./App";
 import { AdaptiveEditorToolbar } from "./AdaptiveEditorToolbar";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";
@@ -1151,18 +1157,123 @@ export const ShapesSwitcher = ({
 };
 
 export const ZoomActions = ({
-  renderAction,
+  actionManager,
 }: {
-  renderAction: ActionManager["renderAction"];
-}) => (
-  <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
-    <Stack.Row align="center">
-      {renderAction("zoomOut")}
-      {renderAction("resetZoom")}
-      {renderAction("zoomIn")}
-    </Stack.Row>
-  </Stack.Col>
-);
+  actionManager: ActionManager;
+}) => {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const zoom = useAppStateValue((appState) => appState.zoom.value);
+  const app = useApp();
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const close = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !rootRef.current?.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("pointerdown", close);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
+  const runAndClose = (action: typeof actionZoomToFit) => {
+    actionManager.executeAction(action, "ui");
+    setOpen(false);
+  };
+
+  const setZoom = (value: number) => {
+    app.requestUnfollow();
+    app.setAppState(
+      getViewportForZoomWithScrollConstraints(
+        {
+          viewportX: app.state.width / 2 + app.state.offsetLeft,
+          viewportY: app.state.height / 2 + app.state.offsetTop,
+          nextZoom: getNormalizedZoom(value),
+        },
+        app.state,
+      ),
+    );
+    setOpen(false);
+  };
+
+  return (
+    <div className={CLASSES.ZOOM_ACTIONS} ref={rootRef}>
+      <button
+        type="button"
+        className="zoom-menu-trigger"
+        aria-label={t("buttons.resetZoom")}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {Math.round(zoom * 100)}%
+      </button>
+      {open && (
+        <div className="zoom-menu" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => actionManager.executeAction(actionZoomIn, "ui")}
+          >
+            <span className="zoom-menu__icon">＋</span>
+            <span>{t("buttons.zoomIn")}</span>
+            <span className="zoom-menu__shortcut">⌘ +</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => actionManager.executeAction(actionZoomOut, "ui")}
+          >
+            <span className="zoom-menu__icon">−</span>
+            <span>{t("buttons.zoomOut")}</span>
+            <span className="zoom-menu__shortcut">⌘ −</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => runAndClose(actionZoomToFit)}
+          >
+            <span className="zoom-menu__icon">⌗</span>
+            <span>{t("helpDialog.zoomToFit")}</span>
+            <span className="zoom-menu__shortcut">⇧ 1</span>
+          </button>
+          <div className="zoom-menu__separator" />
+          {[0.5, 1, 2].map((value) => (
+            <button
+              type="button"
+              role="menuitem"
+              className={Math.abs(zoom - value) < 0.001 ? "is-selected" : ""}
+              key={value}
+              onClick={() => {
+                setZoom(value);
+              }}
+            >
+              <span>{value * 100}%</span>
+              {Math.abs(zoom - value) < 0.001 && (
+                <span className="zoom-menu__check">✓</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const UndoRedoActions = ({
   renderAction,

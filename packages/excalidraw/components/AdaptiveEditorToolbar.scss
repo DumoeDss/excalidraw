@@ -33,11 +33,11 @@
     &__group-trigger,
     &__menu-trigger,
     &__overflow-trigger {
-      flex: 0 0 2.25rem;
-      width: 2.25rem;
-      height: 2.25rem;
-      min-width: 2.25rem;
-      min-height: 2.25rem;
+      flex: 0 0 2.125rem;
+      width: 2.125rem;
+      height: 2.125rem;
+      min-width: 2.125rem;
+      min-height: 2.125rem;
       border: 0;
       border-radius: var(--ui-radius-md);
       background: transparent;
@@ -64,8 +64,14 @@
 
       &--selected,
       &[aria-pressed="true"] {
-        background: var(--ui-surface-selected);
-        color: var(--color-on-primary-container);
+        --icon-fill-color: #fff;
+        background: #2c2c2c;
+        color: #fff;
+
+        .ToolIcon__icon,
+        svg {
+          color: #fff;
+        }
       }
 
       &:disabled {
@@ -81,8 +87,8 @@
 
     .tool-group-dropdown .ToolIcon__icon,
     .ToolIcon__icon {
-      width: 2.25rem;
-      height: 2.25rem;
+      width: 2.125rem;
+      height: 2.125rem;
       border-radius: var(--ui-radius-md);
 
       svg {
@@ -163,7 +169,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--ui-space-3);
+    gap: 0;
     min-width: 0;
     max-width: 100%;
     pointer-events: none;

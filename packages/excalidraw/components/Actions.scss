@@ -7,6 +7,99 @@
   box-shadow: var(--ui-shadow-2);
 }
 
+.zoom-actions {
+  position: relative;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.zoom-menu-trigger {
+  min-width: 48px;
+  height: 32px;
+  padding: 0 8px;
+  color: var(--color-gray-70);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-md);
+  font-family: var(--ui-font);
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-primary-color);
+    background: var(--ui-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-highlight-color);
+    outline-offset: 1px;
+  }
+}
+
+.zoom-menu {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: calc(100% + 8px);
+  z-index: var(--zIndex-ui-bottom);
+  width: 200px;
+  box-sizing: border-box;
+  padding: 6px;
+  color: var(--text-primary-color);
+  background: #fff;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  button {
+    width: 100%;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 9px;
+    color: inherit;
+    text-align: start;
+    background: transparent;
+    border: 0;
+    border-radius: var(--ui-radius-md);
+    font-family: var(--ui-font);
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &:hover,
+    &.is-selected {
+      background: var(--ui-surface-hover);
+    }
+  }
+
+  &__icon {
+    width: 18px;
+    flex: 0 0 auto;
+    color: var(--color-gray-70);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  &__check {
+    margin-inline-start: auto;
+    color: var(--color-primary);
+  }
+
+  &__shortcut {
+    margin-inline-start: auto;
+    color: #c3c3c3;
+    font-size: 0.75rem;
+  }
+
+  &__separator {
+    height: 1px;
+    margin: 5px 4px;
+    background: var(--ui-border);
+  }
+}
+
 // media icon decorated with a small sparkle, used for AI generator tools
 .generator-tool-icon {
   position: relative;
@@ -101,6 +194,15 @@
 }
 
 .undo-redo-buttons {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+
+  button {
+    width: 32px;
+    height: 32px;
+  }
+
   .undo-button-container button {
     border-top-left-radius: var(--border-radius-lg) !important;
     border-bottom-left-radius: var(--border-radius-lg) !important;
@@ -128,6 +230,14 @@
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
     }
+  }
+}
+
+.layer-ui__wrapper__footer-left {
+  .ToolIcon__lock,
+  .ToolIcon__lock .ToolIcon__icon {
+    width: 32px;
+    height: 32px;
   }
 }
 

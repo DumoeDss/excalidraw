@@ -56,6 +56,36 @@
     pointer-events: all;
   }
 
+  .excalidraw-generator-node-label {
+    position: absolute;
+    inset-block-start: -22px;
+    inset-inline-start: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    overflow: hidden;
+    color: #3f86ff;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    pointer-events: none;
+
+    &__kind {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      > span {
+        font-size: 9px;
+      }
+    }
+  }
+
   .excalidraw-generator-badge {
     position: absolute;
     display: inline-flex;
