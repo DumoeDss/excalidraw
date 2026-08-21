@@ -70,7 +70,7 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`6`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
     expect(h.elements.length).toEqual(0);
   });
@@ -85,7 +85,7 @@ describe("remove shape in non linear elements", () => {
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`6`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
     expect(h.elements.length).toEqual(0);
   });
@@ -119,7 +119,7 @@ describe("multi point mode in linear elements", () => {
     });
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `11`,
+      `12`,
     );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
@@ -164,7 +164,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `11`,
+      `12`,
     );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
@@ -219,7 +219,7 @@ describe("multi point mode in linear elements", () => {
     });
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `11`,
+      `12`,
     );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);

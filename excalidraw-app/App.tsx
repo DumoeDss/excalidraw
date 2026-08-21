@@ -731,7 +731,8 @@ const ExcalidrawWrapper = () => {
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
       LocalData.save(elements, appState, files, () => {
-        if (excalidrawAPI) {
+        // debounced save can fire after the editor unmounted
+        if (excalidrawAPI && !excalidrawAPI.isDestroyed) {
           let didChange = false;
 
           const elements = excalidrawAPI

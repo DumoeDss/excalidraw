@@ -143,6 +143,9 @@ describe("FontPicker", () => {
         ...window.h.app.editorInterface,
         isTouchScreen: true,
       };
+      // recompute the responsive profile so `density` becomes "touch" —
+      // surfaces (e.g. the font picker popover) gate auto-focus on it
+      window.h.app.refreshEditorInterface();
       window.h.app.forceUpdate();
     });
     textEditor.focus();

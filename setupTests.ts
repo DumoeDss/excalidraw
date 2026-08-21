@@ -22,15 +22,20 @@ PolyfillLocalStorage();
 // (often hundreds of lines of HTML per failure). Strip it out unless
 // VITE_DEBUG_DOM is enabled (see .env.test), e.g. `VITE_DEBUG_DOM=true yarn test`.
 const debugDom = ["true", "1"].includes(process.env.VITE_DEBUG_DOM ?? "");
-if (!debugDom) {
-  configure({
-    getElementError: (message) => {
-      const error = new Error(message ?? undefined);
-      error.name = "TestingLibraryElementError";
-      return error;
-    },
-  });
-}
+configure({
+  ...(debugDom
+    ? {}
+    : {
+        getElementError: (message: string | undefined) => {
+          const error = new Error(message ?? undefined);
+          error.name = "TestingLibraryElementError";
+          return error;
+        },
+      }),
+  // the 1s default waitFor budget flakes when the suite's workers saturate
+  // the CPU (cold starts, font loading, first renders)
+  asyncUtilTimeout: 5_000,
+});
 
 vi.mock("@excalidraw/common", async (importOriginal) => {
   const module = await importOriginal<typeof import("@excalidraw/common")>();

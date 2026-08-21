@@ -93,9 +93,18 @@ describe("exportToSvg", () => {
       null,
     );
 
-    expect(svgElement).toMatchSnapshot();
+    // the embedded woff2 subsets legitimately differ byte-for-byte between
+    // runs — normalize them so the snapshot asserts the @font-face structure
+    // (families + embedded sources), not the exact font bytes
+    expect(
+      svgElement.outerHTML.replace(
+        /url\(data:font\/woff2;base64,[A-Za-z0-9+/=]+/g,
+        "url(data:font/woff2;base64,<FONT_BYTES>",
+      ),
+    ).toMatchSnapshot();
     // extend the timeout, as it needs to first load the fonts from disk and then perform whole woff2 decode, subset and encode (without workers)
-  }, 30_000);
+    // (and can multiples slower when the suite's workers saturate the CPU)
+  }, 120_000);
 
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";

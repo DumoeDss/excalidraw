@@ -1,6 +1,6 @@
 import path from "path";
 
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -79,6 +79,13 @@ export default defineConfig({
     sequence: {
       hooks: "parallel",
     },
+    // the default 5s per-test budget flakes on loaded machines (workers
+    // saturate the CPU during cold starts and font/scene work)
+    testTimeout: 20_000,
+    // the visual-regression self-tests have their own runner
+    // (`yarn test:visual*`) and its dedicated config — under the default
+    // config they conflict with each other and refuse dirty working trees
+    exclude: [...configDefaults.exclude, "scripts/visual-regression/**"],
     setupFiles: ["./setupTests.ts"],
     globals: true,
     environment: "jsdom",

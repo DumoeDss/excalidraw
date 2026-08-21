@@ -218,7 +218,7 @@ describe("elbow arrow ui", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!.querySelector("button")!);
   });
 
   it("can follow bound shapes", async () => {

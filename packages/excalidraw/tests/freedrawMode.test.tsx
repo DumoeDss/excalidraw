@@ -39,7 +39,9 @@ describe("freedraw mode action", () => {
     const element = UI.createElement("freedraw", { x: 0, y: 0 });
     API.setSelectedElements([element.get()] as NonDeletedExcalidrawElement[]);
 
-    fireEvent.click(screen.getByTitle("Variable"));
+    // the styles panel renders pressure as a single button that cycles
+    // constant ↔ variable
+    fireEvent.click(screen.getByTitle("Pressure"));
     expect(
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
     ).toBe("variable");
@@ -48,7 +50,7 @@ describe("freedraw mode action", () => {
     ).toBe(0.5);
     expect(h.state.currentItemStrokeVariability).toBe("variable");
 
-    fireEvent.click(screen.getByTitle("Constant"));
+    fireEvent.click(screen.getByTitle("Pressure"));
     expect(
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.variability,
     ).toBe("constant");

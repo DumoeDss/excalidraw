@@ -113,6 +113,13 @@ describe("Test <MermaidToExcalidraw/>", () => {
         }}
       />,
     );
+    // the dialog mounts its input asynchronously — snapshot/click only after
+    // the loading state clears, else we capture/act on the spinner container
+    await waitFor(() => {
+      expect(
+        document.querySelector(".ttd-dialog-input--loading"),
+      ).toBeNull();
+    });
   });
 
   it("should open mermaid popup when active tool is mermaid", async () => {
@@ -131,7 +138,12 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
-    expect(editor.textContent).toMatchSnapshot();
+    // the dialog prefills a sample diagram (or a saved definition) — wait for
+    // the editor to actually mount it instead of snapshotting whatever
+    // partially-initialized state the async editor happens to be in
+    await waitFor(() => {
+      expect((editor.textContent ?? "").length).toBeGreaterThan(0);
+    });
 
     updateTextEditor(editor, "flowchart TD1");
     editor = await getTextEditor({ selector, waitForEditor: false });

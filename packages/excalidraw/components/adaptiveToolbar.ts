@@ -82,78 +82,89 @@ const tool = (
 /**
  * Presentation-neutral canonical inventory. Rendering adapters map these
  * identities to the existing action and icon authorities.
+ *
+ * Built lazily, not at module top level: `tool()` dereferences `TOOLS`, and
+ * `./Tools` (via ToolPopover → App → AdaptiveEditorToolbar) participates in
+ * an import cycle with this module — evaluating the table during module init
+ * crashes when `./Tools` is entered first and still mid-initialization.
  */
-const TOOLBAR_ITEMS: readonly StaticToolbarItem[] = [
-  tool("hand", "selection"),
-  tool("selection", "selection"),
-  tool("lasso", "selection", {
-    shortcutType: "selection",
-    visible: (context) =>
-      context.isFullStylesPanel ||
-      context.preferredSelectionToolType === "lasso" ||
-      context.activeToolType === "lasso",
-  }),
-  tool("image", "upload"),
-  tool("video", "upload"),
-  tool("audio", "upload"),
-  tool("rectangle", "shapes"),
-  tool("diamond", "shapes"),
-  tool("ellipse", "shapes"),
-  tool("arrow", "shapes"),
-  tool("line", "shapes"),
-  tool("freedraw", "drawing"),
-  tool("autoshape", "drawing"),
-  tool("text", "primary"),
-  tool("eraser", "primary"),
-  {
-    id: "action:generate-image",
-    group: "generation",
-    labelKey: "toolBar.imageGenerator",
-    testId: "toolbar-image-generator",
-    activation: { kind: "action", type: "generate-image" },
-    visible: (context) => context.hasGenerator,
-  },
-  {
-    id: "action:generate-video",
-    group: "generation",
-    labelKey: "toolBar.videoGenerator",
-    testId: "toolbar-video-generator",
-    activation: { kind: "action", type: "generate-video" },
-    visible: (context) => context.hasGenerator,
-  },
-  tool("frame", "extra"),
-  tool("embeddable", "extra"),
-  tool("laser", "extra"),
-  tool("bucketfill", "extra"),
-  {
-    id: "action:text-to-diagram",
-    group: "extra",
-    labelKey: "toolBar.textToDiagram",
-    testId: "toolbar-text-to-diagram",
-    activation: { kind: "action", type: "text-to-diagram" },
-    visible: (context) => context.aiEnabled,
-  },
-  {
-    id: "action:mermaid",
-    group: "extra",
-    labelKey: "toolBar.mermaidToExcalidraw",
-    testId: "toolbar-mermaid",
-    activation: { kind: "action", type: "mermaid" },
-  },
-  {
-    id: "action:diagram-to-code",
-    group: "extra",
-    labelKey: "toolBar.magicframe",
-    testId: "toolbar-magicframe",
-    activation: { kind: "action", type: "diagram-to-code" },
-    visible: (context) => context.aiEnabled && context.hasDiagramToCode,
-  },
-] as const;
+let toolbarItemsCache: readonly StaticToolbarItem[] | null = null;
+const getToolbarItems = (): readonly StaticToolbarItem[] => {
+  if (!toolbarItemsCache) {
+    toolbarItemsCache = [
+      tool("hand", "selection"),
+      tool("selection", "selection"),
+      tool("lasso", "selection", {
+        shortcutType: "selection",
+        visible: (context) =>
+          context.isFullStylesPanel ||
+          context.preferredSelectionToolType === "lasso" ||
+          context.activeToolType === "lasso",
+      }),
+      tool("image", "upload"),
+      tool("video", "upload"),
+      tool("audio", "upload"),
+      tool("rectangle", "shapes"),
+      tool("diamond", "shapes"),
+      tool("ellipse", "shapes"),
+      tool("arrow", "shapes"),
+      tool("line", "shapes"),
+      tool("freedraw", "drawing"),
+      tool("autoshape", "drawing"),
+      tool("text", "primary"),
+      tool("eraser", "primary"),
+      {
+        id: "action:generate-image",
+        group: "generation",
+        labelKey: "toolBar.imageGenerator",
+        testId: "toolbar-image-generator",
+        activation: { kind: "action", type: "generate-image" },
+        visible: (context) => context.hasGenerator,
+      },
+      {
+        id: "action:generate-video",
+        group: "generation",
+        labelKey: "toolBar.videoGenerator",
+        testId: "toolbar-video-generator",
+        activation: { kind: "action", type: "generate-video" },
+        visible: (context) => context.hasGenerator,
+      },
+      tool("frame", "extra"),
+      tool("embeddable", "extra"),
+      tool("laser", "extra"),
+      tool("bucketfill", "extra"),
+      {
+        id: "action:text-to-diagram",
+        group: "extra",
+        labelKey: "toolBar.textToDiagram",
+        testId: "toolbar-text-to-diagram",
+        activation: { kind: "action", type: "text-to-diagram" },
+        visible: (context) => context.aiEnabled,
+      },
+      {
+        id: "action:mermaid",
+        group: "extra",
+        labelKey: "toolBar.mermaidToExcalidraw",
+        testId: "toolbar-mermaid",
+        activation: { kind: "action", type: "mermaid" },
+      },
+      {
+        id: "action:diagram-to-code",
+        group: "extra",
+        labelKey: "toolBar.magicframe",
+        testId: "toolbar-magicframe",
+        activation: { kind: "action", type: "diagram-to-code" },
+        visible: (context) => context.aiEnabled && context.hasDiagramToCode,
+      },
+    ];
+  }
+  return toolbarItemsCache;
+};
 
 export const resolveToolbarItems = (
   context: ToolbarResolveContext,
 ): readonly ResolvedToolbarItem[] =>
-  TOOLBAR_ITEMS.filter((item) => {
+  getToolbarItems().filter((item) => {
     const toolType =
       item.activation.kind === "tool" ? item.activation.type : null;
     return (

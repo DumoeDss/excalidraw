@@ -42,6 +42,7 @@ import type {
 
 import { createTestHook } from "../../components/App";
 import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
+import { TOOL_GROUP_TRIGGER } from "./toolGroups";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 
 import { API } from "./api";
@@ -454,36 +455,46 @@ export class UI {
           `[data-testid="toolbar-${toolName}"]`,
         ),
       );
-      return (
-        matches.find((element) => !element.closest(".tool-popover-content")) ??
-        matches[0] ??
-        null
+      const standalone = matches.filter(
+        (element) =>
+          !element.closest(".tool-popover-content, .tool-group-dropdown__menu"),
       );
+      return standalone[0] ?? matches[0] ?? null;
     };
-    let tool = queryVisibleTool();
-    if (!tool) {
-      const groupTrigger = (
-        ["hand", "selection", "lasso"].includes(toolName)
-          ? "toolbar-selection"
-          : ["image", "video", "audio"].includes(toolName)
-          ? "toolbar-upload-group"
-          : ["rectangle", "diamond", "ellipse", "arrow", "line"].includes(
-              toolName,
-            )
-          ? "toolbar-shapes-group"
-          : ["freedraw", "autoshape"].includes(toolName)
-          ? "toolbar-freedraw"
-          : null
-      ) as string | null;
-      if (groupTrigger) {
-        const trigger = GlobalTestState.renderResult.container.querySelector(
-          `[data-testid="${groupTrigger}"]`,
+    const attemptActivation = () => {
+      let tool = queryVisibleTool();
+      if (!tool) {
+        const groupTrigger = TOOL_GROUP_TRIGGER[toolName];
+        if (groupTrigger) {
+          const trigger = document.querySelector<HTMLElement>(
+            `[data-testid="${groupTrigger}"]`,
+          );
+          if (trigger) {
+            fireEvent.click(trigger);
+            tool = queryVisibleTool();
+          }
+        }
+      }
+      if (!tool) {
+        // non-required units (generators, extra tools) live in the overflow
+        // menu when space is tight — and always under jsdom's zero widths
+        const trigger = document.querySelector<HTMLElement>(
+          `[data-testid="toolbar-overflow-trigger"]`,
         );
         if (trigger) {
           fireEvent.click(trigger);
           tool = queryVisibleTool();
         }
       }
+      return tool;
+    };
+    let tool = attemptActivation();
+    if (!tool) {
+      // opening a group activates its displayed tool, and the first
+      // activation can remount the toolbar (the responsive shell settles
+      // its layout on the first appState change), tearing down the very
+      // menu we just opened — retry once against the fresh instance
+      tool = attemptActivation();
     }
     if (!tool) {
       throw new Error(`Unable to find an element with tool name: ${toolName}`);

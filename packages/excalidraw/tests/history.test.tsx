@@ -84,6 +84,11 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
+// let rAF-deferred layout work (adaptive toolbar re-plan, font settles)
+// flush before counting, else render totals depend on machine timing
+const settleDeferredWork = () =>
+  new Promise((resolve) => setTimeout(resolve, 30));
+
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
@@ -139,7 +144,8 @@ describe("history", () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await settleDeferredWork();
     checkpoint("end of test");
   });
 
