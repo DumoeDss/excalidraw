@@ -2517,10 +2517,36 @@ class App extends React.Component<AppProps, AppState> {
                   )}
                 </div>
               )}
+              {showPanel && (
+                <div
+                  className="excalidraw-generator-node-label"
+                  style={{ width: `${el.width * scale}px` }}
+                >
+                  <span className="excalidraw-generator-node-label__kind">
+                    <span aria-hidden="true">
+                      {config.kind === "video" ? "▶" : "▧"}
+                    </span>
+                    {config.kind === "video"
+                      ? "Video Generator"
+                      : "Image Generator"}
+                  </span>
+                  <span>
+                    {config.kind === "video"
+                      ? "1920 × 1080"
+                      : `${String(config.params.width ?? 1456)} × ${String(
+                          config.params.height ?? 816,
+                        )}`}
+                  </span>
+                </div>
+              )}
               {panel && (
                 <div
                   className="excalidraw-generator-panel-anchor"
-                  style={{ top: `${el.height * scale + 12}px` }}
+                  style={{
+                    top: `${el.height * scale + 7}px`,
+                    left: `${(el.width * scale) / 2}px`,
+                    transform: "translateX(-50%)",
+                  }}
                 >
                   {panel}
                 </div>
@@ -14155,7 +14181,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public createGeneratorNode = (kind: GeneratorKind) => {
     const clientX = this.state.width / 2 + this.state.offsetLeft;
-    const clientY = this.state.height / 2 + this.state.offsetTop;
+    const clientY = this.state.height * 0.32 + this.state.offsetTop;
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
       this.state,
@@ -14166,6 +14192,10 @@ class App extends React.Component<AppProps, AppState> {
         ? this.newImagePlaceholder({ sceneX: x, sceneY: y })
         : this.newMediaPlaceholder({ sceneX: x, sceneY: y, kind });
     const node = newElementWith(base, {
+      x: x - 120,
+      y: y - 67.5,
+      width: 240,
+      height: 135,
       customData: { generator: newGeneratorConfig(kind) },
     });
 

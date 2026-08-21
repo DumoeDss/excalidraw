@@ -10,7 +10,7 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element";
+import { isGeneratorElement, mutateElement } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
@@ -64,7 +64,6 @@ import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { ToastRegion } from "./Toast";
-import { LockButton } from "./LockButton";
 import { HintViewer } from "./HintViewer";
 
 import "./LayerUI.scss";
@@ -295,8 +294,22 @@ const LayerUI = ({
   };
 
   const renderDesktopLayout = (footerZones: CanvasUiZones) => {
+    const selectedElementIds = Object.keys(appState.selectedElementIds);
+    const isGeneratorPanelOpen =
+      Boolean(app.props.renderGeneratorPanel) &&
+      selectedElementIds.length === 1 &&
+      elements.some(
+        (element) =>
+          element.id === selectedElementIds[0] && isGeneratorElement(element),
+      );
     const shouldRenderSelectedShapeActions =
-      defaultUIEnabled && showSelectedShapeActions(appState, elements);
+      defaultUIEnabled &&
+      !isGeneratorPanelOpen &&
+      showSelectedShapeActions(appState, elements);
+    const isSidebarVisible = Boolean(
+      appState.openSidebar && editorInterface.canFitSidebar,
+    );
+    const isDockedSidebarVisible = isSidebarVisible && isSidebarDocked;
 
     const shouldShowStats =
       defaultUIEnabled &&
@@ -359,16 +372,6 @@ const LayerUI = ({
                         title={t("toolBar.penMode")}
                         penDetected={appState.penDetected}
                       />
-                      {app.props.activeTool == null && (
-                        <LockButton
-                          checked={appState.activeTool.locked}
-                          onChange={onLockToggle}
-                          title={t("toolBar.lock")}
-                        />
-                      )}
-
-                      <div className="App-toolbar__divider" />
-
                       <ShapesSwitcher
                         setAppState={setAppState}
                         activeTool={appState.activeTool}
@@ -376,7 +379,7 @@ const LayerUI = ({
                         app={app}
                         maxWidth={Math.max(
                           180,
-                          Math.min(420, appState.width - 360),
+                          Math.min(404, appState.width - 360),
                         )}
                       />
                       {isCollaborating && (
@@ -436,30 +439,36 @@ const LayerUI = ({
       </div>
     );
 
-    const propertyStack = defaultUIEnabled ? (
-      <div
-        className={clsx("layer-ui__property-stack", {
-          "layer-ui__property-stack--compact": isCompactStylesPanel,
-        })}
-        data-property-stack="top-end"
-      >
-        {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
-        {isCompactStylesPanel &&
-          !appState.viewModeEnabled &&
-          shouldRenderSelectedShapeActions && (
-            <PenModeButton
-              checked={appState.penMode}
-              onChange={() => onPenModeToggle(null)}
-              title={t("toolBar.penMode")}
-              isMobile
-              penDetected={appState.penDetected}
-            />
-          )}
-      </div>
-    ) : null;
+    const propertyStack =
+      defaultUIEnabled && shouldRenderSelectedShapeActions ? (
+        <div
+          className={clsx("layer-ui__property-stack", {
+            "layer-ui__property-stack--compact": isCompactStylesPanel,
+          })}
+          data-property-stack="top-end"
+        >
+          {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+          {isCompactStylesPanel &&
+            !appState.viewModeEnabled &&
+            shouldRenderSelectedShapeActions && (
+              <PenModeButton
+                checked={appState.penMode}
+                onChange={() => onPenModeToggle(null)}
+                title={t("toolBar.penMode")}
+                isMobile
+                penDetected={appState.penDetected}
+              />
+            )}
+        </div>
+      ) : null;
 
     const topEnd = (
-      <div className="layer-ui__top-end-zone">
+      <div
+        className={clsx("layer-ui__top-end-zone", {
+          "layer-ui__top-end-zone--overlay-sidebar-open":
+            isSidebarVisible && !isDockedSidebarVisible,
+        })}
+      >
         {topEndChrome}
         {propertyStack}
       </div>
@@ -478,11 +487,7 @@ const LayerUI = ({
     return (
       <CanvasUiLayout
         mode="desktop"
-        dockedSidebar={Boolean(
-          appState.openSidebar &&
-            isSidebarDocked &&
-            editorInterface.canFitSidebar,
-        )}
+        dockedSidebar={isDockedSidebarVisible}
         zones={{
           topStart,
           topCenter: null,
@@ -676,6 +681,7 @@ const LayerUI = ({
               renderWelcomeScreen={renderWelcomeScreen}
               defaultUIEnabled={defaultUIEnabled}
               zoomUIEnabled={zoomUIEnabled}
+              onLockToggle={onLockToggle}
             >
               {(footerZones) => renderDesktopLayout(footerZones)}
             </Footer>

@@ -22,30 +22,52 @@ import type { GeneratorKind } from "@excalidraw/element/types";
 const MODELS: Record<GeneratorKind, GeneratorModel[]> = {
   image: [
     {
-      id: "mock-image-v1",
-      label: "Mock Image v1",
+      id: "nano-banana-pro",
+      label: "Nano Banana Pro",
       kind: "image",
-      params: [
-        {
-          type: "select",
-          key: "size",
-          label: "Size",
-          options: [
-            { value: "512", label: "512" },
-            { value: "1024", label: "1024" },
-          ],
-          default: "512",
-        },
-        {
-          type: "number",
-          key: "steps",
-          label: "Steps",
-          min: 1,
-          max: 50,
-          step: 1,
-          default: 20,
-        },
-      ],
+      params: [],
+    },
+    {
+      id: "nano-banana-2",
+      label: "Nano Banana 2",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "nano-banana-2-lite",
+      label: "Nano Banana 2 Lite",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "gpt-image-2",
+      label: "GPT Image 2",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "gpt-image-1-5",
+      label: "GPT Image 1.5",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "seedream-5-pro",
+      label: "Seedream 5.0 Pro",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "luma-uni-1",
+      label: "Luma Uni-1",
+      kind: "image",
+      params: [],
+    },
+    {
+      id: "luma-uni-1-max",
+      label: "Luma Uni-1 Max",
+      kind: "image",
+      params: [],
     },
   ],
   audio: [
@@ -68,8 +90,50 @@ const MODELS: Record<GeneratorKind, GeneratorModel[]> = {
   ],
   video: [
     {
-      id: "mock-video-v1",
-      label: "Mock Video v1",
+      id: "seedance-2-5",
+      label: "Seedance 2.5",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "seedance-2-0",
+      label: "Seedance 2.0",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "seedance-2-0-fast",
+      label: "Seedance 2.0 Fast",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "seedance-2-0-mini",
+      label: "Seedance 2.0 Mini",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "kling-3",
+      label: "Kling 3.0",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "kling-3-omni",
+      label: "Kling 3.0 Omni",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "veo-3-1",
+      label: "Veo 3.1",
+      kind: "video",
+      params: [],
+    },
+    {
+      id: "veo-3-1-fast",
+      label: "Veo 3.1 Fast",
       kind: "video",
       params: [],
     },

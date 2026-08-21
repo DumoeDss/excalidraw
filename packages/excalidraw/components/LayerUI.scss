@@ -124,6 +124,17 @@
     block-size: 100%;
     max-block-size: 100%;
     pointer-events: none;
+    transform: translateX(4px);
+
+    &:dir(rtl) {
+      transform: translateX(-4px);
+    }
+
+    &--overlay-sidebar-open {
+      margin-inline-end: calc(
+        var(--right-sidebar-width) - var(--editor-container-padding)
+      );
+    }
   }
 
   .layer-ui__property-stack {

@@ -36,7 +36,8 @@
       }
 
       &--bottom {
-        bottom: calc(var(--editor-container-padding) + var(--sab));
+        bottom: max(6px, var(--sab));
+        align-items: end;
       }
     }
 

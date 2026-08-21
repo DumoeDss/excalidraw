@@ -5,8 +5,10 @@ import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { useApp } from "../App";
 import { HelpButton } from "../HelpButton";
+import { LockButton } from "../LockButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
+import { t } from "../../i18n";
 
 import type { ActionManager } from "../../actions/manager";
 import type { UIAppState } from "../../types";
@@ -24,6 +26,7 @@ const Footer = ({
   renderWelcomeScreen,
   defaultUIEnabled,
   zoomUIEnabled,
+  onLockToggle,
   children,
 }: {
   appState: UIAppState;
@@ -32,6 +35,7 @@ const Footer = ({
   renderWelcomeScreen: boolean;
   defaultUIEnabled: boolean;
   zoomUIEnabled: boolean;
+  onLockToggle: () => void;
   children: (zones: FooterZones) => React.ReactNode;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
@@ -50,23 +54,35 @@ const Footer = ({
             },
           )}
         >
-          <Stack.Col gap={2}>
+          <Stack.Row gap={1} align="center">
             <Section heading="canvasActions">
-              {zoomUIEnabled && app.isNavigationEnabled() && (
-                <ZoomActions renderAction={actionManager.renderAction} />
-              )}
+              <Stack.Row gap={1} align="center">
+                {defaultUIEnabled &&
+                  !appState.viewModeEnabled &&
+                  app.props.activeTool == null && (
+                    <LockButton
+                      checked={appState.activeTool.locked}
+                      onChange={onLockToggle}
+                      title={t("toolBar.lock")}
+                    />
+                  )}
 
-              {defaultUIEnabled && !appState.viewModeEnabled && (
-                <UndoRedoActions
-                  renderAction={actionManager.renderAction}
-                  className={clsx("zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom":
-                      appState.zenModeEnabled,
-                  })}
-                />
-              )}
+                {defaultUIEnabled && !appState.viewModeEnabled && (
+                  <UndoRedoActions
+                    renderAction={actionManager.renderAction}
+                    className={clsx("zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-bottom":
+                        appState.zenModeEnabled,
+                    })}
+                  />
+                )}
+
+                {zoomUIEnabled && app.isNavigationEnabled() && (
+                  <ZoomActions actionManager={actionManager} />
+                )}
+              </Stack.Row>
             </Section>
-          </Stack.Col>
+          </Stack.Row>
         </div>
       ) : null,
     bottomCenter: <FooterCenterTunnel.Out />,

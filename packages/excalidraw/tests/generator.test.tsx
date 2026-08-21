@@ -12,11 +12,33 @@ import * as restore from "../data/restore";
 
 import { API } from "./helpers/api";
 import { mockHTMLImageElement } from "./helpers/mocks";
-import { render, act, queryByTestId } from "./test-utils";
+import { render, act, fireEvent, queryByTestId, waitFor } from "./test-utils";
 
 const h = window.h;
 
 describe("generator nodes", () => {
+  it("lets the generator panel replace the selected-element properties", async () => {
+    const view = await render(
+      <Excalidraw
+        renderGeneratorPanel={() => <div data-testid="generator-panel" />}
+      />,
+    );
+    const rectangle = API.createElement({ type: "rectangle" });
+
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+    expect(
+      view.container.querySelector('[data-viewport-ui-name="stylesPanel"]'),
+    ).not.toBeNull();
+
+    act(() => h.app.createGeneratorNode("image"));
+
+    expect(queryByTestId(view.container, "generator-panel")).not.toBeNull();
+    expect(
+      view.container.querySelector('[data-viewport-ui-name="stylesPanel"]'),
+    ).toBeNull();
+  });
+
   describe("config helpers & guard", () => {
     it("newGeneratorConfig has idle defaults", () => {
       const config = newGeneratorConfig("image");
@@ -358,12 +380,18 @@ describe("generator nodes", () => {
         />,
       );
 
-      expect(
-        queryByTestId(container, "toolbar-image-generator"),
-      ).not.toBeNull();
-      expect(
-        queryByTestId(container, "toolbar-video-generator"),
-      ).not.toBeNull();
+      if (!queryByTestId(container, "toolbar-image-generator")) {
+        fireEvent.click(queryByTestId(container, "toolbar-overflow-trigger")!);
+      }
+
+      await waitFor(() => {
+        expect(
+          queryByTestId(container, "toolbar-image-generator"),
+        ).not.toBeNull();
+        expect(
+          queryByTestId(container, "toolbar-video-generator"),
+        ).not.toBeNull();
+      });
       // audio generation is disabled (no audio-generation backend)
       expect(queryByTestId(container, "toolbar-audio-generator")).toBeNull();
     });
