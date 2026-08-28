@@ -891,6 +891,14 @@ export interface ExcalidrawProps {
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
   /**
+   * Called before the editor processes an interactive canvas drop.
+   * Return `false` when the host handled or cancelled the drop to stop the
+   * editor's default drop path. Return `true` to continue default processing.
+   */
+  onDrop?: (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => boolean | Promise<boolean>;
+  /**
    * Called when element(s) are duplicated so you can listen or modify as
    * needed.
    *
