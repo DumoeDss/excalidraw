@@ -1163,9 +1163,11 @@ export type CanvasActions = Partial<{
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
-  tools: {
+  tools: Partial<{
     image: boolean;
-  };
+    video: boolean;
+    audio: boolean;
+  }>;
   /**
    * Optionally control the editor form factor and desktop UI mode from the host app.
    * If not provided, we will take care of it internally.

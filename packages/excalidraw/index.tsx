@@ -135,6 +135,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     },
     tools: {
       image: props.UIOptions?.tools?.image ?? true,
+      video: props.UIOptions?.tools?.video ?? true,
+      audio: props.UIOptions?.tools?.audio ?? true,
     },
   };
 
