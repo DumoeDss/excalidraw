@@ -14304,7 +14304,29 @@ class App extends React.Component<AppProps, AppState> {
       event,
       this.state,
     );
-    const dataTransferList = await parseDataTransferEvent(event);
+    const dataTransferListPromise = parseDataTransferEvent(event).catch(
+      (error) => {
+        console.error(error);
+        return null;
+      },
+    );
+    let shouldContinueDefault = true;
+
+    try {
+      shouldContinueDefault = (await this.props.onDrop?.(event)) ?? true;
+    } catch (error: any) {
+      console.error(error);
+      return;
+    }
+
+    if (shouldContinueDefault === false) {
+      return;
+    }
+
+    const dataTransferList = await dataTransferListPromise;
+    if (!dataTransferList) {
+      return;
+    }
 
     // must be retrieved first, in the same frame
     const fileItems = dataTransferList.getFiles();

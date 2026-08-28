@@ -1,5 +1,7 @@
 import { vi } from "vitest";
 
+import { KEYS, MIME_TYPES } from "@excalidraw/common";
+
 import {
   newAudioElement,
   newVideoElement,
@@ -9,13 +11,29 @@ import {
   shouldTestInside,
 } from "@excalidraw/element";
 
+import type { ExcalidrawVideoElement } from "@excalidraw/element/types";
+
+import { actionAddToLibrary } from "../actions/actionAddToLibrary";
+import { loadFromBlob, parseLibraryJSON } from "../data/blob";
+import { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
 import * as restore from "../data/restore";
 
 import { API } from "./helpers/api";
-import { render, act } from "./test-utils";
+import {
+  createNativeVideoFixture,
+  getNativeVideoMetadata,
+  getNativeVideoSnapshot,
+} from "./helpers/nativeVideo";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { act, render, waitFor } from "./test-utils";
 
 const h = window.h;
+
+const getVideo = (id: string) =>
+  h.app.scene
+    .getElementsIncludingDeleted()
+    .find((element) => element.id === id) as ExcalidrawVideoElement;
 
 describe("media elements (audio / video)", () => {
   describe("factories", () => {
@@ -122,6 +140,201 @@ describe("media elements (audio / video)", () => {
       const [restored] = restore.restoreElements([video], null);
       expect((restored as any).src).toBe(null);
       expect((restored as any).status).toBe("saved");
+    });
+  });
+
+  describe("native video lifecycle", () => {
+    let lifecyclePauseSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeAll(() => {
+      lifecyclePauseSpy = vi
+        .spyOn(window.HTMLMediaElement.prototype, "pause")
+        .mockImplementation(() => undefined);
+    });
+
+    afterAll(() => {
+      lifecyclePauseSpy.mockRestore();
+    });
+
+    it("creates, selects, moves, resizes, and deletes without losing metadata", async () => {
+      const video = createNativeVideoFixture();
+      const expectedMetadata = getNativeVideoMetadata(video);
+      const mouse = new Pointer("mouse");
+
+      await render(
+        <Excalidraw
+          initialData={{ elements: [video] }}
+          handleKeyboardGlobally
+        />,
+      );
+
+      mouse.select(video);
+      expect(API.getSelectedElement().id).toBe(video.id);
+      expect(getNativeVideoMetadata(getVideo(video.id))).toEqual(
+        expectedMetadata,
+      );
+
+      const beforeMove = getNativeVideoSnapshot(getVideo(video.id));
+      mouse.downAt(video.x + 40, video.y + 40);
+      mouse.moveTo(video.x + 80, video.y + 60);
+      mouse.upAt(video.x + 80, video.y + 60);
+      const moved = getVideo(video.id);
+      expect(moved.x).toBe(beforeMove.x + 40);
+      expect(moved.y).toBe(beforeMove.y + 20);
+      expect(getNativeVideoMetadata(moved)).toEqual(expectedMetadata);
+
+      const beforeResize = getNativeVideoSnapshot(moved);
+      UI.resize(moved, "se", [40, 20]);
+      const resized = getVideo(video.id);
+      expect(resized.width).not.toBe(beforeResize.width);
+      expect(resized.height).not.toBe(beforeResize.height);
+      expect(getNativeVideoMetadata(resized)).toEqual(expectedMetadata);
+
+      API.setSelectedElements([video]);
+      Keyboard.keyPress(KEYS.DELETE);
+      const deleted = getVideo(video.id);
+      expect(deleted.isDeleted).toBe(true);
+      expect(getNativeVideoMetadata(deleted)).toEqual(expectedMetadata);
+    });
+
+    it("preserves a deleted video through undo and redo", async () => {
+      const video = createNativeVideoFixture();
+      const original = getNativeVideoSnapshot(video);
+
+      await render(
+        <Excalidraw
+          initialData={{ elements: [video] }}
+          handleKeyboardGlobally
+        />,
+      );
+      API.setSelectedElements([video]);
+      Keyboard.keyPress(KEYS.DELETE);
+
+      await waitFor(() => expect(getVideo(video.id).isDeleted).toBe(true));
+      Keyboard.undo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual(original);
+      Keyboard.redo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual({
+        ...original,
+        isDeleted: true,
+      });
+    });
+
+    it("preserves a moved video through undo and redo", async () => {
+      const video = createNativeVideoFixture();
+      const original = getNativeVideoSnapshot(video);
+      const mouse = new Pointer("mouse");
+
+      await render(
+        <Excalidraw
+          initialData={{ elements: [video] }}
+          handleKeyboardGlobally
+        />,
+      );
+      mouse.downAt(video.x + 40, video.y + 40);
+      mouse.moveTo(video.x + 80, video.y + 60);
+      mouse.upAt(video.x + 80, video.y + 60);
+      const moved = getNativeVideoSnapshot(getVideo(video.id));
+      expect(moved.x).toBe(original.x + 40);
+      expect(moved.y).toBe(original.y + 20);
+
+      await waitFor(() => expect(API.getUndoStack()).toHaveLength(1));
+      Keyboard.undo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual(original);
+      Keyboard.redo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual(moved);
+    });
+
+    it("preserves a resized video through undo and redo", async () => {
+      const video = createNativeVideoFixture();
+      const original = getNativeVideoSnapshot(video);
+
+      await render(
+        <Excalidraw
+          initialData={{ elements: [video] }}
+          handleKeyboardGlobally
+        />,
+      );
+      UI.resize(video, "se", [40, 20]);
+      const resized = getNativeVideoSnapshot(getVideo(video.id));
+      expect(resized.width).not.toBe(original.width);
+      expect(resized.height).not.toBe(original.height);
+
+      Keyboard.undo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual(original);
+      Keyboard.redo();
+      expect(getNativeVideoSnapshot(getVideo(video.id))).toEqual(resized);
+    });
+
+    it("survives JSON serialization and the normal scene-loading path", async () => {
+      const video = createNativeVideoFixture();
+      await render(<Excalidraw />);
+      const serialized = serializeAsJSON([video], h.state, {}, "local");
+
+      const restoredScene = await loadFromBlob(
+        new Blob([serialized], { type: MIME_TYPES.excalidraw }),
+        h.state,
+        [],
+      );
+
+      expect(
+        getNativeVideoSnapshot(
+          restoredScene.elements[0] as ExcalidrawVideoElement,
+        ),
+      ).toEqual(getNativeVideoSnapshot(video));
+    });
+
+    it("survives library add, export, import, and instantiation", async () => {
+      const video = createNativeVideoFixture();
+      const expectedMetadata = getNativeVideoMetadata(video);
+
+      await render(<Excalidraw initialData={{ elements: [video] }} />);
+      API.setSelectedElements([video]);
+      API.executeAction(actionAddToLibrary);
+
+      await waitFor(async () => {
+        const libraryItems = await h.app.library.getLatestLibrary();
+        expect(libraryItems).toHaveLength(1);
+      });
+      const addedItems = await h.app.library.getLatestLibrary();
+      expect(
+        getNativeVideoMetadata(
+          addedItems[0].elements[0] as ExcalidrawVideoElement,
+        ),
+      ).toEqual(expectedMetadata);
+
+      const exported = serializeLibraryAsJSON(addedItems);
+      const parsed = parseLibraryJSON(exported);
+      expect(
+        getNativeVideoMetadata(parsed[0].elements[0] as ExcalidrawVideoElement),
+      ).toEqual(expectedMetadata);
+
+      await h.app.library.resetLibrary();
+      await h.app.library.updateLibrary({
+        libraryItems: new Blob([exported], {
+          type: MIME_TYPES.excalidrawlib,
+        }),
+      });
+      const importedItems = await h.app.library.getLatestLibrary();
+      expect(
+        getNativeVideoMetadata(
+          importedItems[0].elements[0] as ExcalidrawVideoElement,
+        ),
+      ).toEqual(expectedMetadata);
+
+      API.setElements([]);
+      await API.drop([
+        {
+          kind: "string",
+          value: serializeLibraryAsJSON(importedItems),
+          type: MIME_TYPES.excalidrawlib,
+        },
+      ]);
+
+      await waitFor(() => expect(h.elements).toHaveLength(1));
+      const instantiated = h.elements[0] as ExcalidrawVideoElement;
+      expect(instantiated.id).not.toBe(video.id);
+      expect(getNativeVideoMetadata(instantiated)).toEqual(expectedMetadata);
     });
   });
 
