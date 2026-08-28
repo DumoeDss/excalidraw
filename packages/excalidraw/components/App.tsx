@@ -14304,14 +14304,27 @@ class App extends React.Component<AppProps, AppState> {
       event,
       this.state,
     );
-    const dataTransferListPromise = parseDataTransferEvent(event);
-    const hostDropDecision = this.props.onDrop?.(event) ?? true;
-    const [dataTransferList, shouldContinueDefault] = await Promise.all([
-      dataTransferListPromise,
-      hostDropDecision,
-    ]);
+    const dataTransferListPromise = parseDataTransferEvent(event).catch(
+      (error) => {
+        console.error(error);
+        return null;
+      },
+    );
+    let shouldContinueDefault = true;
+
+    try {
+      shouldContinueDefault = (await this.props.onDrop?.(event)) ?? true;
+    } catch (error: any) {
+      console.error(error);
+      return;
+    }
 
     if (shouldContinueDefault === false) {
+      return;
+    }
+
+    const dataTransferList = await dataTransferListPromise;
+    if (!dataTransferList) {
       return;
     }
 

@@ -124,6 +124,97 @@ describe("host drop interception", () => {
     expect(await h.app.library.getLatestLibrary()).toEqual([]);
   });
 
+  it("fails closed when the host handler throws synchronously", async () => {
+    const error = new Error("host drop failed synchronously");
+    const onDrop = vi.fn(() => {
+      throw error;
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      await render(<Excalidraw onDrop={onDrop} />);
+      fireEvent(
+        GlobalTestState.interactiveCanvas,
+        createDropEvent([
+          createStringItem("https://www.youtube.com/watch?v=sync-error"),
+        ]),
+      );
+
+      await waitFor(() => expect(consoleErrorSpy).toHaveBeenCalledWith(error));
+      expect(onDrop).toHaveBeenCalledTimes(1);
+      expect(h.elements).toEqual([]);
+      expect(await h.app.library.getLatestLibrary()).toEqual([]);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+
+  it("fails closed when the host handler rejects asynchronously", async () => {
+    const error = new Error("host drop failed asynchronously");
+    let rejectDecision!: (reason: Error) => void;
+    const decision = new Promise<boolean>((_resolve, reject) => {
+      rejectDecision = reject;
+    });
+    const onDrop = vi.fn(() => decision);
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      await render(<Excalidraw onDrop={onDrop} />);
+      fireEvent(
+        GlobalTestState.interactiveCanvas,
+        createDropEvent([
+          createStringItem("https://www.youtube.com/watch?v=async-error"),
+        ]),
+      );
+
+      expect(onDrop).toHaveBeenCalledTimes(1);
+      expect(h.elements).toEqual([]);
+      rejectDecision(error);
+
+      await waitFor(() => expect(consoleErrorSpy).toHaveBeenCalledWith(error));
+      expect(h.elements).toEqual([]);
+      expect(await h.app.library.getLatestLibrary()).toEqual([]);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+
+  it("lets a false host decision win when drop parsing rejects", async () => {
+    const parseError = new Error("drop parsing failed");
+    const getAsFile = vi.fn(() => {
+      throw parseError;
+    });
+    const onDrop = vi.fn(() => false);
+    const onMediaUpload = vi.fn();
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      await render(
+        <Excalidraw onDrop={onDrop} onMediaUpload={onMediaUpload} />,
+      );
+      fireEvent(
+        GlobalTestState.interactiveCanvas,
+        createDropEvent([{ kind: "file", type: "video/mp4", getAsFile }]),
+      );
+
+      await waitFor(() =>
+        expect(consoleErrorSpy).toHaveBeenCalledWith(parseError),
+      );
+      expect(onDrop).toHaveBeenCalledTimes(1);
+      expect(getAsFile).toHaveBeenCalledTimes(1);
+      expect(onMediaUpload).not.toHaveBeenCalled();
+      expect(h.elements).toEqual([]);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+
   it("continues the existing default path when the host returns true", async () => {
     const link = "https://www.youtube.com/watch?v=allowed";
     const onDrop = vi.fn(() => true);
